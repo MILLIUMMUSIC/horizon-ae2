@@ -1,5 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-fn ae2_right_click(game: &mut crate::game::Game<'_>, pos: [i32; 3], canceled: &mut bool) {
+fn ae2_right_click(
+    game: &mut crate::game::Game<'_>,
+    pos: [i32; 3],
+    face: [i32; 3],
+    canceled: &mut bool,
+) {
+    if !*canceled && crate::game::ae2_wrench::rotate(game, pos, face) {
+        *canceled = true;
+        game.swing_arm();
+        return;
+    }
     if game
         .held()
         .is_some_and(|stack| crate::game::ae2_cable::Cable::from_item(&stack.item).is_some())

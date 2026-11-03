@@ -3,7 +3,34 @@
 Last updated: 3 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current Charger/Drive orientation checkpoint
+## Current wrench rotation checkpoint
+
+- Formatting, Clippy, 137 standalone Rust tests and 14 Python tooling tests pass.
+  Native check/build pass; 197 game tests and 17 native library tests pass.
+- Four new `ae2_orientation` tests pin the source rotation behaviour:
+  `Direction.getClockWise`/`getCounterClockWise` for each axis, four quarter
+  turns returning the original orientation, spin derivation from the rotated up
+  reference, and refusal of unknown directions/faces. These run in the
+  standalone suite and the native game and library test builds.
+- [Wrench rotation world scenario](docs/wrench-rotation-world-smoke.json): 15
+  checks with actual player clicks and explicit faces. Four up-face turns cycle
+  a Charger north/east/south/west/north with one swing each; two east-face turns
+  derive spin 2 through the X axis; a Drive turns without opening its menu; a
+  vanilla dispenser is untouched; the network tool and a non-wrench item do not
+  turn the Charger; an attached Crank turns north/east and refuses a side without
+  a crankable; the Charger's power and unknown NBT survive turns; rotated states
+  and the Charger data survive save/quit/relaunch.
+- Rotation is gated on the common `c:tools/wrench` item tag and excludes
+  `ae2:network_tool`, matching the source `ConventionTags.WRENCH` check and
+  `NetworkToolItem` special case. Shift mode does not rotate.
+- Limits: shift-disassembly, permissions/claims, the network tool UI, client-side
+  prediction and independent multiplayer are not covered. Only Charger, Drive and
+  Crank have native orientation strategies today. The adapter performs two
+  sequential property writes instead of the source single `setBlockAndUpdate`, and
+  refused/vanilla fallthrough click swings are not compared. These classes remain
+  partial.
+
+## Charger/Drive orientation checkpoint (previous)
 
 - Formatting, Clippy, 133 standalone Rust tests and 14 Python tooling tests pass.
   Native check/build pass; 193 game tests and 17 native library tests pass.
@@ -289,6 +316,7 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 | [charger-inventory-charging-regression.json](docs/charger-inventory-charging-regression.json) | PASS | checks: 7 |
 | [charger-inventory-world-smoke.json](docs/charger-inventory-world-smoke.json) | PASS | checks: 5 |
 | [charger-orientation-world-smoke.json](docs/charger-orientation-world-smoke.json) | PASS | 6 player placements; 24 bound models |
+| [wrench-rotation-world-smoke.json](docs/wrench-rotation-world-smoke.json) | PASS | 15 player turns and refusal checks |
 | [charger-oracle.json](docs/charger-oracle.json) | PASS | cases: 2,000; operations: 200,000 |
 | [component-sync-charging-world.json](docs/component-sync-charging-world.json) | PASS | checks: 7 |
 | [component-sync-drive-gui.json](docs/component-sync-drive-gui.json) | PASS | See report scope and limits |

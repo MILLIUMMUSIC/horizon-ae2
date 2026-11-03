@@ -80,21 +80,40 @@ fn write_crank(be: &mut ModBlockEntity, crank: Crank) {
     be.data = vec![crank.rotation, crank.charge, crank.hits as i32];
 }
 
-fn facing(game: &Game<'_>, pos: Pos) -> Pos {
-    match game.native_block_property(pos, "facing").as_deref() {
-        Some("down") => [0, -1, 0],
-        Some("up") => [0, 1, 0],
-        Some("south") => [0, 0, 1],
-        Some("west") => [-1, 0, 0],
-        Some("east") => [1, 0, 0],
+fn direction(name: &str) -> Pos {
+    match name {
+        "down" => [0, -1, 0],
+        "up" => [0, 1, 0],
+        "south" => [0, 0, 1],
+        "west" => [-1, 0, 0],
+        "east" => [1, 0, 0],
         _ => [0, 0, -1],
     }
 }
 
-fn crank_target(game: &Game<'_>, pos: Pos) -> Option<Pos> {
-    let dir = facing(game, pos);
+fn facing(game: &Game<'_>, pos: Pos) -> Pos {
+    direction(
+        game.native_block_property(pos, "facing")
+            .as_deref()
+            .unwrap_or_default(),
+    )
+}
+
+/// The crank's attached crankable on `facing`: only the Charger is ported, and
+/// the source requires it to point back at the crank. Shared with wrench turns.
+pub(super) fn crankable_attached(game: &Game<'_>, pos: Pos, facing: &str) -> Option<Pos> {
+    let dir = direction(facing);
     let target = std::array::from_fn(|i| pos[i] - dir[i]);
-    (game.native_block(target) == CHARGER && facing(game, target) != dir).then_some(target)
+    (game.native_block(target) == CHARGER
+        && game.native_block_property(target, "facing").as_deref() != Some(facing))
+    .then_some(target)
+}
+
+fn crank_target(game: &Game<'_>, pos: Pos) -> Option<Pos> {
+    let face = game
+        .native_block_property(pos, "facing")
+        .unwrap_or_default();
+    crankable_attached(game, pos, &face)
 }
 
 pub(super) fn ingredient_json(value: &serde_json::Value) -> Option<serde_json::Value> {

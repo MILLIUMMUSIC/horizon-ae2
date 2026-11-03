@@ -81,8 +81,13 @@ Prepared blockstates must use Horizon's x/y/z composition, not the source-only
 ae2:z key; tools/block_orientation.py derives the equivalent triples from the
 original BlockOrientation table. Server placement applies the source
 FacingWithSpinStrategy (65-degree pitch thresholds and SpinMapping). Client
-prediction still starts from the engine template state, and wrench
-rotation/disassembly remains an unported tool path.
+prediction still starts from the engine template state. The Certus Quartz
+Wrench turns supported oriented hosts through the `c:tools/wrench` common tag,
+excluding `ae2:network_tool`, using the source Direction.getClockWise rotation
+and spin derivation. Never rotate vanilla blocks; a crank turn is refused unless
+the new attached side is a crankable, and shift mode must not rotate. Disassembly,
+permissions/claims and the network tool UI remain unported; do not present this
+as the complete WrenchHook.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.

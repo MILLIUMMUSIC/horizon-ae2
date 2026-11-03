@@ -21,7 +21,7 @@ The full mod is not yet complete.
 | Controller | 8,000 public AE, 3 AE/tick idle, source flags and structures, channel supply, 18 state/type models and world conflict/restart checks | Status menu, power funnel, immediate source event/readiness/shape ordering and spatial lifecycle |
 | Energy cells | Network storage, original energy/node NBT, finite fullness states/models and local comparator, deferred notifications | Exact TickManager/base settings, material/lifecycle completeness and every saved-BE/explosion/pick/loot path |
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
-| Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator and full-orientation placement | Live config, capability API, exact render geometry/effects/drop RNG, wrench rotation/disassembly and complete lifecycle |
+| Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator, full-orientation placement and wrench turns | Live config, capability API, exact render geometry/effects/drop RNG, wrench disassembly and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
@@ -280,10 +280,19 @@ state to the source `FacingWithSpinStrategy` orientation, including the 65-degre
 pitch thresholds and the `SpinMapping` up reference.
 
 The client's local placement prediction still starts from the engine's template
-state until the server block update. Wrench rotation/disassembly, complete
-Charger/Drive menu and model composition, the crank's own orientation states,
-external multiplayer and the template's inherited redstone behaviour remain
-open.
+state until the server block update. The Certus Quartz Wrench turns supported
+oriented hosts around the clicked face through the common `c:tools/wrench` tag,
+excluding `ae2:network_tool`, using the pinned `Direction.getClockWise` rotation
+and the source spin derivation. A turn that would not change the state falls
+through to the block's own use, matching `newState != state`; a crank turn is
+refused unless the new attached side is a crankable. The wrapped world check
+covers four up-face turns, two X-axis turns incl. spin derivation, a Drive turn
+without its menu, refused vanilla/network-tool/non-wrench clicks, crank survival,
+block-entity data retention and restart. Shift-disassembly, permissions/claims,
+the network tool UI, complete Charger/Drive menu and model composition, the
+crank's own facing states and external multiplayer remain open. The native
+adapter performs two sequential property writes rather than the source single
+`setBlockAndUpdate`.
 
 ## Native networking, recipes, and platform limits
 

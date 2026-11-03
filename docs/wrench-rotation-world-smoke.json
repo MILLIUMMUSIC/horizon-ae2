@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "checks": [
+    "charger four clockwise up-face turns north->east->south->west->north with one swing per successful turn",
+    "charger east-face turns north->down and down->south spin 2 (source X-axis turn and spin derivation)",
+    "drive up-face turn north->east, with no Drive menu opened",
+    "vanilla dispenser unchanged (no AE2 orientation strategy)",
+    "network tool in the wrench tag does not rotate the charger",
+    "non-wrench item does not rotate the charger",
+    "attached crank turns north->east; a turn without a crankable on the new side is refused",
+    "charger internalCurrentPower and unknown NBT survive turns",
+    "rotated states and charger data survive save, quit and relaunch"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/wrench-rotation-u7rqqx_v",
+  "limits": [
+    "Shift-disassembly, permissions/claims, the network tool UI and external multiplayer remain unported",
+    "Only Charger, Drive and Crank carry native orientation strategies today",
+    "Rotation is server-authoritative; client prediction and vanilla fallthrough swings are not compared",
+    "Two sequential property writes stand in for the source single setBlockAndUpdate"
+  ]
+}

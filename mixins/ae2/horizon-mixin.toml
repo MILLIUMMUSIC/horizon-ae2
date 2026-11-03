@@ -546,6 +546,12 @@ name = "ae2_orientation"
 source = "orientation.rs"
 
 [[module]]
+id = "wrench"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_wrench"
+source = "wrench.rs"
+
+[[module]]
 id = "charger-orientation"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_charger_orientation"
@@ -628,6 +634,7 @@ helper = "right_click.rs"
 bindings = [
   { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
   { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "face", ty = "[i32; 3]", value = "face" },
   { name = "canceled", ty = "&mut bool", value = "&mut *canceled" },
 ]
 

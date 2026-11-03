@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-// Original appeng.block.orientation.SpinMapping and FacingWithSpinStrategy
-// placement rules for fully orientable AE2 blocks (Charger, Drive). The native
-// blockstate tables expose the source `facing` and `spin` properties; this
-// module only decides which orientation a placement context produces.
+// Original appeng.block.orientation.SpinMapping, FacingWithSpinStrategy and
+// BlockOrientation rotation rules. The native blockstate tables expose the
+// source `facing` and `spin` properties; this module decides which orientation
+// a placement context produces and how the Certus Quartz Wrench turns one.
 
 /// Direction order used by Minecraft's `Direction` enum.
 pub const DIRECTIONS: [&str; 6] = ["down", "up", "north", "south", "west", "east"];
@@ -81,6 +81,73 @@ pub fn placement(yaw: f32, pitch: f32) -> (&'static str, u8) {
     (facing, spin_from_up(facing, up))
 }
 
+fn step(direction: &str) -> Option<[i32; 3]> {
+    Some(match direction {
+        "down" => [0, -1, 0],
+        "up" => [0, 1, 0],
+        "north" => [0, 0, -1],
+        "south" => [0, 0, 1],
+        "west" => [-1, 0, 0],
+        "east" => [1, 0, 0],
+        _ => return None,
+    })
+}
+
+fn from_step(step: [i32; 3]) -> Option<&'static str> {
+    Some(match step {
+        [0, -1, 0] => "down",
+        [0, 1, 0] => "up",
+        [0, 0, -1] => "north",
+        [0, 0, 1] => "south",
+        [-1, 0, 0] => "west",
+        [1, 0, 0] => "east",
+        _ => return None,
+    })
+}
+
+/// One clockwise quarter turn around the clicked face's axis, as
+/// `Direction.getClockWise(Axis)`:
+/// X: `(x, z, -y)`, Y: `(-z, y, x)`, Z: `(y, -x, z)`.
+fn clockwise(step: [i32; 3], axis: usize) -> [i32; 3] {
+    let [x, y, z] = step;
+    match axis {
+        0 => [x, z, -y],
+        1 => [-z, y, x],
+        _ => [y, -x, z],
+    }
+}
+
+/// `BlockOrientation.rotateClockwiseAround(clickedFace)`: the clicked face's
+/// axis direction selects clockwise or counter-clockwise.
+pub fn rotated(direction: &str, clicked: &str) -> Option<&'static str> {
+    let (axis, positive) = match clicked {
+        "east" => (0, true),
+        "west" => (0, false),
+        "up" => (1, true),
+        "down" => (1, false),
+        "south" => (2, true),
+        "north" => (2, false),
+        _ => return None,
+    };
+    let mut step = step(direction)?;
+    let turns = if positive { 1 } else { 3 };
+    for _ in 0..turns {
+        step = clockwise(step, axis);
+    }
+    from_step(step)
+}
+
+/// `BlockOrientation.rotateClockwiseAround` for a full orientation: rotate the
+/// facing and its up reference, then derive the spin. A degenerate up
+/// reference falls back to spin 0, as `BlockOrientation.get(facing, top)` does.
+pub fn rotate_full(facing: &str, spin: u8, clicked: &str) -> Option<(&'static str, u8)> {
+    ordinal(facing)?;
+    let up = up_from_spin(facing, spin);
+    let new_facing = rotated(facing, clicked)?;
+    let new_up = rotated(up, clicked)?;
+    Some((new_facing, spin_from_up(new_facing, new_up)))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -125,5 +192,73 @@ mod tests {
     fn degenerate_up_direction_falls_back_to_no_spin() {
         assert_eq!(spin_from_up("north", "north"), 0);
         assert_eq!(spin_from_up("unknown", "up"), 0);
+    }
+
+    #[test]
+    fn clockwise_axis_rotations_match_minecraft_direction() {
+        // Direction.getClockWise(Axis) from the pinned 1.21.1 client.
+        assert_eq!(rotated("north", "up"), Some("east"));
+        assert_eq!(rotated("east", "up"), Some("south"));
+        assert_eq!(rotated("south", "up"), Some("west"));
+        assert_eq!(rotated("west", "up"), Some("north"));
+        assert_eq!(rotated("up", "up"), Some("up"));
+        assert_eq!(rotated("down", "up"), Some("down"));
+        assert_eq!(rotated("down", "east"), Some("south"));
+        assert_eq!(rotated("up", "east"), Some("north"));
+        assert_eq!(rotated("north", "east"), Some("down"));
+        assert_eq!(rotated("south", "east"), Some("up"));
+        assert_eq!(rotated("down", "south"), Some("west"));
+        assert_eq!(rotated("up", "south"), Some("east"));
+        assert_eq!(rotated("west", "south"), Some("up"));
+        assert_eq!(rotated("east", "south"), Some("down"));
+        // The negative axis directions are the inverse quarter turns.
+        assert_eq!(rotated("north", "down"), Some("west"));
+        assert_eq!(rotated("down", "down"), Some("down"));
+        assert_eq!(rotated("down", "up"), Some("down"));
+        assert_eq!(rotated("down", "west"), Some("north"));
+        assert_eq!(rotated("north", "north"), Some("north"));
+    }
+
+    #[test]
+    fn four_clicks_around_an_axis_return_the_orientation() {
+        for direction in DIRECTIONS {
+            for clicked in DIRECTIONS {
+                let mut current = direction;
+                for _ in 0..4 {
+                    current = rotated(current, clicked).unwrap();
+                }
+                assert_eq!(current, direction, "{direction} around {clicked}");
+            }
+        }
+        for clicked in DIRECTIONS {
+            let mut orientation = ("north", 0);
+            for _ in 0..4 {
+                orientation = rotate_full(orientation.0, orientation.1, clicked).unwrap();
+            }
+            assert_eq!(
+                orientation,
+                ("north", 0),
+                "full orientation around {clicked}"
+            );
+        }
+    }
+
+    #[test]
+    fn full_orientation_rotation_derives_the_source_spin() {
+        assert_eq!(rotate_full("north", 0, "up"), Some(("east", 0)));
+        assert_eq!(rotate_full("north", 0, "east"), Some(("down", 0)));
+        assert_eq!(rotate_full("north", 0, "south"), Some(("north", 3)));
+        assert_eq!(rotate_full("north", 0, "west"), Some(("up", 2)));
+        // Rotating around X turns a down-facing block south while rotating
+        // its up reference onto the vertical axis.
+        assert_eq!(rotate_full("down", 0, "east"), Some(("south", 2)));
+        assert_eq!(rotate_full("down", 1, "east"), Some(("south", 3)));
+    }
+
+    #[test]
+    fn unknown_directions_and_faces_are_refused() {
+        assert_eq!(rotated("north", "sideways"), None);
+        assert_eq!(rotated("sideways", "up"), None);
+        assert_eq!(rotate_full("sideways", 0, "up"), None);
     }
 }

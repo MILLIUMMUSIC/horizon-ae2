@@ -48,7 +48,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Energy storage and grid energy service | `energy.rs`, `power.rs`: finite/creative stores, provider priorities, local buffers, drain and merge/split rules |
 | Storage providers, mounts and network storage service | `mounts.rs`, `service.rs`, `drive.rs`: mounting, priorities, public/private storage and provider changes |
 | Charger and Wooden Crank | `charger.rs`, `glue.rs`, `charger_inventory.rs`: recipe work, crank rules, local/grid power and original inventory persistence; complete crank placement/animation remains open |
-| Charger/Drive orientation | `block_states.rs`, `orientation.rs`, `block_orientation.py`: 24 source facing/spin states, effective blockstate rotations and source placement; client prediction and wrench rotation remain open |
+| Charger/Drive orientation and wrench turns | `block_states.rs`, `orientation.rs`, `wrench.rs`, `block_orientation.py`: 24 source facing/spin states, effective blockstate rotations, source placement and Certus Quartz Wrench turns; client prediction, disassembly and permissions remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
