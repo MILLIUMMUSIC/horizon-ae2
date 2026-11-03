@@ -11,7 +11,9 @@ centers** are ported in part and checked in isolated game worlds. Cable items su
 survival drops, names, waterlogging/buckets and persistent ownership. The current input layer adds
 the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
 placement also has client prediction, source interaction results and server correction.
-Adventure item use evaluates the actual hand and original block/state/NBT predicates.
+Charger and Drive use the source 24-state facing/spin orientation, including source player
+placement thresholds and effective structure rotation. Adventure item use evaluates the actual
+hand and original block/state/NBT predicates.
 Adventure-mode rework is suspended for now: that validated behavior stays in place, while its
 remaining cache, block-entity codec and permission work is deferred.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
@@ -25,7 +27,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 1. Toolchain and delivery | Pinned sources, original content preparation, native builds and deterministic packages | Launcher installation/rebuild verification and release workflow |
 | 2. Keys, cells and persistence | Component-aware item/fluid keys; all 23 built-in basic, portable, creative and tool cell profiles; Drive backends | Complete registry recovery, Cell Workbench, config writers and upgrade lifecycle |
 | 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers, item placement/drop and waterlogging | Complete part interactions, side parts/facades, full source events, collision and lighting paths |
-| 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power | Energy Acceptor, Inscriber, Vibration Chamber, external power capabilities and complete machine behavior |
+| 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power, source Charger/Drive orientation | Energy Acceptor, Inscriber, Vibration Chamber, external power capabilities and complete machine behavior |
 | 5. Storage and terminals | Ten-slot Drive, cell mounting, priorities in the storage core, filtered screen and automation | Terminals, ME Chest, storage buses, priority UI and complete storage interactions |
 | 6. Autocrafting | Pending | Patterns, providers, assemblers, crafting CPUs, planning and job lifecycle |
 | 7. Other network services | Pending | P2P, quantum links, wireless, security, spatial I/O and buses |
@@ -46,6 +48,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Energy storage and grid energy service | `energy.rs`, `power.rs`: finite/creative stores, provider priorities, local buffers, drain and merge/split rules |
 | Storage providers, mounts and network storage service | `mounts.rs`, `service.rs`, `drive.rs`: mounting, priorities, public/private storage and provider changes |
 | Charger and Wooden Crank | `charger.rs`, `glue.rs`, `charger_inventory.rs`: recipe work, crank rules, local/grid power and original inventory persistence; complete crank placement/animation remains open |
+| Charger/Drive orientation | `block_states.rs`, `orientation.rs`, `block_orientation.py`: 24 source facing/spin states, effective blockstate rotations and source placement; client prediction and wrench rotation remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
@@ -88,6 +91,7 @@ mixins/ae2/
                         cable placement, drops, waterlogging and player ownership
   cable_view.rs, cable_sync.rs
                         native cable rendering, shapes and client state
+  orientation.rs       source Charger/Drive facing+spin placement rules
   *.rs                  menu policies, item views and small injection helpers
 src/lib.rs              engine-independent rules as a library for cargo test
 examples/               Rust drivers for Java differential comparisons
@@ -96,6 +100,7 @@ tools/
   prepare_content.py    prepare the content mod from your AE2 jar
   horizon.py            export pinned Horizon, apply the bundle, check/test/build
   package.py            produce the source-only .hnmod
+  block_orientation.py  source BlockOrientation -> Horizon blockstate rotations
   smoke_*.py            isolated native game scenarios
   *_oracle.py           differential checks against pinned Java behavior
 docs/                   full plan, parity boundaries, inventory and evidence

@@ -36,17 +36,12 @@ pub(super) fn build(
     let _guard = BuildGuard;
     let result = (|| {
         for (kind, block) in &declarations {
-            let template = if *kind == Definition::CableBus {
-                "minecraft:glass"
-            } else {
-                "minecraft:iron_block"
-            };
-            if block.template != template
+            if block.template != kind.template()
                 || block.shapes.is_some()
                 || !block.default_state.is_empty()
             {
                 return Err(format!(
-                    "AE2 state adapter requires its pinned single-row template: {}",
+                    "AE2 state adapter requires its pinned template: {}",
                     block.id
                 )
                 .into());
@@ -65,6 +60,11 @@ pub(super) fn build(
     core::ops::ControlFlow::Break(result)
 }
 
+/// Fully orientable source blocks: `facing` (6) and `spin` (0..3), with the
+/// source default facing north and spin 0. Native rows are ordered facing
+/// major and spin minor so the engine's cartesian state table accepts them.
+const ORIENTED_FACINGS: [&str; 6] = ["north", "east", "south", "west", "up", "down"];
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Definition {
     Controller,
@@ -72,6 +72,8 @@ enum Definition {
     EnergyCell,
     DenseEnergyCell,
     CreativeEnergyCell,
+    Charger,
+    Drive,
 }
 impl Definition {
     fn from_block(id: &str) -> Option<Self> {
@@ -81,6 +83,8 @@ impl Definition {
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
+            "ae2:charger" => Some(Self::Charger),
+            "ae2:drive" => Some(Self::Drive),
             _ => None,
         }
     }
@@ -91,6 +95,15 @@ impl Definition {
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
+            Self::Charger => "ae2:charger",
+            Self::Drive => "ae2:drive",
+        }
+    }
+    fn template(self) -> &'static str {
+        match self {
+            Self::CableBus => "minecraft:glass",
+            Self::Charger | Self::Drive => "minecraft:dispenser",
+            _ => "minecraft:iron_block",
         }
     }
     fn variants(self) -> usize {
@@ -98,8 +111,38 @@ impl Definition {
             Self::Controller => ae2_controller::VARIANTS,
             Self::CableBus => 32,
             Self::CreativeEnergyCell => 1,
+            Self::Charger | Self::Drive => 24,
             _ => 5,
         }
+    }
+    /// Rows the pinned template initially contributes for this block.
+    fn source_rows(self) -> usize {
+        match self {
+            Self::Charger | Self::Drive => 12,
+            _ => 1,
+        }
+    }
+    /// The template row copied for native row `index`. Oriented blocks keep
+    /// the facing-dependent template values and use its untriggered row.
+    fn source_index(self, index: usize) -> usize {
+        match self {
+            // The dispenser template orders (north, east, south, west, up,
+            // down) with its untriggered row second; the native order streams
+            // the same facings with spin varying fastest.
+            Self::Charger | Self::Drive => (index / 4) * 2 + 1,
+            _ => 0,
+        }
+    }
+    /// The native row replacing a template row. Both triggered template rows
+    /// collapse onto the same spin-zero orientation.
+    fn old_to_new(self, old: usize) -> usize {
+        match self {
+            Self::Charger | Self::Drive => old / 2 * 4,
+            _ => 0,
+        }
+    }
+    fn oriented(self) -> bool {
+        matches!(self, Self::Charger | Self::Drive)
     }
     fn properties(self, index: usize) -> Value {
         match self {
@@ -108,6 +151,10 @@ impl Definition {
                 json!({"light_level":(index/2).to_string(),"waterlogged":(index%2==1).to_string()})
             }
             Self::CreativeEnergyCell => json!({}),
+            Self::Charger | Self::Drive => json!({
+                "facing": ORIENTED_FACINGS[index / 4],
+                "spin": (index % 4).to_string(),
+            }),
             _ => json!({"fullness": index.to_string()}),
         }
     }
@@ -120,6 +167,10 @@ impl Definition {
             Self::CableBus => {
                 json!({"light_level":{"integer":[0,15]},"waterlogged":{"named":["false","true"]}})
             }
+            Self::Charger | Self::Drive => json!({
+                "facing":{"named":ORIENTED_FACINGS},
+                "spin":{"integer":[0,3]},
+            }),
             _ => json!({"fullness":{"integer":[0,4]}}),
         }
     }
@@ -137,6 +188,9 @@ impl Definition {
                 ],
                 ["waterlogged", ["false", "true"]]
             ]),
+            Self::Charger | Self::Drive => {
+                json!([["facing", ORIENTED_FACINGS], ["spin", ["0", "1", "2", "3"]]])
+            }
             _ => json!([["fullness", ["0", "1", "2", "3", "4"]]]),
         }
     }
@@ -150,13 +204,19 @@ struct Layout {
 }
 impl Layout {
     fn extra(self) -> usize {
-        self.kind.variants() - 1
+        self.kind.variants() - self.kind.source_rows()
+    }
+    fn replaced(self) -> core::ops::Range<usize> {
+        self.first..self.first + self.kind.source_rows()
     }
     fn id(self, old: u64) -> u64 {
-        if old > self.first as u64 && old < self.old_len as u64 {
-            old + self.extra() as u64
+        let old = old as usize;
+        if self.replaced().contains(&old) {
+            (self.first + self.kind.old_to_new(old - self.first)) as u64
+        } else if old >= self.replaced().end && old < self.old_len {
+            (old + self.extra()) as u64
         } else {
-            old
+            old as u64
         }
     }
     fn remap(self, value: &mut Value) {
@@ -179,6 +239,11 @@ impl Layout {
             _ => {}
         }
     }
+    fn replacement(self, rows: &[Value]) -> Vec<Value> {
+        (0..self.kind.variants())
+            .map(|i| rows[self.first + self.kind.source_index(i)].clone())
+            .collect()
+    }
     fn rows(self, value: &mut Value) -> Result<()> {
         let rows = value
             .as_array_mut()
@@ -186,11 +251,8 @@ impl Layout {
         if rows.len() != self.old_len {
             return Err("AE2 state table lengths disagree".into());
         }
-        let original = rows[self.first].clone();
-        rows.splice(
-            self.first..=self.first,
-            std::iter::repeat_n(original, self.kind.variants()),
-        );
+        let replacement = self.replacement(rows);
+        rows.splice(self.replaced(), replacement);
         Ok(())
     }
 }
@@ -198,6 +260,61 @@ impl Layout {
 fn properties(index: usize) -> Value {
     json!({"state": ae2_controller::STATES[index / ae2_controller::TYPES.len()],
            "type": ae2_controller::TYPES[index % ae2_controller::TYPES.len()]})
+}
+fn facing_index(face: &str) -> usize {
+    ORIENTED_FACINGS
+        .iter()
+        .position(|f| *f == face)
+        .unwrap_or(0)
+}
+/// Fixed structure rotation turns the facing only; the source block inherits
+/// vanilla's `DirectionProperty` rotation and its integer spin does not move.
+fn rotated(index: usize, turns: usize) -> usize {
+    let face = ORIENTED_FACINGS[index / 4];
+    let face = match turns % 4 {
+        1 => match face {
+            "north" => "east",
+            "east" => "south",
+            "south" => "west",
+            "west" => "north",
+            other => other,
+        },
+        2 => match face {
+            "north" => "south",
+            "south" => "north",
+            "east" => "west",
+            "west" => "east",
+            other => other,
+        },
+        3 => match face {
+            "north" => "west",
+            "west" => "south",
+            "south" => "east",
+            "east" => "north",
+            other => other,
+        },
+        _ => face,
+    };
+    facing_index(face) * 4 + index % 4
+}
+/// The two vanilla structure mirrors: front/back flips north/south, left/right
+/// flips east/west; vertical facings and the spin stay.
+fn mirrored(index: usize, front_back: bool) -> usize {
+    let face = ORIENTED_FACINGS[index / 4];
+    let face = if front_back {
+        match face {
+            "north" => "south",
+            "south" => "north",
+            other => other,
+        }
+    } else {
+        match face {
+            "east" => "west",
+            "west" => "east",
+            other => other,
+        }
+    };
+    facing_index(face) * 4 + index % 4
 }
 fn read_json(root: &Path, name: &str) -> Result<Value> {
     Ok(serde_json::from_slice(&owned(root, name)?)?)
@@ -221,8 +338,13 @@ fn expand(root: &Path, definitions: &[Definition]) -> Result<()> {
             .filter(|(_, r)| r[0].as_str() == Some(kind.block()))
             .map(|(i, _)| i)
             .collect();
-        if matches.len() != 1 {
-            return Err(format!("expected one initial state: {}", kind.block()).into());
+        if matches.len() != kind.source_rows() {
+            return Err(format!(
+                "expected {} initial states: {}",
+                kind.source_rows(),
+                kind.block()
+            )
+            .into());
         }
         initial.push((matches[0], kind));
     }
@@ -310,6 +432,10 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 }
             }
             layout.remap(&mut doc["defaults"]);
+            if layout.kind.oriented() {
+                // Source default: facing north, spin 0.
+                doc["defaults"][layout.kind.block()] = json!(layout.first);
+            }
         }
         "gameplay-facts.json" => {
             layout.rows(&mut doc["states"])?;
@@ -396,6 +522,9 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             layout.remap(doc);
             doc[layout.kind.block()]["states"] =
                 json!((layout.first..layout.first + layout.kind.variants()).collect::<Vec<_>>());
+            if layout.kind.oriented() {
+                doc[layout.kind.block()]["default"] = json!(layout.first);
+            }
         }
         "command-registries.json" => {
             doc["blocks"][layout.kind.block()] = layout.kind.commands();
@@ -404,13 +533,35 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             for key in ["rotate", "mirror"] {
                 layout.remap(&mut doc[key]);
                 layout.rows(&mut doc[key])?;
-                for i in 0..layout.kind.variants() {
-                    let row = doc[key][layout.first + i]
-                        .as_array_mut()
-                        .ok_or("no structure rotation row")?;
-                    for id in row {
-                        *id = json!(layout.first + i);
-                    } // Source orientation strategy is NONE.
+                if layout.kind.oriented() {
+                    let turns = if key == "rotate" { 3 } else { 2 };
+                    for i in 0..layout.kind.variants() {
+                        let row = doc[key][layout.first + i]
+                            .as_array_mut()
+                            .ok_or("no structure rotation row")?;
+                        if row.len() != turns {
+                            return Err("structure rotation row length".into());
+                        }
+                        for (n, id) in row.iter_mut().enumerate() {
+                            *id = json!(
+                                layout.first
+                                    + if key == "rotate" {
+                                        rotated(i, n + 1)
+                                    } else {
+                                        mirrored(i, n == 0)
+                                    }
+                            );
+                        }
+                    }
+                } else {
+                    for i in 0..layout.kind.variants() {
+                        let row = doc[key][layout.first + i]
+                            .as_array_mut()
+                            .ok_or("no structure rotation row")?;
+                        for id in row {
+                            *id = json!(layout.first + i);
+                        } // Source orientation strategy is NONE.
+                    }
                 }
             }
             layout.rows(&mut doc["full_block"])?;
@@ -444,11 +595,10 @@ fn rewrite_nbt(layout: Layout, tag: &mut Tag) -> Result<usize> {
         match (key.to_string_lossy().as_str(), value) {
             ("states", Tag::List(rows)) if rows.len() == layout.old_len => {
                 changed += 1;
-                let original = rows[layout.first].clone();
-                rows.splice(
-                    layout.first..=layout.first,
-                    std::iter::repeat_n(original, layout.kind.variants()),
-                );
+                let replacement: Vec<Tag> = (0..layout.kind.variants())
+                    .map(|i| rows[layout.first + layout.kind.source_index(i)].clone())
+                    .collect();
+                rows.splice(layout.replaced(), replacement);
                 for (i, row) in rows[layout.first..layout.first + layout.kind.variants()]
                     .iter_mut()
                     .enumerate()
@@ -476,11 +626,12 @@ fn rewrite_nbt(layout: Layout, tag: &mut Tag) -> Result<usize> {
             }
             ("cached_shapes", Tag::IntArray(rows)) if rows.len() == layout.old_len => {
                 changed += 1;
-                let original = cable_shape.unwrap_or(rows[layout.first]);
-                rows.splice(
-                    layout.first..=layout.first,
-                    std::iter::repeat_n(original, layout.kind.variants()),
-                );
+                let replacement: Vec<i32> = (0..layout.kind.variants())
+                    .map(|i| {
+                        cable_shape.unwrap_or(rows[layout.first + layout.kind.source_index(i)])
+                    })
+                    .collect();
+                rows.splice(layout.replaced(), replacement);
             }
             (_, inner @ Tag::Compound(_)) => changed += rewrite_nbt(layout, inner)?,
             _ => {}
@@ -522,10 +673,24 @@ mod tests {
     }
 
     fn content(root: &Path, id: &str, declarations: &[(&str, Value)]) -> ContentMod {
+        content_assets(root, id, declarations, &[])
+    }
+
+    fn content_assets(
+        root: &Path,
+        id: &str,
+        declarations: &[(&str, Value)],
+        assets: &[(&str, Value)],
+    ) -> ContentMod {
         fs::create_dir_all(root).unwrap();
         fs::write(root.join("horizon-mod.toml"), format!("id=\"{id}\"\nname=\"Test\"\nversion=\"0.1.0\"\napi=\"0.2\"\nside=\"both\"\ncapabilities=[\"registries\"]\n")).unwrap();
         for (block, data) in declarations {
             let path = root.join(format!("data/{id}/horizon/block/{block}.json"));
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, serde_json::to_vec(data).unwrap()).unwrap();
+        }
+        for (relative, data) in assets {
+            let path = root.join(relative);
             fs::create_dir_all(path.parent().unwrap()).unwrap();
             fs::write(path, serde_json::to_vec(data).unwrap()).unwrap();
         }
@@ -776,5 +941,151 @@ mod tests {
                 .all(|(i, row)| row[4]["properties"] == Definition::EnergyCell.properties(i))
         );
         crate::assets::Assets::load(&out).unwrap();
+    }
+
+    #[test]
+    fn oriented_charger_and_drive_get_source_facing_spin_states_and_rotation_mappings() {
+        let scratch = Scratch::new();
+        let base = PathBuf::from(std::env::var_os("HORIZON_RESOURCES").unwrap());
+        let states: Value = (0..24)
+            .map(|i| {
+                (
+                    format!("facing={},spin={}", ORIENTED_FACINGS[i / 4], i % 4),
+                    json!({"model": "ae2:block/charger"}),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>()
+            .into();
+        let drive_states: Value = (0..24)
+            .map(|i| {
+                (
+                    format!("facing={},spin={}", ORIENTED_FACINGS[i / 4], i % 4),
+                    json!({"model": "ae2:block/drive/drive_base"}),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>()
+            .into();
+        let ae2 = content_assets(
+            &scratch.0.join("ae2"),
+            "ae2",
+            &[
+                ("charger", json!({"template":"minecraft:dispenser"})),
+                ("drive", json!({"template":"minecraft:dispenser"})),
+            ],
+            &[
+                (
+                    "assets/ae2/blockstates/charger.json",
+                    json!({"variants": states}),
+                ),
+                (
+                    "assets/ae2/blockstates/drive.json",
+                    json!({"variants": drive_states}),
+                ),
+                (
+                    "assets/ae2/models/block/charger.json",
+                    json!({"elements": []}),
+                ),
+                (
+                    "assets/ae2/models/block/drive/drive_base.json",
+                    json!({"elements": []}),
+                ),
+            ],
+        );
+        let out = scratch.0.join("root");
+        super::super::build(&base, &[ae2], &out).unwrap();
+        let facts = read_json(&out, "facts.json").unwrap();
+        let rows = facts["states"].as_array().unwrap();
+        let model = read_json(&out, "model-states.json").unwrap();
+        let render = read_json(&out, "render-definitions.json").unwrap();
+        let command = read_json(&out, "command-registries.json").unwrap();
+        let gameplay = read_json(&out, "gameplay-facts.json").unwrap();
+        let structure = read_json(&out, "worldgen/blocks/structure-blocks.json").unwrap();
+        for kind in [Definition::Charger, Definition::Drive] {
+            let states: Vec<_> = rows
+                .iter()
+                .enumerate()
+                .filter(|(_, row)| row[0] == kind.block())
+                .collect();
+            assert_eq!(states.len(), 24);
+            for (i, (_, row)) in states.iter().enumerate() {
+                assert_eq!(row[4]["properties"], kind.properties(i));
+                assert_eq!(gameplay["states"][states[i].0]["block_entity"], true);
+            }
+            assert_eq!(facts["defaults"][kind.block()], states[0].0);
+            assert_eq!(model[kind.block()]["schema"], kind.schema());
+            assert_eq!(model[kind.block()]["states"].as_array().unwrap().len(), 24);
+            assert_eq!(render[kind.block()]["default"], states[0].0);
+            assert_eq!(render[kind.block()]["states"].as_array().unwrap().len(), 24);
+            assert_eq!(command["blocks"][kind.block()], kind.commands());
+            assert_eq!(structure["states"].as_u64().unwrap() as usize, rows.len());
+            // Source structure rotation moves only the facing; integer spin
+            // stays. Index 2 is north spin 2 under this canonical order.
+            let first = states[0].0;
+            assert_eq!(
+                structure["rotate"][first + 2],
+                json!([first + 6, first + 10, first + 14])
+            );
+            assert_eq!(
+                structure["mirror"][first + 2],
+                json!([first + 10, first + 2])
+            );
+        }
+        let (named, _) = nbt::read_named(
+            &fs::read(out.join("occlusion.nbt")).unwrap(),
+            Limits::tables(),
+        )
+        .unwrap();
+        let Tag::Compound(occlusion) = named.tag else {
+            panic!("no occlusion root");
+        };
+        let Some(Tag::List(states)) = occlusion.get(&JavaString::from("states")) else {
+            panic!("no occlusion states");
+        };
+        assert_eq!(states.len(), rows.len());
+        // The engine derives the cartesian state table from the facts rows;
+        // a wrong order or a property mismatch fails this load.
+        let assets = crate::assets::Assets::load(&out).unwrap();
+        assert_eq!(assets.registry.len(), rows.len());
+        let mut table = horizon_world::level::StateTable::new(&assets.registry).unwrap();
+        let facing = table.key_of("facing").unwrap();
+        let spin = table.key_of("spin").unwrap();
+        for kind in [Definition::Charger, Definition::Drive] {
+            let block = table.block_by_name(kind.block()).unwrap();
+            let default = table.default_state(block);
+            assert_eq!(table.name(default), kind.block());
+            for i in 0..24 {
+                // States of a block are contiguous from its first row.
+                let state = horizon_world::registry::BlockStateId(default.0 + i as u32);
+                assert_eq!(table.text(state, facing), ORIENTED_FACINGS[i / 4]);
+                assert_eq!(table.int(state, spin), i as i32 % 4);
+            }
+            let east = table.with_text(default, facing, "east").unwrap();
+            assert_eq!(table.int(east, spin), 0);
+            let sheet = table.with_int(east, spin, 2).unwrap();
+            assert_eq!(table.text(sheet, facing), "east");
+            assert_eq!(table.int(sheet, spin), 2);
+        }
+        let mut sprites = horizon_client_render::sprites::Sprites::default();
+        let models = horizon_client_render::models::catalog::StateModels::load(
+            &out,
+            assets.registry,
+            &["ae2:charger", "ae2:drive"],
+            &mut sprites,
+        )
+        .unwrap();
+        for kind in [Definition::Charger, Definition::Drive] {
+            let first = facts["defaults"][kind.block()].as_u64().unwrap() as u32;
+            for i in 0..24 {
+                assert!(
+                    !models
+                        .collect(
+                            horizon_world::registry::BlockStateId(first + i),
+                            horizon_core::position::BlockPos::new(0, 0, 0)
+                        )
+                        .unwrap()
+                        .is_empty()
+                );
+            }
+        }
     }
 }

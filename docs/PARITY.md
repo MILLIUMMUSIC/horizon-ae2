@@ -21,7 +21,7 @@ The full mod is not yet complete.
 | Controller | 8,000 public AE, 3 AE/tick idle, source flags and structures, channel supply, 18 state/type models and world conflict/restart checks | Status menu, power funnel, immediate source event/readiness/shape ordering and spatial lifecycle |
 | Energy cells | Network storage, original energy/node NBT, finite fullness states/models and local comparator, deferred notifications | Exact TickManager/base settings, material/lifecycle completeness and every saved-BE/explosion/pick/loot path |
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
-| Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation and comparator | Live config, capability API, exact geometry/orientation/effects/drop RNG and complete lifecycle |
+| Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator and full-orientation placement | Live config, capability API, exact render geometry/effects/drop RNG, wrench rotation/disassembly and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
@@ -239,8 +239,9 @@ newer syntax. Its defensive nesting limit is 512; deeper source parser behavior
 is not claimed. Source facts cover 1,060 original vanilla blocks and seven
 currently supported AE2 hosts in an AE2-owned data file. An absent/new/addon
 domain or missing native property refuses that state condition; it is not a
-complete dynamic property API. Charger/Drive's missing native spin states remain
-part of their existing orientation gap.
+complete dynamic property API. Charger/Drive now expose their native facing/spin
+states, so those property conditions have native state data; new/addon domains
+remain absent.
 
 The matcher evaluates fresh predicates on real native state/entity data. Client
 NBT lookup constructs an absent registered BE on demand for a loaded block and
@@ -259,6 +260,30 @@ correct refusal. This is not an implementation of those parts or AE2's full
 source packet. Exact source neighbour/event/packet timing, full settings/security,
 multipart prediction and all unload/replacement/fake-player paths remain open.
 These are partial placement paths, not complete PartPlacement/IPart parity.
+
+## Charger and Drive orientation
+
+The native state adapter replaces the dispenser template's twelve facing/triggered
+rows with the source 24 facing+spin states for `ae2:charger` and `ae2:drive`. The
+rows are ordered facing major and spin minor (the engine's canonical property
+product), default to facing north and spin 0, and rewrite the model-state,
+render, gameplay, behaviour, command, worldgen and NBT tables together. Structure
+rotation and mirror move only the facing, matching vanilla's `DirectionProperty`
+transforms and the source block's inherited behaviour.
+
+Prepared blockstates translate the jar's source-only `ae2:z` rotation into
+Horizon's plain x/y/z quarter turns. `tools/block_orientation.py` checks every
+source variant against the pinned `BlockOrientation` table and finds the
+equivalent Horizon triple by matrix equality; this is a conversion of the same
+transform, not an approximation. Server player placement rewrites the placed
+state to the source `FacingWithSpinStrategy` orientation, including the 65-degree
+pitch thresholds and the `SpinMapping` up reference.
+
+The client's local placement prediction still starts from the engine's template
+state until the server block update. Wrench rotation/disassembly, complete
+Charger/Drive menu and model composition, the crank's own orientation states,
+external multiplayer and the template's inherited redstone behaviour remain
+open.
 
 ## Native networking, recipes, and platform limits
 

@@ -11,13 +11,12 @@ import tempfile
 import zipfile
 import upstream
 import source_properties
+import block_orientation
 from item_stack_limits import UNSTACKABLE
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = json.loads((ROOT / "upstream.lock.json").read_text())
 MARKER = ".horizon-ae2-generated.json"
-FACINGS = {"down": (0, -1, 0), "up": (0, 1, 0), "north": (0, 0, -1),
-           "south": (0, 0, 1), "west": (-1, 0, 0), "east": (1, 0, 0)}
 CRAFTING = ["network/blocks/crystal_processing_charger.json", "network/blocks/crank.json",
             "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json",
             "network/blocks/storage_drive.json"]
@@ -160,17 +159,11 @@ def fit(content, jar, platform):
 
     for name in ["charger", "drive"]:
         original = json.loads((states / f"{name}.json").read_text())
-        variants = {}
-        for face in FACINGS:
-            selected = original.get("variants", {}).get(f"facing={face},spin=0")
-            if selected is None:
-                raise ValueError(f"{name} model missing facing={face},spin=0")
-            if name == "drive":
-                # Upstream's generated drive.json is empty: DriveBakedModel
-                # composes the base, cell chassis and LEDs at runtime. Carry
-                # the actual base housing now; dynamic cells/LEDs remain open.
-                selected = {**selected, "model": "ae2:block/drive/drive_base"}
-            variants[f"facing={face}"] = selected
+        # Upstream's generated drive.json is empty: DriveBakedModel composes
+        # the base, cell chassis and LEDs at runtime. Carry the actual base
+        # housing now; dynamic cells/LEDs remain open.
+        model = "ae2:block/drive/drive_base" if name == "drive" else None
+        variants = block_orientation.oriented_variants(original, model)
         write_json(states / f"{name}.json", {"variants": variants})
     # CrankBlockEntityRenderer uses a separate handle model. Static preview only
     # for this milestone; the exact animation needs render/sync work.

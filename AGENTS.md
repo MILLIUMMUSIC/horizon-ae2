@@ -72,7 +72,17 @@ suspended for now at the user's request: keep the validated codec, matcher and
 actual-hand gate working, but do not extend them. Source mutable component-object
 cache, ItemStack.copy sharing, full BE save/component codecs, new/addon property
 domains and complete security/fake-player lifecycle remain deferred. Do not
-equate fresh oracle/world results with those remaining contracts.
+equate fresh oracle/world results with those remaining contracts. Native
+Charger/Drive facing/spin states are now present; extending adventure
+predicates beyond the validated codec is still suspended.
+Charger/Drive use the source full orientation: 24 facing+spin rows replace the
+dispenser template's facing/triggered rows in the engine's canonical order.
+Prepared blockstates must use Horizon's x/y/z composition, not the source-only
+ae2:z key; tools/block_orientation.py derives the equivalent triples from the
+original BlockOrientation table. Server placement applies the source
+FacingWithSpinStrategy (65-degree pitch thresholds and SpinMapping). Client
+prediction still starts from the engine template state, and wrench
+rotation/disassembly remains an unported tool path.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
@@ -99,12 +109,16 @@ in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (Charger + three energy-cell kinds + Drive + Controller).
 controller.rs supplies source 8000 public AE/idle 3, node profile and visual rules.
-block_states.rs wraps only owned Controller/energy-cell/CableBus content builds and expands the
-single physical cube rows to actual Controller 18 state/type and finite-cell five
-fullness variants (creative stays one property-free state) across effective
-JSON/NBT tables. Preserve vanilla ids and foreign shape/model references. This
+block_states.rs wraps only owned Controller/energy-cell/CableBus and Charger/Drive
+content builds. It expands single physical cube rows to Controller 18 state/type
+and finite-cell five fullness variants, and replaces the dispenser template's
+twelve facing/triggered rows for Charger/Drive with the source 24 facing/spin
+states across effective JSON/NBT tables. Oriented rows are ordered facing major
+and spin minor, keep the source north/0 default, and structure rotation/mirror
+move only facing. Preserve vanilla ids and foreign shape/model references. This
 is not a general custom-state API. Controller model schema requires named values;
-finite-cell fullness uses integer [0,4]. Cells use source cube glass properties,
+finite-cell fullness uses integer [0,4]; Charger/Drive use facing named values
+and integer spin [0,3]. Cells use source cube glass properties,
 never dispenser behaviour/inventory. energy_cell_glue.rs feeds local stored power
 to analog output and defers comparator/fullness notifications to block-ticking
 chunks, preserving pending NBT. Exact TickManager/readiness and the full item/drop energy
@@ -187,7 +201,9 @@ by unit tests. Log meaningful engine gaps and known deviations in docs/PARITY.md
 Do not report a partial class or a carried resource as complete feature parity.
 
 All generated/intermediate files stay under target/. Update VALIDATION.md with
-what actually ran, including limits. Publication and pushing require explicit user
+what actually ran, including limits. Do not run a game smoke while a native
+stage/check/test/build can replace the client binary: the running client can
+exit without a crash report. Publication and pushing require explicit user
 authorization; the public horizon-ae2 creation/push is authorized above.
 
 The user removed the quota-based automatic pause rule. Continue the full-port

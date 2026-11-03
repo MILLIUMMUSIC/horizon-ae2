@@ -13,6 +13,7 @@ from unittest.mock import patch
 import zipfile
 
 import package
+import block_orientation
 import prepare_content as content
 
 
@@ -33,12 +34,22 @@ class ContentTests(unittest.TestCase):
         carried = self.root / "carry"
         for name in content.UNSTACKABLE | {"certus_quartz_crystal", "blank_pattern"}:
             content.write_json(carried / f"data/ae2/horizon/item/{name}.json", {"template": "minecraft:stick"})
-        content.write_json(carried / "assets/ae2/blockstates/charger.json", {
-            "variants": {f"facing={face},spin=0": {"model": "ae2:block/charger"} for face in content.FACINGS}
-        })
-        content.write_json(carried / "assets/ae2/blockstates/drive.json", {
-            "variants": {f"facing={face},spin=0": {"model": "ae2:block/drive"} for face in content.FACINGS}
-        })
+        def orientation_states(model):
+            variants = {}
+            for ordinal, face in enumerate(block_orientation.FACING_ORDER):
+                for spin in range(4):
+                    ax, ay, az = block_orientation.ANGLES[ordinal * 4 + spin]
+                    variant = {"model": model}
+                    if ax:
+                        variant["x"] = ax
+                    if ay:
+                        variant["y"] = ay
+                    if az:
+                        variant["ae2:z"] = az
+                    variants[f"facing={face},spin={spin}"] = variant
+            return {"variants": variants}
+        content.write_json(carried / "assets/ae2/blockstates/charger.json", orientation_states("ae2:block/charger"))
+        content.write_json(carried / "assets/ae2/blockstates/drive.json", orientation_states("ae2:block/drive"))
         for name in ("energy_cell", "dense_energy_cell"):
             content.write_json(carried / f"assets/ae2/blockstates/{name}.json", {
                 "variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}
@@ -96,7 +107,7 @@ class ContentTests(unittest.TestCase):
         for name in ("blank_pattern", "certus_quartz_crystal"):
             self.assertEqual(json.loads((path.parent / f"{name}.json").read_text())["max_stack_size"], 64)
 
-    def test_native_hosts_have_block_entities_and_valid_six_facing_models(self):
+    def test_native_hosts_have_block_entities_and_full_orientation_models(self):
         carried, jar = self.fixture()
         content.fit(carried, jar, self.platform)
         controller = json.loads((carried / "data/ae2/horizon/block/controller.json").read_text())
@@ -120,9 +131,15 @@ class ContentTests(unittest.TestCase):
             self.assertEqual([(entry["when"], entry["model"]["model"]) for entry in item["cases"]],
                              [(str(i), f"ae2:block/{name}_{i}") for i in range(5)])
         states = json.loads((carried / "assets/ae2/blockstates/charger.json").read_text())
-        self.assertEqual(set(states["variants"]), {f"facing={face}" for face in content.FACINGS})
+        keys = {f"facing={face},spin={spin}" for face in block_orientation.FACING_ORDER for spin in range(4)}
+        self.assertEqual(set(states["variants"]), keys)
+        # The source x/y/ae2:z keys become the equivalent Horizon triple:
+        # UP_NORTH is x=90, z=180 in Horizon's composition order.
+        self.assertEqual(states["variants"]["facing=up,spin=0"],
+                         {"model": "ae2:block/charger", "x": 90, "z": 180})
+        self.assertNotIn("ae2:z", states["variants"]["facing=up,spin=0"])
         drive = json.loads((carried / "assets/ae2/blockstates/drive.json").read_text())
-        self.assertEqual(set(drive["variants"]), {f"facing={face}" for face in content.FACINGS})
+        self.assertEqual(set(drive["variants"]), keys)
         self.assertTrue(all(v["model"] == "ae2:block/drive/drive_base" for v in drive["variants"].values()))
         self.assertEqual((carried / "assets/ae2/textures/gui/drive.png").read_bytes(), b"original-gui-fixture")
 
@@ -151,7 +168,7 @@ class ContentTests(unittest.TestCase):
         (out / "sentinel").write_text("keep")
         (carried / "assets/ae2/blockstates/charger.json").write_text('{"variants":{}}')
         lock = {**content.LOCK, "jar": {"sha512": hashlib.sha512(jar.read_bytes()).hexdigest()}}
-        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "verify_platform"), self.assertRaisesRegex(ValueError, "model missing"):
+        with patch.object(content, "LOCK", lock), patch.object(content.upstream, "verify_platform"), self.assertRaisesRegex(ValueError, "orientation variants"):
             content.prepare(jar, carried, None, None, out, self.platform)
         self.assertEqual((out / "sentinel").read_text(), "keep")
 
@@ -238,6 +255,24 @@ class PackageTests(unittest.TestCase):
         for injection in mixin["injection"]:
             self.assertTrue((root / "mixins/ae2" / injection["helper"]).is_file())
 
+
+class BlockOrientationTests(unittest.TestCase):
+    def test_every_source_orientation_has_the_same_horizon_transform(self):
+        seen = set()
+        for ordinal, face in enumerate(block_orientation.FACING_ORDER):
+            for spin in range(4):
+                angle = block_orientation.ANGLES[ordinal * 4 + spin]
+                turns = block_orientation.horizon_turns(face, spin)
+                self.assertEqual(block_orientation.horizon_matrix(turns),
+                                 block_orientation.source_matrix(*angle),
+                                 f"{face} spin {spin}")
+                seen.add(turns)
+        self.assertEqual(len(seen), 24)
+
+    def test_source_angle_mismatch_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "differ"):
+            block_orientation.oriented_variants({"variants": {
+                "facing=north,spin=0": {"model": "ae2:block/charger", "x": 90}}})
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

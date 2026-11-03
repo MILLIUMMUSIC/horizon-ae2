@@ -24,6 +24,10 @@ and host data. A client success swings once; a failure stops before the off hand
 adventure stack gate instead returns PASS on denied use, checks the actual hand
 and evaluates original saved block/state/NBT predicates. Adventure-mode rework
 is suspended for now; the validated gate remains in place without extension.
+Charger and Drive now use the source 24 facing/spin state product: the dispenser
+template rows are replaced, prepared models use the equivalent Horizon rotation
+triples, and server placement applies the source 65-degree/SpinMapping
+orientation. Client-predicted orientation and wrench rotation remain open.
 
 ## Verified foundations
 
@@ -33,18 +37,19 @@ is suspended for now; the validated gate remains in place without extension.
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
 | Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full multipart behavior and external multiplayer remain open |
+| Charger/Drive orientation | 24 native facing+spin states, source structure rotate/mirror, equivalent Horizon blockstate triples and source placement; client-predicted orientation, wrench rotation and machine lifecycle remain open |
 | Adventure predicates | 73,399 original-Java comparisons: saved predicates, SNBT, NBT comparison and integer parsing; actual-hand native gate. Rework is suspended for now; its deferred cache and full BE codecs are unchanged |
 | Part use | 10,320 Java placement-result/order/consumption cases; supported center client preview and server correction; full multipart/settings/security and source event lifecycle remain open |
 | Finite cell items | Fixed power profiles, original item-model thresholds, Charger support, placement/first matching drop energy transfer; full base APIs and all loot paths remain open |
 | Energy cells | Original fullness states/models, local comparator formula, deferred ticking-chunk notifications, grid power and persistence; complete event/TickManager lifecycle remains open |
 | Controller | Public 8,000 AE store, 3 AE/tick idle, source flags/validation/channel rules, 18 states/models, conflict/restart world checks; menus/capabilities/full lifecycle remain open |
 | Drive | Ten real cell slots, all 23 built-in backend profiles, source inventory, power/channel gating, filtered screen, automation and restart; full menu/capability/render lifecycle remains open |
-| Charger | Recipe and powered-item work, original inventory, automation, grid/local power and item energy display/sync; complete geometry/effects/config/capabilities remain open |
+| Charger | Recipe and powered-item work, original inventory, automation, grid/local power and item energy display/sync; full-orientation states and placement; complete geometry/effects/config/capabilities remain open |
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 128 standalone Rust tests, 188 native game tests, 16 native
-library tests and 12 Python tests. Native check/build and the isolated CableBus
+Current validation: 133 standalone Rust tests, 193 native game tests, 17 native
+library tests and 14 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.
@@ -64,8 +69,9 @@ See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 Complete multipart client prediction, settings/security and all lifecycle paths,
 remaining direct collision/support/fluid/light paths, full
 CableBus part interactions, partial removal, facades, full source visual packets,
-and source event/readiness model. Finish native Charger/Drive spin states and
-their original blockstate/model variants. Continue
+and source event/readiness model. Finish Charger/Drive client-prediction
+orientation, wrench rotation/disassembly and their complete menu/model behavior.
+Continue
 with missing storage hosts/terminals, capabilities, menu/render gaps, crafting,
 security, wireless/spatial services, tools, world content, addons, and full
 survival/multiplayer validation. The full plan is unchanged.

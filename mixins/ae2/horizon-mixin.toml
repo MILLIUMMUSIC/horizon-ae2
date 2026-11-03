@@ -540,6 +540,29 @@ name = "ae2_charger"
 source = "charger.rs"
 
 [[module]]
+id = "orientation-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_orientation"
+source = "orientation.rs"
+
+[[module]]
+id = "charger-orientation"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_charger_orientation"
+source = "charger_orientation.rs"
+
+[[injection]]
+id = "charger-orientation-placement"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_place_block"
+helper = "charger_orientation_hook.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "stack", ty = "&horizon_client::items::ItemStack", value = "stack" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+]
+
+[[module]]
 id = "glue"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_glue"

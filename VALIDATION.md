@@ -3,7 +3,37 @@
 Last updated: 3 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current adventure stack-use checkpoint
+## Current Charger/Drive orientation checkpoint
+
+- Formatting, Clippy, 133 standalone Rust tests and 14 Python tooling tests pass.
+  Native check/build pass; 193 game tests and 17 native library tests pass.
+- The native library test
+  `mod_content::ae2_block_states::tests::oriented_charger_and_drive_get_source_facing_spin_states_and_rotation_mappings`
+  builds real content over the pinned resources and checks 24 contiguous rows
+  for each of Charger and Drive: facing-major/spin-minor order, the source
+  north/0 default, model/render/gameplay/behaviour/command/worldgen tables, NBT
+  state arrays, structure rotate/mirror (facing only), the engine's derived state
+  table and all 24 bound models. Test models are empty fixtures; their binding
+  proves the state-to-model wiring, not the carried geometry.
+- `tools/block_orientation.py` derives the Horizon x/y/z triple for every one of
+  the 24 source `BlockOrientation` matrices and refuses a prepared variant whose
+  source x/y/ae2:z keys disagree. The tooling tests compare all 24 matrices, the
+  prepared fixture and the refusal path. Preparation now writes all 24
+  Charger/Drive variants instead of collapsing to six facing models.
+- [Charger orientation world scenario](docs/charger-orientation-world-smoke.json):
+  six actual player placements read back the native state: Charger horizontal
+  north/0, steep-down up/3, steep-up down/0 and down/1; Drive horizontal north/0
+  and steep-down up/3. All 24 models bind without a model-load warning.
+- The Charger inventory/charging smoke passes again (five checks) with the new
+  24-state schema: original inv.item0 reconciliation, live charging, malformed
+  refusal and restart.
+- Limits: orientation is applied by the server placement hook; the integrated
+  client's local prediction still starts from the dispenser template state until
+  the block update. Wrench rotation/disassembly, complete Charger/Drive machine
+  menus/models, crank orientation, the template's inherited redstone behavior and
+  independent multiplayer are not covered. These partial classes remain partial.
+
+## Adventure stack-use checkpoint (previous)
 
 - Formatting, Clippy, 128 standalone Rust tests and 12 Python tooling tests pass.
   Native check/build and 188 game tests pass; the library suite passes 16 tests.
@@ -258,6 +288,7 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 | [charger-automation-world-smoke.json](docs/charger-automation-world-smoke.json) | PASS | checks: 8 |
 | [charger-inventory-charging-regression.json](docs/charger-inventory-charging-regression.json) | PASS | checks: 7 |
 | [charger-inventory-world-smoke.json](docs/charger-inventory-world-smoke.json) | PASS | checks: 5 |
+| [charger-orientation-world-smoke.json](docs/charger-orientation-world-smoke.json) | PASS | 6 player placements; 24 bound models |
 | [charger-oracle.json](docs/charger-oracle.json) | PASS | cases: 2,000; operations: 200,000 |
 | [component-sync-charging-world.json](docs/component-sync-charging-world.json) | PASS | checks: 7 |
 | [component-sync-drive-gui.json](docs/component-sync-drive-gui.json) | PASS | See report scope and limits |
