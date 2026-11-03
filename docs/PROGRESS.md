@@ -22,7 +22,8 @@ Center placement predicts a real local part, checks entities, preserves source
 interaction results and uses native sequences to settle authoritative blocks
 and host data. A client success swings once; a failure stops before the off hand. The generic
 adventure stack gate instead returns PASS on denied use, checks the actual hand
-and evaluates original saved block/state/NBT predicates.
+and evaluates original saved block/state/NBT predicates. Adventure-mode rework
+is suspended for now; the validated gate remains in place without extension.
 
 ## Verified foundations
 
@@ -32,7 +33,7 @@ and evaluates original saved block/state/NBT predicates.
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
 | Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full multipart behavior and external multiplayer remain open |
-| Adventure predicates | 73,399 original-Java comparisons: saved predicates, SNBT, NBT comparison and integer parsing; actual-hand native gate; mutable component cache and full BE codecs remain open |
+| Adventure predicates | 73,399 original-Java comparisons: saved predicates, SNBT, NBT comparison and integer parsing; actual-hand native gate. Rework is suspended for now; its deferred cache and full BE codecs are unchanged |
 | Part use | 10,320 Java placement-result/order/consumption cases; supported center client preview and server correction; full multipart/settings/security and source event lifecycle remain open |
 | Finite cell items | Fixed power profiles, original item-model thresholds, Charger support, placement/first matching drop energy transfer; full base APIs and all loot paths remain open |
 | Energy cells | Original fullness states/models, local comparator formula, deferred ticking-chunk notifications, grid power and persistence; complete event/TickManager lifecycle remains open |
@@ -60,20 +61,20 @@ See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 
 ## Next required work
 
-Complete source AdventureModePredicate's mutable component-object cache and
-ItemStack.copy sharing, full original BE save/component codecs/defaults and
-native client/server identity/reload behavior. Fresh matching currently uses
-actual registered BE instances; a missing client instance is created on demand
-only when an NBT predicate reaches it. Add typed domains for new/addon blocks
-through a real property API and finish native Charger/Drive spin states.
-
 Complete multipart client prediction, settings/security and all lifecycle paths,
 remaining direct collision/support/fluid/light paths, full
 CableBus part interactions, partial removal, facades, full source visual packets,
-and source event/readiness model. Continue
+and source event/readiness model. Finish native Charger/Drive spin states and
+their original blockstate/model variants. Continue
 with missing storage hosts/terminals, capabilities, menu/render gaps, crafting,
 security, wireless/spatial services, tools, world content, addons, and full
 survival/multiplayer validation. The full plan is unchanged.
+
+Adventure-mode rework is suspended for now at the user's request. Keep the
+validated decoder, matcher and actual-hand gate working, but do not extend the
+deferred mutable component-object cache, ItemStack.copy sharing, full BE
+save/default/component codecs or permission/security paths. Typed property
+domains for new/addon blocks are deferred with that work.
 
 All sources/builds/worlds used for verification live under ignored `target/`.
 Original repositories, installed resources, player saves, and launcher settings

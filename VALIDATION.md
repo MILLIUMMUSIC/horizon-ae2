@@ -38,13 +38,16 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   no installed Horizon resources are edited and no Java runs in the native game.
 
 These checks establish fresh predicate evaluation and the native stack gate.
+Adventure-mode rework is suspended for now at the user's request; the validated
+codec, matcher and actual-hand gate remain in place, but are not being extended.
 Source mutable AdventureModePredicate component-object cache, ItemStack.copy
 sharing, full original BE save/default/component codecs and lifecycle, new/addon
-property domains, exact permissions/security and independent multiplayer remain
-completion requirements. Missing native properties cannot be inferred from the
-source facts; Charger/Drive spin states remain unported. SNBT nesting above the
-mod's defensive limit of 512 is not covered. Failed or interrupted runs are not
-evidence for this checkpoint; only final-source reports are retained here.
+property domains, exact permissions/security and independent multiplayer are
+deferred. Missing native properties cannot be inferred from the source facts;
+Charger/Drive spin states are handled by the separate block-state work.
+SNBT nesting above the mod's defensive limit of 512 is not covered. Failed or
+interrupted runs are not evidence for this checkpoint; only final-source reports
+are retained here.
 
 ## Current center placement results checkpoint
 
@@ -74,7 +77,7 @@ The rejection fixture corrupts only its private native owner map and restores
 it afterwards. This exercises the adapter's strict refusal and reconciliation;
 it is not a claim about Java corrupt-save recovery. The same integrated bundle
 is used on both sides. Full multipart prediction, source security/settings,
-adventure component-object cache and complete BE codecs/lifecycle,
+deferred adventure component-object cache and complete BE codecs/lifecycle,
 unload/replacement/fake-player paths, exact neighbour/event/packet timing and
 independent external multiplayer remain unfinished.
 

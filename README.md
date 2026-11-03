@@ -12,6 +12,8 @@ survival drops, names, waterlogging/buckets and persistent ownership. The curren
 the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
 placement also has client prediction, source interaction results and server correction.
 Adventure item use evaluates the actual hand and original block/state/NBT predicates.
+Adventure-mode rework is suspended for now: that validated behavior stays in place, while its
+remaining cache, block-entity codec and permission work is deferred.
 The target is the **complete 1:1 port** of the pinned AE2 release; the full mod is still in development.
 See [docs/PLAN.md](docs/PLAN.md) for the scope and next steps, [docs/PARITY.md](docs/PARITY.md) for the
 remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and how.
@@ -61,8 +63,9 @@ AE2 menu remain unfinished. Charger supports 16 powered-item profiles and both f
 items. All 85 cable items place their own center parts, and survival mining returns those parts with
 their custom names. The opposite-side key defaults to Left Control and is configurable in native
 mod settings. Pick Block selects the actual center item; creative Ctrl can include block-entity data.
-Adventure component cache/lifecycle, side parts, facades, partial breaking, Color Applicator placement and complete
-client/security/lifecycle behavior remain to be implemented.
+Adventure-mode rework is suspended for now, including its component cache and lifecycle. Side
+parts, facades, partial breaking, Color Applicator placement and complete client/security/lifecycle
+behavior remain to be implemented.
 
 ## Layout
 

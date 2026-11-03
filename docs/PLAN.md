@@ -65,8 +65,9 @@ and hit-selected Pick Block. Center placement has source interaction results,
 client preview and sequence-based server correction; full multipart prediction
 and complete settings/security remain required. The adventure stack gate uses
 the actual hand, original saved predicates, typed property domains and NBT
-matching. Component-object cache identity and complete BE codecs/lifecycle
-remain required. Keep the original 32
+matching. Adventure-mode rework is suspended for now at the user's request;
+the existing validated gate stays in place, while component-object cache
+identity and complete BE codecs/lifecycle are deferred. Keep the original 32
 `light_level`/`waterlogged` states. Color, type, connections, and channels belong
 to parts and their client state, not invented block properties.
 

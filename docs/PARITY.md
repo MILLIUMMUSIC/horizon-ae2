@@ -226,7 +226,8 @@ pinned NeoForge's `ItemStack.onItemUse` and `CommonHooks.onPlaceItemIntoWorld`.
 A missing/disallowed `can_place_on` returns PASS, leaving the other hand eligible.
 Both server use and client prediction consult the actual passed stack. Block
 reactions still precede the item gate; a permitted part can still return FAIL
-from its placement checks.
+from its placement checks. Adventure-mode rework is suspended for now; this
+existing gate remains in place.
 
 The saved predicate decoder follows original 1.21.1 FULL/SIMPLE alternative
 codecs, including fallback after an invalid full form. Block/tag selectors,
@@ -246,10 +247,12 @@ NBT lookup constructs an absent registered BE on demand for a loaded block and
 keeps existing instances; it does not copy a server save into the client. Full
 original BE save/component codecs and source default-field reconstruction are
 still required for every host. Native 26.3 data is not automatically a complete
-1.21.1 save. Source AdventureModePredicate's mutable component-object cache,
-ItemStack.copy sharing, reload/identity behavior and all permissions/security/
-fake-player paths remain open. Fresh codec comparisons and isolated game checks
-do not establish those contracts.
+1.21.1 save. Adventure-mode rework is suspended for now at the user's request:
+the validated decoder, matcher and actual-hand gate stay working, but source
+AdventureModePredicate's mutable component-object cache, ItemStack.copy sharing,
+reload/identity behavior and all permissions/security/fake-player paths are
+deferred rather than being extended. Fresh codec comparisons and isolated game
+checks do not establish those contracts.
 
 The native visual envelope also carries raw side/facade occupancy fields for
 correct refusal. This is not an implementation of those parts or AE2's full

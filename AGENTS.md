@@ -67,10 +67,12 @@ missing registered BE on demand through new_block_entity; it must not synthesize
 an NBT mask or borrow the server's private save. Existing instances are retained.
 Property domains come from AE2-owned data/ae2/source-property-domains.json, never
 modified base tables. Missing domains/properties refuse that state condition.
-The current matcher evaluates fresh predicates. Source mutable component-object
+The current matcher evaluates fresh predicates. Adventure-mode rework is
+suspended for now at the user's request: keep the validated codec, matcher and
+actual-hand gate working, but do not extend them. Source mutable component-object
 cache, ItemStack.copy sharing, full BE save/component codecs, new/addon property
-domains and complete security/fake-player lifecycle remain open. Do not equate
-fresh oracle/world results with those remaining contracts.
+domains and complete security/fake-player lifecycle remain deferred. Do not
+equate fresh oracle/world results with those remaining contracts.
 Physical states must stay source light_level/waterlogged (32), not invented
 color/type/connection properties. CableBuilder texture names use enum names:
 TRANSPARENT texture suffix is transparent, whereas the item ID prefix is fluix.
