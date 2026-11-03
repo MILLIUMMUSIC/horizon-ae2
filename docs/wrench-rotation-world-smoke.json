@@ -11,7 +11,7 @@
     "charger internalCurrentPower and unknown NBT survive turns",
     "rotated states and charger data survive save, quit and relaunch"
   ],
-  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/wrench-rotation-u7rqqx_v",
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/wrench-rotation-nscas9w2",
   "limits": [
     "Shift-disassembly, permissions/claims, the network tool UI and external multiplayer remain unported",
     "Only Charger, Drive and Crank carry native orientation strategies today",

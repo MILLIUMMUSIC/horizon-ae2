@@ -22,7 +22,7 @@ The full mod is not yet complete.
 | Energy cells | Network storage, original energy/node NBT, finite fullness states/models and local comparator, deferred notifications | Exact TickManager/base settings, material/lifecycle completeness and every saved-BE/explosion/pick/loot path |
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator, full-orientation placement and wrench turns | Live config, capability API, exact render geometry/effects/drop RNG, wrench disassembly and complete lifecycle |
-| Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules and Charger-side restriction | Placement/survival/fake-player/statistics, orientation, animation and full synchronization |
+| Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules, Charger-side restriction, source six facing states, per-facing shape boxes and wrench turns | Placement/survival/fake-player/statistics, animation, synchronization and full lifecycle |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
@@ -264,12 +264,15 @@ These are partial placement paths, not complete PartPlacement/IPart parity.
 ## Charger and Drive orientation
 
 The native state adapter replaces the dispenser template's twelve facing/triggered
-rows with the source 24 facing+spin states for `ae2:charger` and `ae2:drive`. The
-rows are ordered facing major and spin minor (the engine's canonical property
-product), default to facing north and spin 0, and rewrite the model-state,
-render, gameplay, behaviour, command, worldgen and NBT tables together. Structure
-rotation and mirror move only the facing, matching vanilla's `DirectionProperty`
-transforms and the source block's inherited behaviour.
+rows with the source 24 facing+spin states for `ae2:charger` and `ae2:drive`, and
+shrinks the template independently for `ae2:crank` to the source six facing-only
+states. Rows are ordered facing major (spin minor where the block has spin),
+default to facing north (and spin 0), and rewrite the model-state, render,
+gameplay, behaviour, command, worldgen and NBT tables together. The crank keeps
+its source `createShape` box per facing, applied to the effective outline and
+collision tables; structure rotation and mirror move only the facing, matching
+vanilla's `DirectionProperty` transforms and the source block's inherited
+behaviour.
 
 Prepared blockstates translate the jar's source-only `ae2:z` rotation into
 Horizon's plain x/y/z quarter turns. `tools/block_orientation.py` checks every
@@ -290,9 +293,9 @@ covers four up-face turns, two X-axis turns incl. spin derivation, a Drive turn
 without its menu, refused vanilla/network-tool/non-wrench clicks, crank survival,
 block-entity data retention and restart. Shift-disassembly, permissions/claims,
 the network tool UI, complete Charger/Drive menu and model composition, the
-crank's own facing states and external multiplayer remain open. The native
-adapter performs two sequential property writes rather than the source single
-`setBlockAndUpdate`.
+crank's placement orientation/survival, animation and synchronization, and
+external multiplayer remain open. The native adapter performs two sequential
+property writes rather than the source single `setBlockAndUpdate`.
 
 ## Native networking, recipes, and platform limits
 

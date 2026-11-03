@@ -37,7 +37,7 @@ pub(super) fn build(
     let result = (|| {
         for (kind, block) in &declarations {
             if block.template != kind.template()
-                || block.shapes.is_some()
+                || (block.shapes.is_some() && *kind != Definition::Crank)
                 || !block.default_state.is_empty()
             {
                 return Err(format!(
@@ -74,6 +74,7 @@ enum Definition {
     CreativeEnergyCell,
     Charger,
     Drive,
+    Crank,
 }
 impl Definition {
     fn from_block(id: &str) -> Option<Self> {
@@ -85,6 +86,7 @@ impl Definition {
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
             "ae2:charger" => Some(Self::Charger),
             "ae2:drive" => Some(Self::Drive),
+            "ae2:crank" => Some(Self::Crank),
             _ => None,
         }
     }
@@ -97,12 +99,13 @@ impl Definition {
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Charger => "ae2:charger",
             Self::Drive => "ae2:drive",
+            Self::Crank => "ae2:crank",
         }
     }
     fn template(self) -> &'static str {
         match self {
             Self::CableBus => "minecraft:glass",
-            Self::Charger | Self::Drive => "minecraft:dispenser",
+            Self::Charger | Self::Drive | Self::Crank => "minecraft:dispenser",
             _ => "minecraft:iron_block",
         }
     }
@@ -112,13 +115,14 @@ impl Definition {
             Self::CableBus => 32,
             Self::CreativeEnergyCell => 1,
             Self::Charger | Self::Drive => 24,
+            Self::Crank => 6,
             _ => 5,
         }
     }
     /// Rows the pinned template initially contributes for this block.
     fn source_rows(self) -> usize {
         match self {
-            Self::Charger | Self::Drive => 12,
+            Self::Charger | Self::Drive | Self::Crank => 12,
             _ => 1,
         }
     }
@@ -127,9 +131,10 @@ impl Definition {
     fn source_index(self, index: usize) -> usize {
         match self {
             // The dispenser template orders (north, east, south, west, up,
-            // down) with its untriggered row second; the native order streams
-            // the same facings with spin varying fastest.
+            // down) with its untriggered row second. Full orientation streams
+            // spin fastest; the Crank has only the facing property.
             Self::Charger | Self::Drive => (index / 4) * 2 + 1,
+            Self::Crank => index * 2 + 1,
             _ => 0,
         }
     }
@@ -138,10 +143,17 @@ impl Definition {
     fn old_to_new(self, old: usize) -> usize {
         match self {
             Self::Charger | Self::Drive => old / 2 * 4,
+            Self::Crank => old / 2,
             _ => 0,
         }
     }
-    fn oriented(self) -> bool {
+    /// Source blocks with an orientation strategy that structure blocks may
+    /// turn and whose default is a concrete orientation.
+    fn rotates(self) -> bool {
+        matches!(self, Self::Charger | Self::Drive | Self::Crank)
+    }
+    /// Full orientation adds the source spin property.
+    fn full(self) -> bool {
         matches!(self, Self::Charger | Self::Drive)
     }
     fn properties(self, index: usize) -> Value {
@@ -155,6 +167,7 @@ impl Definition {
                 "facing": ORIENTED_FACINGS[index / 4],
                 "spin": (index % 4).to_string(),
             }),
+            Self::Crank => json!({"facing": ORIENTED_FACINGS[index]}),
             _ => json!({"fullness": index.to_string()}),
         }
     }
@@ -171,6 +184,7 @@ impl Definition {
                 "facing":{"named":ORIENTED_FACINGS},
                 "spin":{"integer":[0,3]},
             }),
+            Self::Crank => json!({"facing":{"named":ORIENTED_FACINGS}}),
             _ => json!({"fullness":{"integer":[0,4]}}),
         }
     }
@@ -191,6 +205,7 @@ impl Definition {
             Self::Charger | Self::Drive => {
                 json!([["facing", ORIENTED_FACINGS], ["spin", ["0", "1", "2", "3"]]])
             }
+            Self::Crank => json!([["facing", ORIENTED_FACINGS]]),
             _ => json!([["fullness", ["0", "1", "2", "3", "4"]]]),
         }
     }
@@ -203,8 +218,10 @@ struct Layout {
     kind: Definition,
 }
 impl Layout {
-    fn extra(self) -> usize {
-        self.kind.variants() - self.kind.source_rows()
+    /// Row-count change; negative when the source state set is smaller than
+    /// the template's (the Crank drops the dispenser's triggered dimension).
+    fn extra(self) -> i64 {
+        self.kind.variants() as i64 - self.kind.source_rows() as i64
     }
     fn replaced(self) -> core::ops::Range<usize> {
         self.first..self.first + self.kind.source_rows()
@@ -214,7 +231,7 @@ impl Layout {
         if self.replaced().contains(&old) {
             (self.first + self.kind.old_to_new(old - self.first)) as u64
         } else if old >= self.replaced().end && old < self.old_len {
-            (old + self.extra()) as u64
+            (old as i64 + self.extra()) as u64
         } else {
             old as u64
         }
@@ -269,8 +286,13 @@ fn facing_index(face: &str) -> usize {
 }
 /// Fixed structure rotation turns the facing only; the source block inherits
 /// vanilla's `DirectionProperty` rotation and its integer spin does not move.
-fn rotated(index: usize, turns: usize) -> usize {
-    let face = ORIENTED_FACINGS[index / 4];
+fn rotated(kind: Definition, index: usize, turns: usize) -> usize {
+    let (face_index, spin) = if kind.full() {
+        (index / 4, index % 4)
+    } else {
+        (index, 0)
+    };
+    let face = ORIENTED_FACINGS[face_index];
     let face = match turns % 4 {
         1 => match face {
             "north" => "east",
@@ -295,12 +317,17 @@ fn rotated(index: usize, turns: usize) -> usize {
         },
         _ => face,
     };
-    facing_index(face) * 4 + index % 4
+    facing_index(face) * if kind.full() { 4 } else { 1 } + spin
 }
 /// The two vanilla structure mirrors: front/back flips north/south, left/right
 /// flips east/west; vertical facings and the spin stay.
-fn mirrored(index: usize, front_back: bool) -> usize {
-    let face = ORIENTED_FACINGS[index / 4];
+fn mirrored(kind: Definition, index: usize, front_back: bool) -> usize {
+    let (face_index, spin) = if kind.full() {
+        (index / 4, index % 4)
+    } else {
+        (index, 0)
+    };
+    let face = ORIENTED_FACINGS[face_index];
     let face = if front_back {
         match face {
             "north" => "south",
@@ -314,7 +341,7 @@ fn mirrored(index: usize, front_back: bool) -> usize {
             other => other,
         }
     };
-    facing_index(face) * 4 + index % 4
+    facing_index(face) * if kind.full() { 4 } else { 1 } + spin
 }
 fn read_json(root: &Path, name: &str) -> Result<Value> {
     Ok(serde_json::from_slice(&owned(root, name)?)?)
@@ -349,18 +376,21 @@ fn expand(root: &Path, definitions: &[Definition]) -> Result<()> {
         initial.push((matches[0], kind));
     }
     initial.sort_by_key(|(id, _)| *id);
-    let mut offset = 0;
+    let mut offset: i64 = 0;
     let mut layouts = Vec::new();
     for (first, kind) in initial {
+        let first = first as i64 + offset;
+        let old_len = rows.len() as i64 + offset;
         let layout = Layout {
-            first: first + offset,
-            old_len: rows.len() + offset,
+            first: first as usize,
+            old_len: old_len as usize,
             kind,
         };
         offset += layout.extra();
         layouts.push(layout);
     }
-    if rows.len() + offset > super::MAX_STATES as usize {
+    let total = rows.len() as i64 + offset;
+    if !(0..=super::MAX_STATES as i64).contains(&total) {
         return Err("AE2 states exceed the engine palette limit".into());
     }
     let mut outputs = Vec::new();
@@ -432,8 +462,8 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 }
             }
             layout.remap(&mut doc["defaults"]);
-            if layout.kind.oriented() {
-                // Source default: facing north, spin 0.
+            if layout.kind.rotates() {
+                // Source default: facing north (spin 0 for full orientation).
                 doc["defaults"][layout.kind.block()] = json!(layout.first);
             }
         }
@@ -522,7 +552,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             layout.remap(doc);
             doc[layout.kind.block()]["states"] =
                 json!((layout.first..layout.first + layout.kind.variants()).collect::<Vec<_>>());
-            if layout.kind.oriented() {
+            if layout.kind.rotates() {
                 doc[layout.kind.block()]["default"] = json!(layout.first);
             }
         }
@@ -533,7 +563,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             for key in ["rotate", "mirror"] {
                 layout.remap(&mut doc[key]);
                 layout.rows(&mut doc[key])?;
-                if layout.kind.oriented() {
+                if layout.kind.rotates() {
                     let turns = if key == "rotate" { 3 } else { 2 };
                     for i in 0..layout.kind.variants() {
                         let row = doc[key][layout.first + i]
@@ -546,9 +576,9 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                             *id = json!(
                                 layout.first
                                     + if key == "rotate" {
-                                        rotated(i, n + 1)
+                                        rotated(layout.kind, i, n + 1)
                                     } else {
-                                        mirrored(i, n == 0)
+                                        mirrored(layout.kind, i, n == 0)
                                     }
                             );
                         }
@@ -565,7 +595,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 }
             }
             layout.rows(&mut doc["full_block"])?;
-            doc["states"] = json!(layout.old_len + layout.extra());
+            doc["states"] = json!(layout.old_len as i64 + layout.extra());
         }
         _ => return Err("unhandled AE2 state table".into()),
     }
@@ -1086,6 +1116,134 @@ mod tests {
                         .is_empty()
                 );
             }
+        }
+    }
+    #[test]
+    fn facing_only_crank_gets_source_states_and_shape_boxes() {
+        let scratch = Scratch::new();
+        let base = PathBuf::from(std::env::var_os("HORIZON_RESOURCES").unwrap());
+        let boxes = [
+            ("north", [0.15, 0.15, 0.30, 0.85, 0.85, 1.00]),
+            ("east", [0.0, 0.15, 0.15, 0.7, 0.85, 0.85]),
+            ("south", [0.15, 0.15, 0.00, 0.85, 0.85, 0.70]),
+            ("west", [0.30, 0.15, 0.15, 1.00, 0.85, 0.85]),
+            ("up", [0.15, 0.0, 0.15, 0.85, 0.7, 0.85]),
+            ("down", [0.15, 0.30, 0.15, 0.85, 1.00, 0.85]),
+        ];
+        let shapes: Value = json!({"property": "facing",
+            "values": boxes.iter().map(|(face, b)| ((*face).to_owned(), json!([b]))).collect::<serde_json::Map<_, _>>()});
+        let ae2 = content_assets(
+            &scratch.0.join("ae2"),
+            "ae2",
+            &[(
+                "crank",
+                json!({"template": "minecraft:dispenser", "shapes": shapes}),
+            )],
+            &[
+                (
+                    "assets/ae2/blockstates/crank.json",
+                    json!({"variants": {"": {"model": "ae2:block/crank"}}}),
+                ),
+                (
+                    "assets/ae2/models/block/crank.json",
+                    json!({"elements": []}),
+                ),
+            ],
+        );
+        let out = scratch.0.join("root");
+        super::super::build(&base, &[ae2], &out).unwrap();
+        let facts = read_json(&out, "facts.json").unwrap();
+        let rows = facts["states"].as_array().unwrap();
+        let model = read_json(&out, "model-states.json").unwrap();
+        let render = read_json(&out, "render-definitions.json").unwrap();
+        let command = read_json(&out, "command-registries.json").unwrap();
+        let gameplay = read_json(&out, "gameplay-facts.json").unwrap();
+        let structure = read_json(&out, "worldgen/blocks/structure-blocks.json").unwrap();
+        let kind = Definition::Crank;
+        let states: Vec<_> = rows
+            .iter()
+            .enumerate()
+            .filter(|(_, row)| row[0] == kind.block())
+            .collect();
+        assert_eq!(states.len(), 6);
+        for (i, (_, row)) in states.iter().enumerate() {
+            assert_eq!(row[4]["properties"], kind.properties(i));
+            assert_eq!(gameplay["states"][states[i].0]["block_entity"], true);
+        }
+        let first = states[0].0;
+        assert_eq!(facts["defaults"][kind.block()], json!(first));
+        assert_eq!(model[kind.block()]["schema"], kind.schema());
+        assert_eq!(model[kind.block()]["states"].as_array().unwrap().len(), 6);
+        assert_eq!(render[kind.block()]["default"], json!(first));
+        assert_eq!(render[kind.block()]["states"].as_array().unwrap().len(), 6);
+        assert_eq!(command["blocks"][kind.block()], kind.commands());
+        assert_eq!(structure["states"].as_u64().unwrap() as usize, rows.len());
+        // Facing-only structure rotation turns north to east, south and west.
+        assert_eq!(
+            structure["rotate"][first],
+            json!([first + 1, first + 2, first + 3])
+        );
+        assert_eq!(structure["mirror"][first], json!([first + 2, first]));
+        let (named, _) = nbt::read_named(
+            &fs::read(out.join("cached-collision.nbt")).unwrap(),
+            Limits::tables(),
+        )
+        .unwrap();
+        let Tag::Compound(collision) = named.tag else {
+            panic!("no collision root");
+        };
+        let Some(Tag::IntArray(mapping)) = collision.get(&JavaString::from("cached_shapes")) else {
+            panic!("no collision mapping");
+        };
+        let Some(Tag::List(entries)) = collision.get(&JavaString::from("shapes")) else {
+            panic!("no collision shapes");
+        };
+        assert_eq!(mapping.len(), rows.len());
+        let encode = |b: [f64; 6]| {
+            let shape =
+                horizon_core::geometry::VoxelShape::from_box(horizon_core::geometry::Aabb::new(
+                    horizon_core::geometry::Vec3::new(b[0], b[1], b[2]),
+                    horizon_core::geometry::Vec3::new(b[3], b[4], b[5]),
+                ))
+                .unwrap();
+            super::super::encode_shape(&shape)
+        };
+        for (i, (face, b)) in boxes.iter().enumerate() {
+            let at = mapping[first + i] as usize;
+            assert_eq!(entries[at], encode(*b), "crank shape for {face}");
+        }
+        let assets = crate::assets::Assets::load(&out).unwrap();
+        let table = horizon_world::level::StateTable::new(&assets.registry).unwrap();
+        let facing = table.key_of("facing").unwrap();
+        let block = table.block_by_name(kind.block()).unwrap();
+        let default = table.default_state(block);
+        for i in 0..6 {
+            let state = horizon_world::registry::BlockStateId(default.0 + i as u32);
+            assert_eq!(table.text(state, facing), ORIENTED_FACINGS[i]);
+            assert!(table.value(state, facing).is_some());
+        }
+        assert_eq!(
+            table.with_text(default, facing, "east").unwrap(),
+            horizon_world::registry::BlockStateId(default.0 + 1)
+        );
+        let mut sprites = horizon_client_render::sprites::Sprites::default();
+        let models = horizon_client_render::models::catalog::StateModels::load(
+            &out,
+            assets.registry,
+            &[kind.block()],
+            &mut sprites,
+        )
+        .unwrap();
+        for i in 0..6 {
+            assert!(
+                !models
+                    .collect(
+                        horizon_world::registry::BlockStateId(default.0 + i as u32),
+                        horizon_core::position::BlockPos::new(0, 0, 0)
+                    )
+                    .unwrap()
+                    .is_empty()
+            );
         }
     }
 }

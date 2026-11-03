@@ -17,6 +17,7 @@ from item_stack_limits import UNSTACKABLE
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = json.loads((ROOT / "upstream.lock.json").read_text())
 MARKER = ".horizon-ae2-generated.json"
+ORIENTED_FACINGS = ["north", "east", "south", "west", "up", "down"]
 CRAFTING = ["network/blocks/crystal_processing_charger.json", "network/blocks/crank.json",
             "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json",
             "network/blocks/storage_drive.json"]
@@ -138,10 +139,22 @@ def fit(content, jar, platform):
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.
     for name in ["charger", "crank", "drive"]:
-        write_json(blocks / f"{name}.json", {
+        data = {
             "template": "minecraft:dispenser",
             "properties": {"light": 0, "hardness": 2.2},
-        })
+        }
+        if name == "crank":
+            # CrankBlock.createShape: a 0.7-wide box shifted 0.15 away from
+            # the attached side along the facing vector.
+            def box(face):
+                step = {"down": (0, -1, 0), "up": (0, 1, 0), "north": (0, 0, -1),
+                        "south": (0, 0, 1), "west": (-1, 0, 0), "east": (1, 0, 0)}[face]
+                off = [-0.15 * v for v in step]
+                return [[off[0] + 0.15, off[1] + 0.15, off[2] + 0.15,
+                         off[0] + 0.85, off[1] + 0.85, off[2] + 0.85]]
+            data["shapes"] = {"property": "facing",
+                              "values": {face: box(face) for face in ORIENTED_FACINGS}}
+        write_json(blocks / f"{name}.json", data)
     for name in ["energy_cell", "dense_energy_cell", "creative_energy_cell"]:
         write_json(blocks / f"{name}.json", {
             "template": "minecraft:iron_block",

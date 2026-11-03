@@ -3,7 +3,35 @@
 Last updated: 3 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current wrench rotation checkpoint
+## Current Wooden Crank state checkpoint
+
+- Formatting, Clippy, 137 standalone Rust tests and 14 Python tooling tests pass.
+  Native check/build pass; 197 game tests and 18 native library tests pass.
+- The native state adapter now supports shrinking a template state range. For
+  `ae2:crank` it replaces the dispenser template's twelve facing/triggered rows
+  with the source six facing-only states; rows are ordered facing north, east,
+  south, west, up, down, the default is north, and structure rotation/mirror move
+  only the facing. The crank keeps its source `createShape` box per facing in the
+  effective outline/collision tables; Charger and Drive carry no shapes.
+- The new native library test
+  `mod_content::ae2_block_states::tests::facing_only_crank_gets_source_states_and_shape_boxes`
+  checks the six rows, default, schema/commands, render/model tables, structure
+  rotation/mirror, the exact encoded collision box for every facing, the engine's
+  derived state table and all six bound models. The tooling test checks the
+  prepared crank block definition carries exactly those boxes and that the other
+  hosts do not.
+- [Crank state world scenario](docs/crank-states-world-smoke.json): selection
+  through the north offset box hits the crank, a ray below its bottom misses, and
+  after a wrench turn to east the north-only x range no longer hits while the
+  rotated east box does.
+- The [wrench rotation scenario](docs/wrench-rotation-world-smoke.json) passes
+  again with the fifteen checks, now using the crank's facing-only state strings.
+- Limits: crank placement orientation/canSurvive, TESR animation and
+  synchronization, statistics/fake players, the inherited dispenser behavior
+  chain and independent multiplayer remain open. This checkpoint does not
+  complete the Crank class.
+
+## Wrench rotation checkpoint (previous)
 
 - Formatting, Clippy, 137 standalone Rust tests and 14 Python tooling tests pass.
   Native check/build pass; 197 game tests and 17 native library tests pass.
@@ -317,6 +345,7 @@ Recorded means an audit/metadata/report whose scope must be read directly.
 | [charger-inventory-world-smoke.json](docs/charger-inventory-world-smoke.json) | PASS | checks: 5 |
 | [charger-orientation-world-smoke.json](docs/charger-orientation-world-smoke.json) | PASS | 6 player placements; 24 bound models |
 | [wrench-rotation-world-smoke.json](docs/wrench-rotation-world-smoke.json) | PASS | 15 player turns and refusal checks |
+| [crank-states-world-smoke.json](docs/crank-states-world-smoke.json) | PASS | 4 selection/shape checks |
 | [charger-oracle.json](docs/charger-oracle.json) | PASS | cases: 2,000; operations: 200,000 |
 | [component-sync-charging-world.json](docs/component-sync-charging-world.json) | PASS | checks: 7 |
 | [component-sync-drive-gui.json](docs/component-sync-drive-gui.json) | PASS | See report scope and limits |

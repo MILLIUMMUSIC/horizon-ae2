@@ -114,16 +114,19 @@ in horizon-mixin.toml. keys.rs, storage.rs and cells.rs feed the native cell
 tooltip/codec adapter. energy.rs/grid.rs/power.rs feed network.rs and the
 grid_glue.rs world adapter (Charger + three energy-cell kinds + Drive + Controller).
 controller.rs supplies source 8000 public AE/idle 3, node profile and visual rules.
-block_states.rs wraps only owned Controller/energy-cell/CableBus and Charger/Drive
-content builds. It expands single physical cube rows to Controller 18 state/type
-and finite-cell five fullness variants, and replaces the dispenser template's
-twelve facing/triggered rows for Charger/Drive with the source 24 facing/spin
-states across effective JSON/NBT tables. Oriented rows are ordered facing major
-and spin minor, keep the source north/0 default, and structure rotation/mirror
-move only facing. Preserve vanilla ids and foreign shape/model references. This
-is not a general custom-state API. Controller model schema requires named values;
-finite-cell fullness uses integer [0,4]; Charger/Drive use facing named values
-and integer spin [0,3]. Cells use source cube glass properties,
+block_states.rs wraps only owned Controller/energy-cell/CableBus, Charger/Drive
+and Crank content builds. It expands single physical cube rows to Controller 18
+state/type and finite-cell five fullness variants, replaces the dispenser
+template's twelve facing/triggered rows with the source 24 facing/spin states
+for Charger/Drive, and shrinks the Crank to the source six facing-only states.
+Oriented rows are ordered facing major (spin minor where present), keep the
+source facing-north default, and structure rotation/mirror move only facing.
+The Crank may carry the source per-facing shape boxes; Charger/Drive must not.
+Preserve vanilla ids and foreign shape/model references. The adapter supports
+template ranges both growing and shrinking. This is not a general custom-state
+API. Controller model schema requires named values; finite-cell fullness uses
+integer [0,4]; Charger/Drive use facing named values and integer spin [0,3]; the
+Crank uses facing only. Cells use source cube glass properties,
 never dispenser behaviour/inventory. energy_cell_glue.rs feeds local stored power
 to analog output and defers comparator/fullness notifications to block-ticking
 chunks, preserving pending NBT. Exact TickManager/readiness and the full item/drop energy

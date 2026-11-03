@@ -127,7 +127,7 @@ def main():
             block(dispenser, 'minecraft:dispenser[facing=north]')
             block(crank_back, 'ae2:charger[facing=south,spin=0]')
             block(crank_west, 'ae2:charger[facing=south,spin=0]')
-            block(crank, 'ae2:crank[facing=north,triggered=false]')
+            block(crank, 'ae2:crank[facing=north]')
             ctl('tp', 8.5, 73, 4.5)
         finally:
             ctl('server-hold', 'off')
@@ -135,7 +135,7 @@ def main():
         state_initial = {pos: state(pos) for pos in
                          [charger, drive, dispenser, crank]}
         assert state_initial[charger] == 'ae2:charger[facing=north,spin=0]', state_initial
-        assert state_initial[crank] == 'ae2:crank[facing=north,triggered=false]', state_initial
+        assert state_initial[crank] == 'ae2:crank[facing=north]', state_initial
         ctl('command', 'data merge block 8 73 7 {internalCurrentPower:777.0d,"test:keep":12345L}')
 
         hold('ae2:certus_quartz_wrench')
@@ -188,10 +188,10 @@ def main():
         hold('ae2:certus_quartz_wrench')
         ctl('tp', 6.5, 73, 4.5)
         ctl('wait', 2)
-        state_initial[crank] = 'ae2:crank[facing=north,triggered=false]'
+        state_initial[crank] = 'ae2:crank[facing=north]'
         rotates('wrench turns an attached crank north to east around up',
-                crank, 'up', 'ae2:crank[facing=east,triggered=false]')
-        state_initial[crank] = 'ae2:crank[facing=east,triggered=false]'
+                crank, 'up', 'ae2:crank[facing=east]')
+        state_initial[crank] = 'ae2:crank[facing=east]'
         refused('crank turn refuses a side without a crankable', crank, 'up')
         nbt = '\n'.join(ctl('command', 'data get block 8 73 7')['chat'])
         assert '12345' in nbt and '777' in nbt, nbt
@@ -202,7 +202,7 @@ def main():
         ctl('wait', 20)
         assert state(charger) == 'ae2:charger[facing=south,spin=2]', state(charger)
         assert state(drive) == 'ae2:drive[facing=east,spin=0]', state(drive)
-        assert state(crank) == 'ae2:crank[facing=east,triggered=false]', state(crank)
+        assert state(crank) == 'ae2:crank[facing=east]', state(crank)
         nbt = '\n'.join(ctl('command', 'data get block 8 73 7')['chat'])
         assert '12345' in nbt and '777' in nbt, nbt
         check('rotated states and charger data survive restart',

@@ -116,6 +116,19 @@ class ContentTests(unittest.TestCase):
         for name in ["charger", "crank", "drive"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
+        crank = json.loads((carried / "data/ae2/horizon/block/crank.json").read_text())
+        self.assertEqual(crank["shapes"]["property"], "facing")
+        self.assertEqual(crank["shapes"]["values"], {
+            "north": [[0.15, 0.15, 0.3, 0.85, 0.85, 1.0]],
+            "east": [[0.0, 0.15, 0.15, 0.7, 0.85, 0.85]],
+            "south": [[0.15, 0.15, 0.0, 0.85, 0.85, 0.7]],
+            "west": [[0.3, 0.15, 0.15, 1.0, 0.85, 0.85]],
+            "up": [[0.15, 0.0, 0.15, 0.85, 0.7, 0.85]],
+            "down": [[0.15, 0.3, 0.15, 0.85, 1.0, 0.85]],
+        })
+        for name in ["charger", "drive"]:
+            block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
+            self.assertNotIn("shapes", block)
         for name in ["energy_cell", "dense_energy_cell", "creative_energy_cell"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:iron_block")
