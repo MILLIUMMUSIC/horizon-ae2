@@ -608,6 +608,34 @@ bindings = [
   { name = "canceled", ty = "&mut bool", value = "&mut *canceled" },
 ]
 
+[[injection]]
+id = "terminal-use"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_right_click_block"
+helper = "terminal_use.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "pos", ty = "[i32; 3]", value = "pos" },
+  { name = "face", ty = "[i32; 3]", value = "face" },
+  { name = "canceled", ty = "&mut bool", value = "&mut *canceled" },
+]
+
+[[module]]
+id = "terminal-screen"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_terminal_screen"
+source = "terminal_screen.rs"
+
+[[injection]]
+id = "terminal-menu"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_level_tick_post"
+helper = "terminal_menu.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" },
+]
+
 [[module]]
 id = "energy"
 file = "crates/horizon-client/src/game.rs"

@@ -64,6 +64,8 @@ pub mod ae2_adventure;
 pub mod ae2_ctrl;
 #[path = "../mixins/ae2/part_use.rs"]
 pub mod ae2_part_use;
+#[path = "../mixins/ae2/terminal_screen.rs"]
+pub mod ae2_terminal_screen;
 
 #[path = "../mixins/ae2/adventure_snbt.rs"]
 pub mod ae2_adventure_snbt;
