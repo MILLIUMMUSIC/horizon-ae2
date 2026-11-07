@@ -8,7 +8,7 @@ use super::{
     ae2_drive::{Drive, DriveCell, SLOTS},
     ae2_keys::Key,
     ae2_network::{Kind, Network, Pos},
-    ae2_service::StorageService,
+    ae2_service::{StorageMounts, StorageProvider, StorageService},
 };
 use horizon_client::{containers::BlockEntity, items::ItemStack};
 use horizon_world::nbt::{JavaString, Tag};
@@ -59,6 +59,7 @@ fn encode_inv(items: &[Option<ItemStack>], previous: Option<&Tag>) -> Tag {
 pub(super) struct Drives {
     hosts: BTreeMap<Pos, Host>,
     services: BTreeMap<u64, Service>,
+    chests: BTreeMap<Pos, ChestHost>,
 }
 impl Drives {
     /// Observe commands/slot changes before topology reconciliation. Unchanged
@@ -213,11 +214,16 @@ impl Drives {
                 }
             }
         }
-        let used: BTreeSet<_> = self
+        let mut used: BTreeSet<_> = self
             .hosts
             .values()
             .filter_map(|h| h.registration.map(|r| r.0))
             .collect();
+        used.extend(
+            self.chests
+                .values()
+                .filter_map(|host| host.registration.map(|pair| pair.0)),
+        );
         self.services.retain(|id, _| used.contains(id));
     }
     pub(super) fn end_tick(&mut self) {
@@ -278,7 +284,239 @@ impl Drives {
             host.items = items;
             host.inv = Some(inv);
         }
+        self.persist_chests(game);
     }
+}
+
+struct ChestCells {
+    cell: Option<Arc<Mutex<DriveCell<Key>>>>,
+    priority: i32,
+    online: bool,
+}
+impl StorageProvider<Key, Source> for ChestCells {
+    fn mount(&mut self, mounts: &mut StorageMounts<'_, Key, Source>) -> Result<(), &'static str> {
+        if self.online
+            && let Some(cell) = &self.cell
+        {
+            mounts.mount(cell.clone(), self.priority)?;
+        }
+        Ok(())
+    }
+}
+struct ChestHost {
+    provider: Arc<Mutex<ChestCells>>,
+    item: Option<ItemStack>,
+    registration: Option<(u64, u64)>,
+    refresh: bool,
+}
+impl Default for ChestHost {
+    fn default() -> Self {
+        Self {
+            provider: Arc::new(Mutex::new(ChestCells {
+                cell: None,
+                priority: 0,
+                online: false,
+            })),
+            item: None,
+            registration: None,
+            refresh: true,
+        }
+    }
+}
+impl Drives {
+    pub(super) fn read_chests(&mut self, game: &mut Game<'_>) {
+        let slot = super::ae2_me_chest::CELL_SLOT;
+        let rows: Vec<_> = game
+            .world
+            .block_entities
+            .iter()
+            .filter_map(|(&(x, y, z), entity)| {
+                let BlockEntity::Mod(be) = entity else {
+                    return None;
+                };
+                if be.id != super::ae2_me_chest::BLOCK
+                    || !game.world.loaded(x, z)
+                    || game.native_block([x, y, z]) != super::ae2_me_chest::BLOCK
+                {
+                    return None;
+                }
+                let item = be.items.get(slot).cloned().flatten();
+                let priority = match be.nbt.get(&JavaString::from("priority")) {
+                    Some(Tag::Int(value)) => *value,
+                    _ => 0,
+                };
+                Some(([x, y, z], item, priority))
+            })
+            .collect();
+        let present: BTreeSet<_> = rows.iter().map(|row| row.0).collect();
+        let gone: Vec<_> = self
+            .chests
+            .keys()
+            .filter(|pos| !present.contains(*pos))
+            .copied()
+            .collect();
+        for pos in gone {
+            let host = self.chests.remove(&pos).unwrap();
+            if let Some((service, node)) = host.registration
+                && let Some(service) = self.services.get_mut(&service)
+            {
+                service.remove_node(node);
+            }
+        }
+        for (pos, item, priority) in rows {
+            let host = self.chests.entry(pos).or_default();
+            let mut cells = host.provider.lock().unwrap();
+            if cells.priority != priority {
+                cells.priority = priority;
+                host.refresh = true;
+            }
+            if host.item != item {
+                cells.cell = item.as_ref().and_then(|stack| chest_cell(game, stack));
+                host.item = item;
+                host.refresh = true;
+            }
+        }
+    }
+    pub(super) fn reconcile_chests(&mut self, network: &mut Network) {
+        for (pos, host) in &mut self.chests {
+            let registration = network.node_service(*pos);
+            if host.registration != registration {
+                if let Some((service, node)) = host.registration
+                    && let Some(service) = self.services.get_mut(&service)
+                {
+                    service.remove_node(node);
+                }
+                host.registration = None;
+                host.refresh = true;
+            }
+            let mut cells = host.provider.lock().unwrap();
+            let online = network.is_online(*pos);
+            if cells.online != online {
+                cells.online = online;
+                host.refresh = true;
+            }
+            let idle = cells.cell.as_ref().map_or(0.0, |cell| {
+                1.0 + cell.lock().unwrap().cell.idle_drain()
+            });
+            drop(cells);
+            if registration.is_some() {
+                let _ = network.set_idle(*pos, idle);
+            }
+            if let Some((service, node)) = registration {
+                let storage = self.services.entry(service).or_default();
+                if host.registration.is_none() {
+                    if storage.add_node(node, host.provider.clone()).is_ok() {
+                        host.registration = registration;
+                        host.refresh = false;
+                    }
+                } else if host.refresh {
+                    let _ = storage.refresh_node(node);
+                    host.refresh = false;
+                }
+            }
+        }
+    }
+    pub(super) fn transfer(
+        &self,
+        pos: Pos,
+        key: &Key,
+        amount: u64,
+        insert: bool,
+        commit: bool,
+    ) -> u64 {
+        let Some(service) = self.service_of(pos) else {
+            return 0;
+        };
+        let Some(storage) = self.services.get(&service) else {
+            return 0;
+        };
+        let source = Source::default();
+        if insert {
+            storage.inventory().insert(key, amount, commit, &source)
+        } else {
+            storage.inventory().extract(key, amount, commit, &source)
+        }
+    }
+    pub(super) fn first_item(&self, pos: Pos) -> Option<Key> {
+        let service = self.service_of(pos)?;
+        for host in self.hosts.values() {
+            if host.registration.map(|pair| pair.0) != Some(service) {
+                continue;
+            }
+            let drive = host.drive.lock().unwrap();
+            for slot in drive.slots.iter().flatten() {
+                let cell = slot.lock().unwrap();
+                if let Some((key, _)) = cell.cell.stacks().iter().find(|(_, amount)| **amount > 0) {
+                    return Some(key.clone());
+                }
+            }
+        }
+        for host in self.chests.values() {
+            if host.registration.map(|pair| pair.0) != Some(service) {
+                continue;
+            }
+            let cells = host.provider.lock().unwrap();
+            if let Some(cell) = &cells.cell {
+                let cell = cell.lock().unwrap();
+                if let Some((key, _)) = cell.cell.stacks().iter().find(|(_, amount)| **amount > 0)
+                {
+                    return Some(key.clone());
+                }
+            }
+        }
+        None
+    }
+    fn service_of(&self, pos: Pos) -> Option<u64> {
+        self.chests
+            .get(&pos)
+            .and_then(|host| host.registration.map(|pair| pair.0))
+            .or_else(|| {
+                self.hosts
+                    .get(&pos)
+                    .and_then(|host| host.registration.map(|pair| pair.0))
+            })
+    }
+    fn persist_chests(&mut self, game: &mut Game<'_>) {
+        let slot = super::ae2_me_chest::CELL_SLOT;
+        for (pos, host) in &mut self.chests {
+            let cells = host.provider.lock().unwrap();
+            let Some(cell) = &cells.cell else {
+                continue;
+            };
+            let mut cell = cell.lock().unwrap();
+            if !cell.dirty {
+                continue;
+            }
+            let Some(item) = host.item.as_mut() else {
+                continue;
+            };
+            if codec::persist_backend(item, &cell.cell).is_err() {
+                continue;
+            }
+            cell.dirty = false;
+            let item = item.clone();
+            drop(cell);
+            drop(cells);
+            if let Some(BlockEntity::Mod(be)) =
+                game.world.block_entities.get_mut(&(pos[0], pos[1], pos[2]))
+                && be.id == super::ae2_me_chest::BLOCK
+            {
+                be.items.resize(be.items.len().max(slot + 1), None);
+                be.items[slot] = Some(item);
+                game.world.modified.insert((pos[0] >> 4, pos[2] >> 4));
+            }
+        }
+    }
+}
+
+fn chest_cell(game: &Game<'_>, stack: &ItemStack) -> Option<Arc<Mutex<DriveCell<Key>>>> {
+    let resolve = |kind, id: &str| codec::resolve_key(game.items(), kind, id);
+    let cell = if let Some(allowed) = super::ae2_tool_glue::accepted(game, &stack.item) {
+        codec::load_restricted_backend(stack, &resolve, allowed).ok()?
+    } else {
+        codec::load_backend(stack, &resolve).ok()?
+    };
+    Some(Arc::new(Mutex::new(DriveCell::new(cell))))
 }
 
 #[cfg(test)]

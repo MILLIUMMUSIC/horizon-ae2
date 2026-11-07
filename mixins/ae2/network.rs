@@ -19,6 +19,7 @@ pub enum Kind {
     DenseEnergyCell,
     CreativeEnergyCell,
     Drive,
+    Chest,
     Cable(Cable),
 }
 impl Kind {
@@ -30,6 +31,7 @@ impl Kind {
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
             "ae2:drive" => Some(Self::Drive),
+            "ae2:chest" => Some(Self::Chest),
             _ => None,
         }
     }
@@ -41,6 +43,7 @@ impl Kind {
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Drive => "ae2:drive",
+            Self::Chest => "ae2:chest",
             Self::Cable(_) => "ae2:cable_bus",
         }
     }
@@ -51,7 +54,7 @@ impl Kind {
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
-            Self::Drive | Self::Cable(_) => 0.0,
+            Self::Drive | Self::Chest | Self::Cable(_) => 0.0,
         }
     }
     fn grid_color(self) -> Color {
@@ -84,7 +87,7 @@ impl Kind {
                 self.capacity(),
                 super::ae2_controller::STORAGE_PRIORITY,
             )),
-            Self::Charger | Self::Drive | Self::Cable(_) => None,
+            Self::Charger | Self::Drive | Self::Chest | Self::Cable(_) => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
                 self.capacity(),
@@ -121,7 +124,8 @@ pub struct Snapshot {
 impl Snapshot {
     fn exposes(self, direction: Direction) -> bool {
         self.exposed & (1 << direction as u8) != 0
-            && (!matches!(self.kind, Kind::Charger | Kind::Drive) || self.front != direction)
+            && (!matches!(self.kind, Kind::Charger | Kind::Drive | Kind::Chest)
+                || self.front != direction)
     }
 }
 #[derive(Clone, Copy, Debug)]
@@ -210,7 +214,7 @@ impl Network {
                 None => {
                     let id = self.graph.add_node(NodeSpec {
                         flags: match snapshot.kind {
-                            Kind::Drive => Flags::REQUIRE_CHANNEL,
+                            Kind::Drive | Kind::Chest => Flags::REQUIRE_CHANNEL,
                             Kind::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
                             Kind::Cable(cable) => cable.kind.node_flags(),
                             _ => Flags::default(),

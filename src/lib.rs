@@ -11,6 +11,8 @@ pub mod ae2_energy;
 pub mod ae2_grid;
 #[path = "../mixins/ae2/keys.rs"]
 pub mod ae2_keys;
+#[path = "../mixins/ae2/me_chest.rs"]
+pub mod ae2_me_chest;
 #[path = "../mixins/ae2/mounts.rs"]
 pub mod ae2_mounts;
 #[path = "../mixins/ae2/network.rs"]

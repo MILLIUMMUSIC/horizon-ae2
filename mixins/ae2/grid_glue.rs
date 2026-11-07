@@ -86,9 +86,11 @@ pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     let state = networks.entry(dimension.to_owned()).or_default();
     state.chargers.sync(game);
     state.drives.read(game);
+    state.drives.read_chests(game);
     let nodes = snapshots(game, state);
     state.network.sync(nodes);
     state.drives.reconcile(&mut state.network);
+    state.drives.reconcile_chests(&mut state.network);
     state.network.begin_tick();
 }
 // Placement must test the just-added cable's actual connected shape without
@@ -134,9 +136,11 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         };
         state.chargers.sync(game);
         state.drives.read(game);
+        state.drives.read_chests(game);
         let nodes = snapshots(game, state);
         state.network.sync(nodes);
         state.drives.reconcile(&mut state.network);
+        state.drives.reconcile_chests(&mut state.network);
         let states = state.network.end_tick();
         for persisted in &states {
             let Kind::Cable(cable) = persisted.kind else {
@@ -168,6 +172,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
             }
         }
         state.drives.reconcile(&mut state.network);
+        state.drives.reconcile_chests(&mut state.network);
         state.drives.end_tick();
         state.drives.persist(game);
         // Energy writes are now saved; comparator reads must see those values.
@@ -239,6 +244,48 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         .map(|state| state.cells.collect(game))
         .unwrap_or_default();
     super::ae2_energy_cell_glue::apply(game, cell_updates);
+}
+pub(super) fn chest_online(dimension: &str, pos: [i32; 3]) -> bool {
+    NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get(dimension)
+        .is_some_and(|state| state.network.is_online(pos))
+}
+/// Grid-powered insert or extract through the chest node's storage service.
+pub(super) fn chest_transfer(
+    dimension: &str,
+    pos: [i32; 3],
+    key: &super::ae2_keys::Key,
+    amount: u64,
+    insert: bool,
+) -> u64 {
+    let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    let Some(state) = networks.get_mut(dimension) else {
+        return 0;
+    };
+    if !state.network.is_online(pos) {
+        return 0;
+    }
+    let simulated = state.drives.transfer(pos, key, amount, insert, false);
+    if simulated == 0 {
+        return 0;
+    }
+    let available = state.network.extract(pos, simulated as f64, 1.0, false);
+    let moved = ((available + 0.9) as u64).min(simulated);
+    if moved == 0 {
+        return 0;
+    }
+    state.network.extract(pos, moved as f64, 1.0, true);
+    state.drives.transfer(pos, key, moved, insert, true)
+}
+pub(super) fn chest_first_item(dimension: &str, pos: [i32; 3]) -> Option<super::ae2_keys::Key> {
+    let networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    let state = networks.get(dimension)?;
+    if !state.network.is_online(pos) {
+        return None;
+    }
+    state.drives.first_item(pos)
 }
 pub(super) fn extract(
     dimension: &str,

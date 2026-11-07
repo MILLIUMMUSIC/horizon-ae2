@@ -18,5 +18,10 @@ fn ae2_right_click(game: &mut crate::game::Game<'_>, pos: [i32; 3], canceled: &m
             return;
         }
     }
+    // An owned chest would be canceled in ae2_glue::right_click before
+    // use_hand reaches open_menu. Leave the click alone so the chest menu opens.
+    if game.native_block(pos) == "ae2:chest" {
+        return;
+    }
     crate::game::ae2_glue::right_click(game, pos, canceled);
 }
