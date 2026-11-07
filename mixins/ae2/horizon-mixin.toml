@@ -1118,3 +1118,26 @@ id="adventure-native"
 file="crates/horizon-client/src/game.rs"
 name="ae2_adventure_native"
 source="adventure_native.rs"
+
+[[module]]
+id="meteorite-fallout"
+file="crates/horizon-client/src/game.rs"
+name="ae2_meteorite_fallout"
+source="meteorite_fallout.rs"
+
+[[module]]
+id="meteorite"
+file="crates/horizon-client/src/game.rs"
+name="ae2_meteorite"
+source="meteorite.rs"
+
+[[injection]]
+id="meteorite-command"
+kind="HEAD"
+target="horizon_client::game::native_hooks::Game<'_>::native_command"
+helper="survival_command.rs"
+bindings=[
+ {name="game",ty="&mut crate::game::Game<'_>",value="&mut *self"},
+ {name="command",ty="&str",value="command"},
+ {name="ran",ty="&mut bool",value="&mut *ran"},
+]

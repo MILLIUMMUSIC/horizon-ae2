@@ -67,3 +67,8 @@ pub mod ae2_part_use;
 
 #[path = "../mixins/ae2/adventure_snbt.rs"]
 pub mod ae2_adventure_snbt;
+
+#[path = "../mixins/ae2/meteorite_fallout.rs"]
+pub mod ae2_meteorite_fallout;
+#[path = "../mixins/ae2/meteorite.rs"]
+pub mod ae2_meteorite;
