@@ -1118,3 +1118,24 @@ id="adventure-native"
 file="crates/horizon-client/src/game.rs"
 name="ae2_adventure_native"
 source="adventure_native.rs"
+
+[[module]]
+id = "transform-throw"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_transform_throw"
+source = "transform_throw.rs"
+
+[[module]]
+id = "transform-throw-world"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_transform_throw_world"
+source = "transform_throw_world.rs"
+
+[[injection]]
+id = "fluix-throw-before-discard"
+kind = "HEAD"
+target = "horizon_client::game::Game<'_>::tick_items"
+helper = "transform_throw_tick.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+]

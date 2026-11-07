@@ -67,3 +67,6 @@ pub mod ae2_part_use;
 
 #[path = "../mixins/ae2/adventure_snbt.rs"]
 pub mod ae2_adventure_snbt;
+
+#[path = "../mixins/ae2/transform_throw.rs"]
+pub mod ae2_transform_throw;
