@@ -1118,3 +1118,20 @@ id="adventure-native"
 file="crates/horizon-client/src/game.rs"
 name="ae2_adventure_native"
 source="adventure_native.rs"
+
+[[module]]
+id = "quartz"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_quartz"
+source = "quartz.rs"
+
+[[injection]]
+id = "quartz-player-loot"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::Game<'_>::block_loot_at"
+helper = "survival_loot.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "state", ty = "horizon_world::registry::BlockStateId", value = "state" },
+]

@@ -67,3 +67,6 @@ pub mod ae2_part_use;
 
 #[path = "../mixins/ae2/adventure_snbt.rs"]
 pub mod ae2_adventure_snbt;
+
+#[path = "../mixins/ae2/quartz.rs"]
+pub mod ae2_quartz;
