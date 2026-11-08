@@ -43,8 +43,8 @@ tool UI remain open.
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
 | Cable input | 11,028 Java boolean-packet cases; native per-world/sender state and hit-selected center clone; full multipart behavior and external multiplayer remain open |
-| Charger/Drive orientation | 24 native facing+spin states, source structure rotate/mirror, equivalent Horizon blockstate triples, source placement and wrench turns; client-predicted orientation, wrench disassembly, permissions and machine lifecycle remain open |
-| Wooden Crank states | Six source facing-only states, per-facing outline/collision boxes, structure rotation and wrench turns; placement orientation/survival, animation and synchronization remain open |
+| Charger/Drive orientation | 105,489 original-Java placement/direction cases; 24 native facing+spin states, inherited identity structure hooks, equivalent Horizon blockstate triples, source placement and wrench turns; client-predicted orientation, wrench disassembly, permissions and machine lifecycle remain open |
+| Wooden Crank states | Six source facing-only states, per-facing outline/collision boxes, inherited identity structure hooks and wrench turns; placement orientation/survival, animation and synchronization remain open |
 | Adventure predicates | 73,399 original-Java comparisons: saved predicates, SNBT, NBT comparison and integer parsing; actual-hand native gate. Rework is suspended for now; its deferred cache and full BE codecs are unchanged |
 | Part use | 10,320 Java placement-result/order/consumption cases; supported center client preview and server correction; full multipart/settings/security and source event lifecycle remain open |
 | Finite cell items | Fixed power profiles, original item-model thresholds, Charger support, placement/first matching drop energy transfer; full base APIs and all loot paths remain open |
@@ -55,8 +55,8 @@ tool UI remain open.
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 137 standalone Rust tests, 197 native game tests, 18 native
-library tests and 14 Python tests. Native check/build and the isolated CableBus
+Current validation: 138 standalone Rust tests, 198 native game tests, 18 native
+library tests and 15 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.

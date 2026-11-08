@@ -1,21 +1,125 @@
 {
   "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/wrench-rotation-xuch79fl",
   "checks": [
-    "charger four clockwise up-face turns north->east->south->west->north with one swing per successful turn",
-    "charger east-face turns north->down and down->south spin 2 (source X-axis turn and spin derivation)",
-    "drive up-face turn north->east, with no Drive menu opened",
-    "vanilla dispenser unchanged (no AE2 orientation strategy)",
-    "network tool in the wrench tag does not rotate the charger",
-    "non-wrench item does not rotate the charger",
-    "attached crank turns north->east; a turn without a crankable on the new side is refused",
-    "charger internalCurrentPower and unknown NBT survive turns",
-    "rotated states and charger data survive save, quit and relaunch"
+    {
+      "name": "wrench turns charger north to east around up",
+      "value": {
+        "state": "ae2:charger[facing=east,spin=0]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "wrench turns charger east to south around up",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=0]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "wrench turns charger south to west around up",
+      "value": {
+        "state": "ae2:charger[facing=west,spin=0]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "wrench turns charger west to north around up",
+      "value": {
+        "state": "ae2:charger[facing=north,spin=0]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "wrench turns charger north to down around east",
+      "value": {
+        "state": "ae2:charger[facing=down,spin=0]",
+        "clicked_face": "east"
+      }
+    },
+    {
+      "name": "wrench derives spin 2 from a second x-axis turn",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=2]",
+        "clicked_face": "east"
+      }
+    },
+    {
+      "name": "wrench turns drive north to east around up",
+      "value": {
+        "state": "ae2:drive[facing=east,spin=0]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "wrench turn never opens the Drive menu",
+      "value": {
+        "screen": "playing"
+      }
+    },
+    {
+      "name": "wrench leaves a vanilla dispenser alone",
+      "value": {
+        "state": "minecraft:dispenser[facing=north,triggered=false]"
+      }
+    },
+    {
+      "name": "network tool does not rotate the charger",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=2]"
+      }
+    },
+    {
+      "name": "non-wrench item does not rotate the charger",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=2]"
+      }
+    },
+    {
+      "name": "offhand wrench does not rotate the charger",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=2]"
+      }
+    },
+    {
+      "name": "spectator wrench does not rotate the charger",
+      "value": {
+        "state": "ae2:charger[facing=south,spin=2]"
+      }
+    },
+    {
+      "name": "wrench turns an attached crank north to east around up",
+      "value": {
+        "state": "ae2:crank[facing=east]",
+        "clicked_face": "up"
+      }
+    },
+    {
+      "name": "crank turn refuses a side without a crankable",
+      "value": {
+        "state": "ae2:crank[facing=east]"
+      }
+    },
+    {
+      "name": "wrench turns preserve charger block entity data",
+      "value": {
+        "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}}, proxy: {p: -1}, \"test:keep\": 12345L, x: 8, y: 73, z: 7, id: \"ae2:charger\", internalCurrentPower: 777.0d}"
+      }
+    },
+    {
+      "name": "rotated states and charger data survive restart",
+      "value": {
+        "charger": "ae2:charger[facing=south,spin=2]",
+        "drive": "ae2:drive[facing=east,spin=0]",
+        "crank": "ae2:crank[facing=east]",
+        "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}}, proxy: {p: -1}, \"test:keep\": 12345L, x: 8, y: 73, z: 7, id: \"ae2:charger\", internalCurrentPower: 777.0d}"
+      }
+    }
   ],
-  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/wrench-rotation-nscas9w2",
+  "scope": "Source Certus Quartz Wrench rotation for supported AE2 orientable blocks",
   "limits": [
-    "Shift-disassembly, permissions/claims, the network tool UI and external multiplayer remain unported",
+    "Shift-disassembly, permissions/claims and the network tool UI remain unported",
     "Only Charger, Drive and Crank carry native orientation strategies today",
-    "Rotation is server-authoritative; client prediction and vanilla fallthrough swings are not compared",
-    "Two sequential property writes stand in for the source single setBlockAndUpdate"
+    "Rotation is server-authoritative; independent multiplayer is not covered"
   ]
 }

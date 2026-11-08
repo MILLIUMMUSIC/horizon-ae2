@@ -147,9 +147,9 @@ impl Definition {
             _ => 0,
         }
     }
-    /// Source blocks with an orientation strategy that structure blocks may
-    /// turn and whose default is a concrete orientation.
-    fn rotates(self) -> bool {
+    /// Source hosts whose concrete default is facing north (and spin zero
+    /// where present). Structure rotate/mirror are separate inherited hooks.
+    fn oriented(self) -> bool {
         matches!(self, Self::Charger | Self::Drive | Self::Crank)
     }
     /// Full orientation adds the source spin property.
@@ -278,71 +278,6 @@ fn properties(index: usize) -> Value {
     json!({"state": ae2_controller::STATES[index / ae2_controller::TYPES.len()],
            "type": ae2_controller::TYPES[index % ae2_controller::TYPES.len()]})
 }
-fn facing_index(face: &str) -> usize {
-    ORIENTED_FACINGS
-        .iter()
-        .position(|f| *f == face)
-        .unwrap_or(0)
-}
-/// Fixed structure rotation turns the facing only; the source block inherits
-/// vanilla's `DirectionProperty` rotation and its integer spin does not move.
-fn rotated(kind: Definition, index: usize, turns: usize) -> usize {
-    let (face_index, spin) = if kind.full() {
-        (index / 4, index % 4)
-    } else {
-        (index, 0)
-    };
-    let face = ORIENTED_FACINGS[face_index];
-    let face = match turns % 4 {
-        1 => match face {
-            "north" => "east",
-            "east" => "south",
-            "south" => "west",
-            "west" => "north",
-            other => other,
-        },
-        2 => match face {
-            "north" => "south",
-            "south" => "north",
-            "east" => "west",
-            "west" => "east",
-            other => other,
-        },
-        3 => match face {
-            "north" => "west",
-            "west" => "south",
-            "south" => "east",
-            "east" => "north",
-            other => other,
-        },
-        _ => face,
-    };
-    facing_index(face) * if kind.full() { 4 } else { 1 } + spin
-}
-/// The two vanilla structure mirrors: front/back flips north/south, left/right
-/// flips east/west; vertical facings and the spin stay.
-fn mirrored(kind: Definition, index: usize, front_back: bool) -> usize {
-    let (face_index, spin) = if kind.full() {
-        (index / 4, index % 4)
-    } else {
-        (index, 0)
-    };
-    let face = ORIENTED_FACINGS[face_index];
-    let face = if front_back {
-        match face {
-            "north" => "south",
-            "south" => "north",
-            other => other,
-        }
-    } else {
-        match face {
-            "east" => "west",
-            "west" => "east",
-            other => other,
-        }
-    };
-    facing_index(face) * if kind.full() { 4 } else { 1 } + spin
-}
 fn read_json(root: &Path, name: &str) -> Result<Value> {
     Ok(serde_json::from_slice(&owned(root, name)?)?)
 }
@@ -462,7 +397,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 }
             }
             layout.remap(&mut doc["defaults"]);
-            if layout.kind.rotates() {
+            if layout.kind.oriented() {
                 // Source default: facing north (spin 0 for full orientation).
                 doc["defaults"][layout.kind.block()] = json!(layout.first);
             }
@@ -552,7 +487,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             layout.remap(doc);
             doc[layout.kind.block()]["states"] =
                 json!((layout.first..layout.first + layout.kind.variants()).collect::<Vec<_>>());
-            if layout.kind.rotates() {
+            if layout.kind.oriented() {
                 doc[layout.kind.block()]["default"] = json!(layout.first);
             }
         }
@@ -563,34 +498,15 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             for key in ["rotate", "mirror"] {
                 layout.remap(&mut doc[key]);
                 layout.rows(&mut doc[key])?;
-                if layout.kind.rotates() {
-                    let turns = if key == "rotate" { 3 } else { 2 };
-                    for i in 0..layout.kind.variants() {
-                        let row = doc[key][layout.first + i]
-                            .as_array_mut()
-                            .ok_or("no structure rotation row")?;
-                        if row.len() != turns {
-                            return Err("structure rotation row length".into());
-                        }
-                        for (n, id) in row.iter_mut().enumerate() {
-                            *id = json!(
-                                layout.first
-                                    + if key == "rotate" {
-                                        rotated(layout.kind, i, n + 1)
-                                    } else {
-                                        mirrored(layout.kind, i, n == 0)
-                                    }
-                            );
-                        }
-                    }
-                } else {
-                    for i in 0..layout.kind.variants() {
-                        let row = doc[key][layout.first + i]
-                            .as_array_mut()
-                            .ok_or("no structure rotation row")?;
-                        for id in row {
-                            *id = json!(layout.first + i);
-                        } // Source orientation strategy is NONE.
+                // These AE2 hosts inherit BlockBehaviour.rotate/mirror,
+                // which return the original state. An orientation strategy
+                // enables wrench turns; it does not override structure hooks.
+                for i in 0..layout.kind.variants() {
+                    let row = doc[key][layout.first + i]
+                        .as_array_mut()
+                        .ok_or("no structure rotation row")?;
+                    for id in row {
+                        *id = json!(layout.first + i);
                     }
                 }
             }
@@ -974,7 +890,7 @@ mod tests {
     }
 
     #[test]
-    fn oriented_charger_and_drive_get_source_facing_spin_states_and_rotation_mappings() {
+    fn oriented_hosts_keep_source_states_and_inherited_structure_identity() {
         let scratch = Scratch::new();
         let base = PathBuf::from(std::env::var_os("HORIZON_RESOURCES").unwrap());
         let states: Value = (0..24)
@@ -1048,16 +964,16 @@ mod tests {
             assert_eq!(render[kind.block()]["states"].as_array().unwrap().len(), 24);
             assert_eq!(command["blocks"][kind.block()], kind.commands());
             assert_eq!(structure["states"].as_u64().unwrap() as usize, rows.len());
-            // Source structure rotation moves only the facing; integer spin
-            // stays. Index 2 is north spin 2 under this canonical order.
+            // AEBaseBlock does not override the vanilla identity hooks.
+            // A wrench orientation strategy does not change structure hooks.
             let first = states[0].0;
             assert_eq!(
                 structure["rotate"][first + 2],
-                json!([first + 6, first + 10, first + 14])
+                json!([first + 2, first + 2, first + 2])
             );
             assert_eq!(
                 structure["mirror"][first + 2],
-                json!([first + 10, first + 2])
+                json!([first + 2, first + 2])
             );
         }
         let (named, _) = nbt::read_named(
@@ -1178,12 +1094,9 @@ mod tests {
         assert_eq!(render[kind.block()]["states"].as_array().unwrap().len(), 6);
         assert_eq!(command["blocks"][kind.block()], kind.commands());
         assert_eq!(structure["states"].as_u64().unwrap() as usize, rows.len());
-        // Facing-only structure rotation turns north to east, south and west.
-        assert_eq!(
-            structure["rotate"][first],
-            json!([first + 1, first + 2, first + 3])
-        );
-        assert_eq!(structure["mirror"][first], json!([first + 2, first]));
+        // Crank also inherits the vanilla identity structure hooks.
+        assert_eq!(structure["rotate"][first], json!([first, first, first]));
+        assert_eq!(structure["mirror"][first], json!([first, first]));
         let (named, _) = nbt::read_named(
             &fs::read(out.join("cached-collision.nbt")).unwrap(),
             Limits::tables(),

@@ -15,8 +15,5 @@ pub(super) fn placed(game: &mut Game<'_>, _stack: &ItemStack, pos: [i32; 3]) {
         return;
     };
     let (facing, spin) = ae2_orientation::placement(player.yaw, player.pitch);
-    if !game.native_set_block_property(pos, "facing", facing) {
-        return;
-    }
-    let _ = game.native_set_block_property(pos, "spin", &spin.to_string());
+    let _ = super::ae2_wrench::set_full(game, pos, facing, spin);
 }

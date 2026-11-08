@@ -35,15 +35,20 @@ pub fn opposite(direction: &str) -> &'static str {
 
 /// `Direction.fromYRot` for a horizontal direction.
 pub fn from_yaw(yaw: f32) -> &'static str {
-    let yaw = yaw.rem_euclid(360.0);
-    if yaw < 45.0 || yaw >= 315.0 {
-        "south"
-    } else if yaw < 135.0 {
-        "west"
-    } else if yaw < 225.0 {
-        "north"
+    // Entity.getDirection widens yaw to double before Direction.fromYRot.
+    // Reducing a negative f32 yaw modulo 360 first loses boundary precision.
+    let quadrant = f64::from(yaw) / 90.0 + 0.5;
+    let truncated = quadrant as i32;
+    let floor = if quadrant < f64::from(truncated) {
+        truncated.wrapping_sub(1)
     } else {
-        "east"
+        truncated
+    };
+    match floor & 3 {
+        0 => "south",
+        1 => "west",
+        2 => "north",
+        _ => "east",
     }
 }
 
@@ -177,6 +182,14 @@ mod tests {
     fn boundaries_are_exclusive_above_and_below_sixty_five() {
         assert_eq!(placement(0.0, 65.0), ("north", 0));
         assert_eq!(placement(0.0, -65.0), ("north", 0));
+    }
+
+    #[test]
+    fn negative_yaw_boundary_keeps_direction_from_the_original_double_conversion() {
+        let below = f32::from_bits((-45.0f32).to_bits() + 1);
+        assert_eq!(from_yaw(below), "east");
+        assert_eq!(from_yaw(-45.0), "south");
+        assert_eq!(from_yaw(f32::from_bits((-45.0f32).to_bits() - 1)), "south");
     }
 
     #[test]

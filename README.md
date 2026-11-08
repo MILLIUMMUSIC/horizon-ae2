@@ -12,7 +12,7 @@ survival drops, names, waterlogging/buckets and persistent ownership. The curren
 the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
 placement also has client prediction, source interaction results and server correction.
 Charger and Drive use the source 24-state facing/spin orientation, including source player
-placement thresholds and effective structure rotation. Adventure item use evaluates the actual
+placement thresholds and source identity structure hooks. Adventure item use evaluates the actual
 hand and original block/state/NBT predicates.
 Adventure-mode rework is suspended for now: that validated behavior stays in place, while its
 remaining cache, block-entity codec and permission work is deferred.
@@ -48,7 +48,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Energy storage and grid energy service | `energy.rs`, `power.rs`: finite/creative stores, provider priorities, local buffers, drain and merge/split rules |
 | Storage providers, mounts and network storage service | `mounts.rs`, `service.rs`, `drive.rs`: mounting, priorities, public/private storage and provider changes |
 | Charger and Wooden Crank | `charger.rs`, `glue.rs`, `charger_inventory.rs`: recipe work, crank rules, local/grid power, original inventory persistence, source crank facing states and per-facing shape; complete crank placement/animation remains open |
-| Charger/Drive/Crank orientation and wrench turns | `block_states.rs`, `orientation.rs`, `wrench.rs`, `block_orientation.py`: 24 source facing/spin states, six crank facing states with source shapes, effective rotations, source placement and Certus Quartz Wrench turns; client prediction, crank placement/animation, disassembly and permissions remain open |
+| Charger/Drive/Crank orientation and wrench turns | `block_states.rs`, `orientation.rs`, `wrench.rs`, `block_orientation.py`: 24 source facing/spin states, six crank facing states with source shapes, inherited identity structure hooks, source placement and Certus Quartz Wrench turns; client prediction, crank placement/animation, disassembly and permissions remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |

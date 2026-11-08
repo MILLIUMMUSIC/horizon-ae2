@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -80,7 +81,7 @@ def main():
 
     def check(name, value):
         checks.append({'name': name, 'value': value})
-        print('PASS:', name, flush=True)
+        print('PASS:', name, file=sys.stderr, flush=True)
 
     def block(pos, state_name):
         ctl('setblock', *pos, state_name)
@@ -118,6 +119,14 @@ def main():
     crank_west = (5, 73, 7)
     try:
         launch()
+        ctl('tp', 8.5, 82, 4.5)
+        for corner in [(3, 72, 2), (17, 72, 11)]:
+            for _ in range(60):
+                if ctl('block', *corner).get('loaded'):
+                    break
+                ctl('wait', 5)
+            else:
+                raise AssertionError(f'fixture chunk never loaded: {corner}')
         ctl('server-hold', 'on')
         try:
             ctl('command', 'fill 3 72 2 17 72 11 stone')
@@ -132,6 +141,7 @@ def main():
         finally:
             ctl('server-hold', 'off')
         ctl('wait', 4)
+        assert ctl('getblock', 8, 72, 4)['block'] == 'minecraft:stone'
         state_initial = {pos: state(pos) for pos in
                          [charger, drive, dispenser, crank]}
         assert state_initial[charger] == 'ae2:charger[facing=north,spin=0]', state_initial
@@ -184,6 +194,16 @@ def main():
         hold('minecraft:stick')
         refused('non-wrench item does not rotate the charger', charger, 'up')
 
+        # The source hook handles only MAIN_HAND and rejects spectators.
+        hold('minecraft:stick')
+        ctl('command', 'item replace entity @s weapon.offhand with ae2:certus_quartz_wrench')
+        refused('offhand wrench does not rotate the charger', charger, 'up')
+        ctl('command', 'item replace entity @s weapon.offhand with minecraft:air')
+        hold('ae2:certus_quartz_wrench')
+        ctl('command', 'gamemode spectator')
+        refused('spectator wrench does not rotate the charger', charger, 'up')
+        ctl('command', 'gamemode creative')
+
         # The crank turns only while its new attached side is a crankable.
         hold('ae2:certus_quartz_wrench')
         ctl('tp', 6.5, 73, 4.5)
@@ -217,11 +237,10 @@ def main():
                 'Shift-disassembly, permissions/claims and the network tool UI remain unported',
                 'Only Charger, Drive and Crank carry native orientation strategies today',
                 'Rotation is server-authoritative; independent multiplayer is not covered',
-                'Two property writes stand in for the source single setBlockAndUpdate',
             ],
         }
         (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
-        print('PASS: wrench rotation; logs:', work, flush=True)
+        print(json.dumps(report, indent=2))
     finally:
         for process in processes:
             if process.poll() is None:

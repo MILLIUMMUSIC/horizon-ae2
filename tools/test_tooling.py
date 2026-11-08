@@ -6,6 +6,7 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import tomllib
 import unittest
@@ -257,6 +258,18 @@ class PackageTests(unittest.TestCase):
             # Corresponding source must be runnable as its own Cargo tree.
             self.assertEqual(z.read(prefix + "data/source/mixins/ae2/charger.rs"),
                              z.read(prefix + "charger.rs"))
+
+    def test_corresponding_source_includes_content_preparation_imports(self):
+        with contextlib.redirect_stdout(io.StringIO()):
+            package.package()
+        with tempfile.TemporaryDirectory() as temporary:
+            with zipfile.ZipFile(package.ROOT / "target/ae2-0.1.0.hnmod") as archive:
+                archive.extractall(temporary)
+            source = Path(temporary) / "mixins/ae2/data/source"
+            run = subprocess.run([sys.executable, "-I", "-c",
+                "import sys; sys.path.insert(0, sys.argv[1]); import prepare_content; import block_orientation; assert len(block_orientation.ANGLES)==24",
+                str(source / "tools")], cwd=source, text=True, capture_output=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
 
     def test_bundle_pins_match_and_all_injections_have_helpers(self):
         root = package.ROOT

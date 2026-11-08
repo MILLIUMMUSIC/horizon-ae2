@@ -28,6 +28,9 @@ fn face_name(face: [i32; 3]) -> Option<&'static str> {
 /// in the common tag but is explicitly excluded by the source.
 fn wrenching(game: &Game<'_>) -> bool {
     // Source `isInAlternateUseMode`: shift is the disassembly mode, not rotation.
+    if game.spectator() || game.hand != horizon_client::first_person::Hand::Main {
+        return false;
+    }
     if game.keys.contains(&KeyCode::ShiftLeft) || game.keys.contains(&KeyCode::ShiftRight) {
         return false;
     }
@@ -81,11 +84,15 @@ pub(super) fn rotate(game: &mut Game<'_>, pos: [i32; 3], face: [i32; 3]) -> bool
     if (new_facing, new_spin) == (facing.as_str(), spin) {
         return false;
     }
-    if !game.native_set_block_property(pos, "facing", new_facing) {
+    set_full(game, pos, new_facing, new_spin)
+}
+
+pub(super) fn set_full(game: &mut Game<'_>, pos: [i32; 3], facing: &str, spin: u8) -> bool {
+    let old = game.world.block(pos[0], pos[1], pos[2]);
+    let spin = spin.to_string();
+    let Some(state) = game.with_props(old, &[("facing", facing), ("spin", &spin)]) else {
         return false;
-    }
-    if !game.native_set_block_property(pos, "spin", &new_spin.to_string()) {
-        return false;
-    }
-    true
+    };
+    let dimension = game.dim.id().to_owned();
+    game.native_set_block(&dimension, pos, state, 3)
 }

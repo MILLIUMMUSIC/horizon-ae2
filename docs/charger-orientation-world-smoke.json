@@ -1,18 +1,114 @@
 {
   "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-orientation-pezwdwla",
   "checks": [
-    "charger horizontal placement: facing north, spin 0",
-    "charger steep downward look (>65 degrees): facing up, spin 3 from the west look",
-    "charger steep upward look: facing down, spin 0 from the north look",
-    "charger steep upward look from the east: facing down, spin 1",
-    "drive horizontal placement: facing north, spin 0",
-    "drive steep downward look: facing up, spin 3 from the west look",
-    "all 24 prepared blockstate variants bound without model-load warnings"
+    {
+      "name": "charger horizontal facing north spin 0",
+      "value": {
+        "block": "ae2:charger[facing=north,spin=0]",
+        "target": [
+          8,
+          73,
+          6
+        ],
+        "player": [
+          8.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "charger steep look places facing up spin 3",
+      "value": {
+        "block": "ae2:charger[facing=up,spin=3]",
+        "target": [
+          10,
+          72,
+          7
+        ],
+        "player": [
+          11.05,
+          73,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "charger steep upward look places facing down spin 0",
+      "value": {
+        "block": "ae2:charger[facing=down,spin=0]",
+        "target": [
+          12,
+          75,
+          7
+        ],
+        "player": [
+          12.5,
+          73,
+          8.05
+        ]
+      }
+    },
+    {
+      "name": "charger steep upward look places facing down spin 1",
+      "value": {
+        "block": "ae2:charger[facing=down,spin=1]",
+        "target": [
+          14,
+          75,
+          7
+        ],
+        "player": [
+          14.95,
+          73,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "drive horizontal facing north spin 0",
+      "value": {
+        "block": "ae2:drive[facing=north,spin=0]",
+        "target": [
+          13,
+          73,
+          6
+        ],
+        "player": [
+          13.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "drive steep look places facing up spin 3",
+      "value": {
+        "block": "ae2:drive[facing=up,spin=3]",
+        "target": [
+          11,
+          72,
+          9
+        ],
+        "player": [
+          12.05,
+          73,
+          9.5
+        ]
+      }
+    },
+    {
+      "name": "all 24 orientation models bound for charger and drive",
+      "value": {
+        "log": "clean"
+      }
+    }
   ],
-  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-orientation-puwb5a6e",
+  "scope": "Native source FacingWithSpinStrategy placement for ae2:charger and ae2:drive",
   "limits": [
-    "Integrated single-player client; placement orientation is applied by the server hook",
-    "Client prediction still starts from the engine dispenser-template state until the block update",
-    "Wrench rotation/disassembly, machine menus/models, crank orientation and independent multiplayer are not covered"
+    "Player-facing placement through horizon-ctl; not independent multiplayer",
+    "The client prediction path still uses the engine template state until the server update",
+    "Charger/Drive machine behavior, menu and model composition remain separate gaps"
   ]
 }

@@ -270,9 +270,9 @@ states. Rows are ordered facing major (spin minor where the block has spin),
 default to facing north (and spin 0), and rewrite the model-state, render,
 gameplay, behaviour, command, worldgen and NBT tables together. The crank keeps
 its source `createShape` box per facing, applied to the effective outline and
-collision tables; structure rotation and mirror move only the facing, matching
-vanilla's `DirectionProperty` transforms and the source block's inherited
-behaviour.
+collision tables. Structure rotation and mirror preserve the complete original
+state: AEBaseBlock and these hosts do not override BlockBehaviour's identity
+hooks. Wrench orientation strategies are independent of those hooks.
 
 Prepared blockstates translate the jar's source-only `ae2:z` rotation into
 Horizon's plain x/y/z quarter turns. `tools/block_orientation.py` checks every
@@ -294,8 +294,8 @@ without its menu, refused vanilla/network-tool/non-wrench clicks, crank survival
 block-entity data retention and restart. Shift-disassembly, permissions/claims,
 the network tool UI, complete Charger/Drive menu and model composition, the
 crank's placement orientation/survival, animation and synchronization, and
-external multiplayer remain open. The native adapter performs two sequential
-property writes rather than the source single `setBlockAndUpdate`.
+external multiplayer remain open. The native adapter writes facing and spin together through one authoritative
+`Level.setBlock` call, preserving the existing block entity.
 
 ## Native networking, recipes, and platform limits
 

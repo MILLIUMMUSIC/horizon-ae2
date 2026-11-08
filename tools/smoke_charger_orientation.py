@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -72,7 +73,7 @@ def main():
 
     def check(name, value):
         checks.append({'name': name, 'value': value})
-        print('PASS:', name, flush=True)
+        print('PASS:', name, file=sys.stderr, flush=True)
 
     def off(tick):
         ctl('wait', tick)
@@ -90,7 +91,11 @@ def main():
         off(2)
 
     def placed(target):
-        ctl('place', *target)
+        try:
+            ctl('place', *target)
+        except RuntimeError:
+            (work / 'placement-failure.json').write_text(json.dumps(ctl('state'), indent=2)+'\n')
+            raise
         off(3)
         return ctl('block', *target).get('state')
 
@@ -102,6 +107,14 @@ def main():
 
     try:
         launch()
+        ctl('tp', 8.5, 82, 4.5)
+        for corner in [(5, 72, 2), (16, 72, 10)]:
+            for _ in range(60):
+                if ctl('block', *corner).get('loaded'):
+                    break
+                off(5)
+            else:
+                raise AssertionError(f'fixture chunk never loaded: {corner}')
         ctl('server-hold', 'on')
         try:
             ctl('command', 'fill 5 72 2 16 72 10 stone')
@@ -112,6 +125,7 @@ def main():
         finally:
             ctl('server-hold', 'off')
         off(4)
+        assert ctl('getblock', 11, 72, 7)['block'] == 'minecraft:stone'
         # Horizontal look: the source forward is the clicked direction toward
         # the player, so the placed block faces north.
         case('charger horizontal facing north spin 0',
@@ -158,7 +172,7 @@ def main():
             ],
         }
         (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
-        print('PASS: Charger/Drive source orientation; logs:', work, flush=True)
+        print(json.dumps(report, indent=2))
     finally:
         for process in processes:
             if process.poll() is None:

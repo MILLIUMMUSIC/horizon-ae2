@@ -83,8 +83,10 @@ original BlockOrientation table. Server placement applies the source
 FacingWithSpinStrategy (65-degree pitch thresholds and SpinMapping). Client
 prediction still starts from the engine template state. The Certus Quartz
 Wrench turns supported oriented hosts through the `c:tools/wrench` common tag,
-excluding `ae2:network_tool`, using the source Direction.getClockWise rotation
-and spin derivation. Never rotate vanilla blocks; a crank turn is refused unless
+excluding `ae2:network_tool`, restricted to the main hand and nonspectators,
+using the source Direction.getClockWise rotation
+and spin derivation. Facing and spin must change in one authoritative write.
+Never rotate vanilla blocks; a crank turn is refused unless
 the new attached side is a crankable, and shift mode must not rotate. Disassembly,
 permissions/claims and the network tool UI remain unported; do not present this
 as the complete WrenchHook.
@@ -120,7 +122,7 @@ state/type and finite-cell five fullness variants, replaces the dispenser
 template's twelve facing/triggered rows with the source 24 facing/spin states
 for Charger/Drive, and shrinks the Crank to the source six facing-only states.
 Oriented rows are ordered facing major (spin minor where present), keep the
-source facing-north default, and structure rotation/mirror move only facing.
+source facing-north default, and structure rotation/mirror preserve the original state.
 The Crank may carry the source per-facing shape boxes; Charger/Drive must not.
 Preserve vanilla ids and foreign shape/model references. The adapter supports
 template ranges both growing and shrinking. This is not a general custom-state

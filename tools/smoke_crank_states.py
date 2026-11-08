@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -72,7 +73,7 @@ def main():
 
     def check(name, value):
         checks.append({'name': name, 'value': value})
-        print('PASS:', name, flush=True)
+        print('PASS:', name, file=sys.stderr, flush=True)
 
     def target(point):
         ctl('look-at', *point)
@@ -92,6 +93,14 @@ def main():
         charger = (6, 73, 8)
         charger_west = (5, 73, 7)
         crank = (6, 73, 7)
+        ctl('tp', 8.5, 82, 4.5)
+        for corner in [(3, 72, 2), (17, 72, 11)]:
+            for _ in range(60):
+                if ctl('block', *corner).get('loaded'):
+                    break
+                ctl('wait', 5)
+            else:
+                raise AssertionError(f'fixture chunk never loaded: {corner}')
         ctl('server-hold', 'on')
         try:
             ctl('command', 'fill 3 72 2 17 72 11 stone')
@@ -103,6 +112,7 @@ def main():
         finally:
             ctl('server-hold', 'off')
         ctl('wait', 4)
+        assert ctl('getblock', 8, 72, 4)['block'] == 'minecraft:stone'
         assert ctl('block', *crank)['state'] == 'ae2:crank[facing=north]'
         # North facing box: x 0.15..0.85, y 0.15..0.85, z 0.30..1.00.
         assert block((6.75, 73.5, 7.5)) == 'ae2:crank'
@@ -135,7 +145,7 @@ def main():
             ],
         }
         (work / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
-        print('PASS: crank facing states and shape; logs:', work, flush=True)
+        print(json.dumps(report, indent=2))
     finally:
         for process in processes:
             if process.poll() is None:

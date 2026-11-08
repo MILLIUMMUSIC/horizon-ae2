@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "cases": 105489,
+  "placement_cases": 105345,
+  "rotation_cases": 144,
+  "source_sha256": {
+    "api/orientation/FacingWithSpinStrategy.java": "f93427fb3e8ced33a50b35e67e81aa85d028e677c22ac1771acd75f63a9ab3e2",
+    "block/orientation/SpinMapping.java": "d460e7e10f9cecaba9e8c239420ee8a23589e5ebb03c77cb45a593e58d150d28"
+  },
+  "port_sha256": "a8acca66d8be0c8fba96acacccf077fd25eb5c6ed4ff7979e89dfd9d5fd77707",
+  "input_sha256": "102a74731b9cbe95d0ad80eac177df77a19bd40d951204c31d28d410d7afb039",
+  "scope": "Verbatim FacingWithSpinStrategy and SpinMapping with original Minecraft Direction.fromYRot and clockwise/counterclockwise direction methods",
+  "limits": [
+    "Placement context/property/state/interface are minimal hosts, not a complete Java world",
+    "Rotation composes original direction turns with SpinMapping as in BlockOrientation; the full BlockOrientation renderer/quaternion class is not executed",
+    "Native hand/spectator gating, placement hooks, structure tables and actual client/server behavior require separate checks"
+  ]
+}

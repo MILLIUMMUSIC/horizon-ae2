@@ -1,17 +1,26 @@
 # Verification evidence
 
-Last updated: 3 November 2026. Development host: macOS arm64, Rust 1.99.1,
+Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current Wooden Crank state checkpoint
+## Current orientation and wrench checkpoint
 
-- Formatting, Clippy, 137 standalone Rust tests and 14 Python tooling tests pass.
-  Native check/build pass; 197 game tests and 18 native library tests pass.
+- Formatting, Clippy, 138 standalone Rust tests and 15 Python tooling tests pass.
+  Native check/build pass; 198 game tests and 18 native library tests pass.
+- [Original Java orientation comparison](docs/orientation-oracle.json): 105,489
+  placement/direction cases pass, including float yaw boundaries. It executes the
+  original placement strategy, SpinMapping and Minecraft direction operations;
+  the host context is a stub and the quaternion renderer is not executed.
+- Facing and spin are written in one authoritative state change. Wrench turns
+  require the main hand and a nonspectator, as in WrenchHook. Structure rotation
+  and mirror retain the input state, matching the inherited vanilla methods.
+- The corresponding-source archive includes block_orientation.py. A tooling
+  regression imports preparation from the extracted archive in isolation.
 - The native state adapter now supports shrinking a template state range. For
   `ae2:crank` it replaces the dispenser template's twelve facing/triggered rows
   with the source six facing-only states; rows are ordered facing north, east,
-  south, west, up, down, the default is north, and structure rotation/mirror move
-  only the facing. The crank keeps its source `createShape` box per facing in the
+  south, west, up, down, the default is north, and structure rotation/mirror preserve
+  the original state. The crank keeps its source `createShape` box per facing in the
   effective outline/collision tables; Charger and Drive carry no shapes.
 - The new native library test
   `mod_content::ae2_block_states::tests::facing_only_crank_gets_source_states_and_shape_boxes`
@@ -25,7 +34,8 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   after a wrench turn to east the north-only x range no longer hits while the
   rotated east box does.
 - The [wrench rotation scenario](docs/wrench-rotation-world-smoke.json) passes
-  again with the fifteen checks, now using the crank's facing-only state strings.
+  with seventeen checks, including spectator/offhand refusal and the crank's
+  facing-only state strings.
 - Limits: crank placement orientation/canSurvive, TESR animation and
   synchronization, statistics/fake players, the inherited dispenser behavior
   chain and independent multiplayer remain open. This checkpoint does not
@@ -33,7 +43,7 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
 ## Wrench rotation checkpoint (previous)
 
-- Formatting, Clippy, 137 standalone Rust tests and 14 Python tooling tests pass.
+- Formatting, Clippy, 138 standalone Rust tests and 14 Python tooling tests pass.
   Native check/build pass; 197 game tests and 17 native library tests pass.
 - Four new `ae2_orientation` tests pin the source rotation behaviour:
   `Direction.getClockWise`/`getCounterClockWise` for each axis, four quarter
@@ -53,9 +63,8 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   `NetworkToolItem` special case. Shift mode does not rotate.
 - Limits: shift-disassembly, permissions/claims, the network tool UI, client-side
   prediction and independent multiplayer are not covered. Only Charger, Drive and
-  Crank have native orientation strategies today. The adapter performs two
-  sequential property writes instead of the source single `setBlockAndUpdate`, and
-  refused/vanilla fallthrough click swings are not compared. These classes remain
+  Crank have native orientation strategies today. Facing and spin now change in one authoritative write. Refused/vanilla
+  fallthrough click swings are not compared. These classes remain
   partial.
 
 ## Charger/Drive orientation checkpoint (previous)
@@ -63,11 +72,11 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 - Formatting, Clippy, 133 standalone Rust tests and 14 Python tooling tests pass.
   Native check/build pass; 193 game tests and 17 native library tests pass.
 - The native library test
-  `mod_content::ae2_block_states::tests::oriented_charger_and_drive_get_source_facing_spin_states_and_rotation_mappings`
+  `mod_content::ae2_block_states::tests::oriented_hosts_keep_source_states_and_inherited_structure_identity`
   builds real content over the pinned resources and checks 24 contiguous rows
   for each of Charger and Drive: facing-major/spin-minor order, the source
   north/0 default, model/render/gameplay/behaviour/command/worldgen tables, NBT
-  state arrays, structure rotate/mirror (facing only), the engine's derived state
+  state arrays, structure rotate/mirror (identity), the engine's derived state
   table and all 24 bound models. Test models are empty fixtures; their binding
   proves the state-to-model wiring, not the carried geometry.
 - `tools/block_orientation.py` derives the Horizon x/y/z triple for every one of

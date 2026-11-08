@@ -1,15 +1,52 @@
 {
   "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/crank-states-hp5u518b",
   "checks": [
-    "crank north shape: a ray through its offset box targets ae2:crank",
-    "crank north shape: a ray passing below the box bottom misses the crank",
-    "after a wrench turn to east, the north-only x range no longer targets the crank",
-    "the rotated east box still targets the crank"
+    {
+      "name": "crank north shape covers its offset box",
+      "value": {
+        "point": [
+          6.75,
+          73.5,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "crank north shape leaves the source gap below it",
+      "value": {
+        "point": [
+          6.5,
+          73.0,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "crank east shape no longer covers the north-only x range",
+      "value": {
+        "point": [
+          6.8,
+          73.5,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "crank east shape covers its rotated box",
+      "value": {
+        "point": [
+          6.35,
+          73.5,
+          7.5
+        ]
+      }
+    }
   ],
-  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/crank-states-0455a9a7",
+  "scope": "Wooden Crank source facing-only state and per-facing selection shape",
   "limits": [
     "Placement orientation/canSurvive, animation/TESR, synchronization, statistics and fake players remain unported",
-    "The selection check exercises the effective gameplay/collision tables; exact encoded collision boxes are also asserted by the native library test",
+    "The selection check exercises the effective gameplay/collision tables; exact collision boxes are also asserted by the native library test",
     "The inherited dispenser behavior chain and independent multiplayer are not covered"
   ]
 }
