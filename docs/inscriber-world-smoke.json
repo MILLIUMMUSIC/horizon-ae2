@@ -1,0 +1,371 @@
+{
+  "passed": true,
+  "recipes": 15,
+  "checks": [
+    {
+      "recipe": "ae2:inscriber/calculation_processor",
+      "mode": "press",
+      "reversed_plates": false,
+      "slots": [
+        [
+          "ae2:printed_calculation_processor",
+          1
+        ],
+        [
+          "ae2:printed_silicon",
+          1
+        ],
+        null,
+        [
+          "ae2:calculation_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/calculation_processor_press",
+      "mode": "inscribe",
+      "reversed_plates": true,
+      "slots": [
+        null,
+        [
+          "ae2:calculation_processor_press",
+          2
+        ],
+        null,
+        [
+          "ae2:calculation_processor_press",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/calculation_processor_print",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        [
+          "ae2:calculation_processor_press",
+          2
+        ],
+        null,
+        null,
+        [
+          "ae2:printed_calculation_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/certus_quartz_dust",
+      "mode": "inscribe",
+      "reversed_plates": true,
+      "slots": [
+        null,
+        null,
+        null,
+        [
+          "ae2:certus_quartz_dust",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/ender_dust",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        null,
+        null,
+        null,
+        [
+          "ae2:ender_dust",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/engineering_processor",
+      "mode": "press",
+      "reversed_plates": true,
+      "slots": [
+        [
+          "ae2:printed_silicon",
+          1
+        ],
+        [
+          "ae2:printed_engineering_processor",
+          1
+        ],
+        null,
+        [
+          "ae2:engineering_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/engineering_processor_press",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        [
+          "ae2:engineering_processor_press",
+          2
+        ],
+        null,
+        null,
+        [
+          "ae2:engineering_processor_press",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/engineering_processor_print",
+      "mode": "inscribe",
+      "reversed_plates": true,
+      "slots": [
+        null,
+        [
+          "ae2:engineering_processor_press",
+          2
+        ],
+        null,
+        [
+          "ae2:printed_engineering_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/fluix_dust",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        null,
+        null,
+        null,
+        [
+          "ae2:fluix_dust",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/logic_processor",
+      "mode": "press",
+      "reversed_plates": true,
+      "slots": [
+        [
+          "ae2:printed_silicon",
+          1
+        ],
+        [
+          "ae2:printed_logic_processor",
+          1
+        ],
+        null,
+        [
+          "ae2:logic_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/logic_processor_press",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        [
+          "ae2:logic_processor_press",
+          2
+        ],
+        null,
+        null,
+        [
+          "ae2:logic_processor_press",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/logic_processor_print",
+      "mode": "inscribe",
+      "reversed_plates": true,
+      "slots": [
+        null,
+        [
+          "ae2:logic_processor_press",
+          2
+        ],
+        null,
+        [
+          "ae2:printed_logic_processor",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/silicon_press",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        [
+          "ae2:silicon_press",
+          2
+        ],
+        null,
+        null,
+        [
+          "ae2:silicon_press",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/silicon_print",
+      "mode": "inscribe",
+      "reversed_plates": true,
+      "slots": [
+        null,
+        [
+          "ae2:silicon_press",
+          2
+        ],
+        null,
+        [
+          "ae2:printed_silicon",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "recipe": "ae2:inscriber/sky_stone_dust",
+      "mode": "inscribe",
+      "reversed_plates": false,
+      "slots": [
+        null,
+        null,
+        null,
+        [
+          "ae2:sky_dust",
+          1
+        ]
+      ],
+      "spent_AE": 2020.0
+    },
+    {
+      "restart": "original inventories and total AE retained"
+    },
+    {
+      "front": "front-facing adjacent power does not run a task"
+    },
+    {
+      "crank_turns": 13,
+      "supplied_AE": 2080,
+      "remaining_AE": 60
+    },
+    {
+      "auto_export": "setting wakes an idle machine and exports its actual result"
+    },
+    {
+      "speed_cards": 4,
+      "spent_AE": 2500.0
+    },
+    {
+      "automation": "invalid input refused; ONE capacity; top/middle admission; separated plate extraction and default output-only extraction"
+    },
+    {
+      "comparator": [
+        {
+          "capacity": "SIXTY_FOUR",
+          "counts": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "dust": 1
+        },
+        {
+          "capacity": "FOUR",
+          "counts": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "dust": 1
+        },
+        {
+          "capacity": "ONE",
+          "counts": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "dust": 4
+        },
+        {
+          "capacity": "FOUR",
+          "counts": [
+            4,
+            4,
+            4,
+            4
+          ],
+          "dust": 15
+        },
+        {
+          "capacity": "SIXTY_FOUR",
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ],
+          "dust": 15
+        },
+        {
+          "capacity": "ONE",
+          "counts": [
+            0,
+            0,
+            0,
+            64
+          ],
+          "dust": 15
+        }
+      ]
+    },
+    {
+      "wrench": "source full orientation turns and retains all four inventory slots"
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/inscriber-hy5gn6v_",
+  "recipe_jar_sha512": "39bc4cf733a4321631e2637a1a6dfd3527135fdac1b572534e6fd1f9eab7a6dd92d56c5fa066263c95149c9b20cabdd1fd3dff80bea515381b1d2d754cad26c3",
+  "binary_sha256": "e5a4354cab3040ebac3e4554521535161414f79b1f751efaa8e4bfec3f8119d9",
+  "binding_sha256": "f07eaa4ab9dd345b5a21b76523bf220ebdd4d4e030b3cc751a04826f3ae3da7d",
+  "state_adapter_sha256": "07aad799f0ce42afe7b7f7a8b81077207176b3e62bdbd4ce9bc25d1e9636258e",
+  "limits": [
+    "inputs are supplied; this is not complete survival progression",
+    "native integrated server only; external multiplayer remains open",
+    "name-press components, complete menu/render packets and full node lifecycle remain open"
+  ]
+}

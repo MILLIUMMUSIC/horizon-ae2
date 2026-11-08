@@ -15,6 +15,9 @@ both the original press and a second press in its output.
 """
 import argparse
 import json
+import hashlib
+import sys
+import zipfile
 import os
 from pathlib import Path
 import subprocess
@@ -42,7 +45,24 @@ def main():
     parser.add_argument("--resources", type=Path, required=True)
     parser.add_argument("--content", type=Path, required=True)
     parser.add_argument("--game", type=Path, default=ROOT / "target/horizon-cargo/fast/horizon-client")
+    parser.add_argument("--jar", type=Path, default=ROOT / "target/jars/appliedenergistics2-19.2.18.jar")
     args = parser.parse_args()
+    lock = json.loads((ROOT / "upstream.lock.json").read_text())
+    assert hashlib.sha512(args.jar.read_bytes()).hexdigest() == lock["jar"]["sha512"]
+    remap = json.loads((args.content / "ae2-recipe-map.json").read_text())
+    with zipfile.ZipFile(args.jar) as archive:
+        source = json.loads(archive.read("data/ae2/recipe/network/blocks/controller.json"))
+        copied = json.loads(archive.read("data/ae2/recipe/inscriber/calculation_processor_press.json"))
+    native_id = remap["ae2:network/blocks/controller"]
+    native = json.loads((args.content / "data/ae2/recipe" / (native_id.split(":",1)[1] + ".json")).read_text())
+    expected = dict(source)
+    expected["key"] = {key: value["item"] if "item" in value else "#" + value["tag"]
+                       for key, value in source["key"].items()}
+    assert native == expected, (native, expected)
+    copy_id = remap["ae2:inscriber/calculation_processor_press"]
+    carried_copy = json.loads((args.content / "data/ae2/recipe" / (copy_id.split(":",1)[1] + ".json")).read_text())
+    assert carried_copy == copied, (carried_copy, copied)
+
     parent = ROOT / "target/smoke"
     parent.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="controller-craft-", dir=parent))
@@ -89,6 +109,9 @@ def main():
                 raise RuntimeError(f"game exited {process.returncode}; see {log.name}")
             try:
                 ctl("wait-ready")
+                loaded_log = Path(log.name).read_text(errors="replace")
+                if "content mods not loaded" in loaded_log or "using the default resources" in loaded_log:
+                    raise AssertionError(f"AE2 content failed to load: {log.name}")
                 if "using the default resources" in Path(log.name).read_text(errors="replace"):
                     raise AssertionError(f"content resource fallback: {log.name}")
                 return
@@ -135,9 +158,16 @@ def main():
     try:
         launch()
         ctl("tp", 8.5, 80, 4.5)
-        ctl("wait", 70)
+        for corner in [(4,72,3), (12,72,12)]:
+            for _ in range(60):
+                if ctl("block", *corner).get("loaded"):
+                    break
+                ctl("wait", 5)
+            else:
+                raise AssertionError(f"fixture chunk did not load: {corner}")
         ctl("command", "fill 4 72 3 12 72 12 stone")
         ctl("command", "fill 4 73 3 12 78 12 air")
+        assert ctl("getblock", 8, 72, 4)["block"] == "minecraft:stone"
         ctl("tp", 6.5, 73, 5.5)
         ctl("wait", 5)
         ctl("time", 6000)
@@ -176,7 +206,7 @@ def main():
         ctl("key", "escape", "down")
         ctl("key", "escape", "up")
         ctl("wait", 5)
-        print("PASS: crafting table produced one controller from the restored recipe", flush=True)
+        print("PASS: crafting table produced one controller from the restored recipe", file=sys.stderr, flush=True)
 
         ctl("setblock", *inscriber, "ae2:inscriber[facing=north]")
         ctl("setblock", *cell, "ae2:creative_energy_cell")
@@ -220,13 +250,20 @@ def main():
         ctl("quit")
         report = {
             "passed": True,
+            "binary_sha256": hashlib.sha256(args.game.read_bytes()).hexdigest(),
+            "controller_recipe": native_id,
+            "press_recipe": copy_id,
+            "recipe_jar_sha512": lock["jar"]["sha512"],
+            "limits": ["raw materials and engineering processor are supplied",
+                       "a creative energy cell powers the real Inscriber",
+                       "the Inscriber menu and full survival progression are not exercised"],
             "controller": controller_count,
             "press_slots": copied,
             "screenshot": str(shot),
             "logs": str(work),
         }
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
-        print(f"PASS: controller item and copied calculation press are both present; logs: {work}", flush=True)
+        print(json.dumps(report, indent=2))
     finally:
         for process in processes:
             if process.poll() is None:

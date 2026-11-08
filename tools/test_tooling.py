@@ -51,6 +51,7 @@ class ContentTests(unittest.TestCase):
             return {"variants": variants}
         content.write_json(carried / "assets/ae2/blockstates/charger.json", orientation_states("ae2:block/charger"))
         content.write_json(carried / "assets/ae2/blockstates/drive.json", orientation_states("ae2:block/drive"))
+        content.write_json(carried / "assets/ae2/blockstates/inscriber.json", orientation_states("ae2:block/inscriber"))
         for name in ("energy_cell", "dense_energy_cell"):
             content.write_json(carried / f"assets/ae2/blockstates/{name}.json", {
                 "variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}
@@ -117,6 +118,13 @@ class ContentTests(unittest.TestCase):
         for name in ["charger", "crank", "drive"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
+        inscriber = json.loads((carried / "data/ae2/horizon/block/inscriber.json").read_text())
+        self.assertEqual(inscriber["properties"]["explosion_resistance"], 11)
+        self.assertFalse(inscriber["properties"]["requires_tool"])
+        variants = json.loads((carried / "assets/ae2/blockstates/inscriber.json").read_text())["variants"]
+        self.assertEqual(len(variants), 48)
+        for key in [f"facing={face},spin={spin}" for face in block_orientation.FACING_ORDER for spin in range(4)]:
+            self.assertEqual(variants[key + ",waterlogged=false"], variants[key + ",waterlogged=true"])
         crank = json.loads((carried / "data/ae2/horizon/block/crank.json").read_text())
         self.assertEqual(crank["shapes"]["property"], "facing")
         self.assertEqual(crank["shapes"]["values"], {

@@ -193,6 +193,27 @@ item/fluid keys. Preserve simulation/commit semantics, long counts, partial
 insertion, byte rounding, type limits, partition/extraction rules and nested-cell
 restrictions. Never fake ME channels, energy, crafting jobs or security permissions.
 
+inscriber.rs/inscriber_glue.rs implement source callback processing and actual
+four-slot inventory/power/automation. Preserve strict processingTime > 200:
+nominal default work costs 101 * 20 = 2020 AE; four cards cost 5 * 500 = 2500 AE.
+Keep the original -0.01 threshold tolerance; do not require an exact nominal grant.
+Simulation chooses a whole local or grid request, never combines insufficient
+sources. Output is inserted at smash step 8 before consuming inputs; step 16
+ends it. No elapsed-tick multiplier. Input count-only edits preserve work;
+component changes reset it. AUTO_EXPORT changes wake idle hosts. Keep source
+inv.item0..3, slotted-list upgrades (one installed card per occupied slot), legacy
+NO-to-FOUR migration, separate faces by full orientation and live automation
+filters. Comparator uses ContainerAdapter's minimum slot limit, including ONE/
+FOUR, and each item's own limit. Inscriber front excludes ME/crank connections;
+cable type is COVERED. Private power must never become a public grid store.
+The 48 wet/oriented states use Block behavior, never dispenser redstone logic.
+Per-hand placement fluid scopes must be Game-scoped and cleared by RAII; retain
+item BLOCK_STATE precedence for Charger/Drive/Inscriber. The source menu, name
+presses, component-result recipes, full upgrades/drop and managed-node/cache/
+TickManager/packet lifecycle are still pending. Never replace these with added
+storage slots or a generic empty menu. Sky Stone properties are source 50/150,
+smooth 5/150; optional Athena connected textures remain open.
+
 quartz.rs/survival_loot.rs guard missing THIS_ENTITY in the native item catalog,
 before allocating/drawing its loot sequence. Keep the original carried tables,
 actual passed tool and native evaluator; never substitute game.held or the level

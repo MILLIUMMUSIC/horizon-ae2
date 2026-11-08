@@ -240,6 +240,15 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "block/misc/InscriberBlock.java": ("mixins/ae2/block_states.rs", "48 source facing/spin/waterlogged states, source default, inherited identity structure hooks, metal properties/light blocking, server placement and item-state precedence; complete client prediction, menu, water/event lifecycle and render packets pending"),
+    "blockentity/misc/InscriberBlockEntity.java": ("mixins/ae2/inscriber_glue.rs", "four original inventory slots, press/inscribe processing, strict >200 threshold, 16-callback smash, private/grid/crank power, four speed-card slots, input capacity, separate-side automation, auto-export and comparator; source callback Java oracle; full menu/upgrades/drop callbacks, packets and managed-node lifecycle pending"),
+    "blockentity/misc/InscriberRecipes.java": ("mixins/ae2/inscriber_glue.rs", "original custom-recipe ingredients, optional/reversible plates and source base-filter admission; dynamic name-press Component recipes, recipe-cache identity and live reload/order remain pending"),
+    "recipes/handlers/InscriberRecipe.java": ("mixins/ae2/inscriber_glue.rs", "native execution of carried middle/top/bottom/result/mode data; press consumes one of each input and inscribe retains plates; arbitrary component results, complete original codec/stream API and addon recovery remain pending"),
+    "core/definitions/AEBlocks.java": ("tools/prepare_content.py", "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; full registration/settings and optional Athena connected textures pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

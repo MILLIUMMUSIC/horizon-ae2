@@ -22,6 +22,7 @@ The full mod is not yet complete.
 | Energy cells | Network storage, original energy/node NBT, finite fullness states/models and local comparator, deferred notifications | Exact TickManager/base settings, material/lifecycle completeness and every saved-BE/explosion/pick/loot path |
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator, full-orientation placement and wrench turns | Live config, capability API, exact render geometry/effects/drop RNG, wrench disassembly and complete lifecycle |
+| Inscriber | Four source slots, all 15 built-in recipe data, press/inscribe callbacks, local/grid/crank power, speed-card rules, input capacity, separated automation/auto-export/comparator, original inventory and 48 wet/oriented states | Name-press components and component-result codecs, source menu/settings/upgrades installation and drops, full cache/TickManager/node lifecycle, client prediction and render packets |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules, Charger-side restriction, source six facing states, per-facing shape boxes and wrench turns | Placement/survival/fake-player/statistics, animation, synchronization and full lifecycle |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Certus quartz buds/clusters | Matching amethyst-stage facing/waterlogged states, geometry and original loot tables; missing-entity guard, plain/Silk Touch/Fortune tool handling | Natural budding growth/decay, richer explosion actor contexts, complete source APIs and independent multiplayer |
@@ -359,3 +360,52 @@ yet wired. The native loot context currently represents THIS_ENTITY as a boolean
 for player breaks; full nonplayer explosion-actor semantics remain unfinished. The native `/loot mine`
 route also constructs vanilla-only table IDs and omits the actor; its AE2 command
 integration is not yet ported. Direct table rolling is distinct from block getDrops.
+
+
+## Inscriber
+
+`inscriber.rs` retains the source callback order and the strict
+`processingTime > 200` condition. Default speed is two steps and twenty AE per
+callback; with full nominal grants it spends 2,020 AE before starting its smash cycle.
+Four speed cards use fifty steps and five hundred AE, requiring five work
+callbacks / 2,500 AE. The local buffer is simulated first. If it cannot meet the
+threshold, a complete request goes to the grid; two insufficient sources are not
+combined. Source `ticksSinceLastCall` does not multiply this work. Smash advances
+one step per callback, inserts the result at step eight, and finishes at sixteen.
+
+The four real slots remain top, bottom, middle and output. `press` consumes one
+of each input; `inscribe` consumes only the middle. Plates may be reversed.
+Configured input capacities are ONE, FOUR and SIXTY_FOUR; output keeps its own
+limit. `ContainerAdapter.getMaxStackSize` nevertheless takes the minimum of all
+host slot limits for comparator arithmetic. The native hook retains that rule
+and actual item limits without a synthetic fullness clamp.
+
+Saved inventories use original `inv.item0` through `item3` alongside the native
+transport mirror. Count-only input changes retain work, input component changes
+reset it, output changes wake it, and AUTO_EXPORT changes wake an idle host.
+Legacy `inscriber_buffer_size=NO` migrates to FOUR. Saved speed upgrades use the
+original slotted list and count occupied card slots, not stack counts. Native
+hoppers enforce the source recipe/base filter, configured capacity, smash locks
+and separated top/bottom/side views. Auto-export uses actual neighboring native
+containers and source direction order. The private buffer is 1,600 AE, is not a
+public network store, and accepts crank turns away from the front. ME connections
+exclude the front and expose COVERED cable geometry.
+
+The block owns 48 facing/spin/waterlogged states with source default north/0/dry,
+inherited identity structure hooks, metal properties, no occlusion and light
+blocking two. Placement retains pre-placement source water in a per-hand scope;
+explicit item block-state properties take precedence. The same precedence is
+preserved for Charger and Drive. Source Controller/Inscriber crafting and the
+normal/smooth sky-stone registrations are prepared from the pinned definitions;
+plain sky stone has hardness fifty, smooth five, both resistance 150. Optional
+Athena connected textures remain unported.
+
+Remaining requirements include the actual source machine menu, name-press text
+components, arbitrary component-result recipes, upgrades installation/removal,
+upgrade drops and full capability/settings APIs. Native inventory decoding keeps
+the existing strict malformed-save refusal; this is not source recovery parity.
+The per-host schedule binds initial rate ten and urgent/slower/sleep behavior,
+but complete shared TickManager queue/readiness, recipe-cache identity/reload,
+replacement/unload/fake-player lifecycle, client prediction, source notification
+and packet timing, and animated rendering remain unfinished. The world scenarios
+supply ingredients and do not establish complete survival progression.

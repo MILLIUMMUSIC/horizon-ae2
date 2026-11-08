@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "binary_sha256": "e5a4354cab3040ebac3e4554521535161414f79b1f751efaa8e4bfec3f8119d9",
+  "controller_recipe": "ae2:network.blocks.controller",
+  "press_recipe": "ae2:inscriber.calculation_processor_press",
+  "recipe_jar_sha512": "39bc4cf733a4321631e2637a1a6dfd3527135fdac1b572534e6fd1f9eab7a6dd92d56c5fa066263c95149c9b20cabdd1fd3dff80bea515381b1d2d754cad26c3",
+  "limits": [
+    "raw materials and engineering processor are supplied",
+    "a creative energy cell powers the real Inscriber",
+    "the Inscriber menu and full survival progression are not exercised"
+  ],
+  "controller": 1,
+  "press_slots": [
+    [
+      "ae2:calculation_processor_press",
+      1
+    ],
+    null,
+    null,
+    [
+      "ae2:calculation_processor_press",
+      1
+    ]
+  ],
+  "screenshot": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/controller-craft-heqz24wa/press-copy.png",
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/controller-craft-heqz24wa"
+}

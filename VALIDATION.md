@@ -3,7 +3,54 @@
 Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current certus quartz loot checkpoint
+## Current Inscriber dependency checkpoint
+
+- Formatting, Clippy with warnings denied, 144 standalone Rust tests, 15 Python
+  tests, source inventory (1,429 Java files / 119 partial classes) and stack-limit
+  audit pass. Native compilation/build pass, with 203 game tests and 19 native
+  client-library tests. The unchanged item-catalog payload retains its 7-test
+  quartz checkpoint; it is not counted as a newly repeated run here.
+- [Original Java callback comparison](docs/inscriber-oracle.json): 4,504 scenarios,
+  261,592 callbacks and 4,504 initial sleeping queries execute four verbatim
+  Inscriber methods. State, modulation and callback order match, including
+  power thresholds, local/grid selection, output blocking, partial insertion,
+  input consumption and smash phases. Inventory/energy/recipe/configuration
+  interfaces are controlled bindings; real external auto-export is a stub there.
+- [Controller crafting and press copy](docs/controller-craft-world-smoke.json)
+  passes on the native client. The source jar and carried Controller/press
+  recipes are compared before play. A real 3x3 crafting table makes the
+  Controller, and the actual Inscriber copies a calculation press using grid
+  power while retaining the original. Ingredients are supplied and the machine
+  menu is explicitly outside this scenario.
+- [Inscriber world scenario](docs/inscriber-world-smoke.json): 23 check groups
+  cover all 15 original recipes, both modes and reversed plates, four real slots,
+  nominal default 2,020 AE per operation, inventories/power across restart,
+  refused front power, thirteen crank turns / sixty AE remaining, four speed
+  cards / 2,500 AE, AUTO_EXPORT wake/export, live hopper admission/capacity/side
+  extraction, six actual comparator/dust configurations and wrench inventory
+  retention. Binary and binding hashes identify the verified code.
+- [Placement regression](docs/charger-orientation-world-smoke.json): twelve checks
+  cover the existing Charger/Drive poses, dry/steep/wet Inscriber placement and
+  explicit item block-state precedence over orientation/water. All 24 Charger/
+  Drive and 48 Inscriber model bindings load. The same final binary also passes
+  [crank-only Charger charging](docs/charge-certus-world-smoke.json).
+- The new native library case loads all 48 states through the actual asset/state
+  table/model loaders and checks fluid rows, default state, light blocking and
+  source Block behavior. Game regressions cover inventory echo/malformed repair,
+  configuration wake, slotted upgrade counts, side/spin rules, insertion limits
+  and minimum-limit comparator arithmetic.
+
+Inscriber menu/name presses, arbitrary component-result recipes, upgrades
+installation/removal/drop callbacks, complete cache/TickManager/managed-node
+lifecycle, client prediction and animated render/source packets remain open.
+Sky Stone uses source 50/150 and smooth sky stone 5/150 properties; their original
+cooking recipe remains carried, while optional Athena connected textures are not
+ported. Strict malformed-inventory refusal is still a documented deviation.
+These worlds supply inputs and do not prove full survival or independent
+multiplayer parity. Original repositories, installed resources and user saves
+remain untouched.
+
+## Certus quartz loot checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 143 standalone Rust tests, 15 Python
   tooling tests and source/stack-limit audits pass. Native compilation/build
@@ -42,7 +89,7 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 - Both scripts load and verify their private fixture chunks before setup, use
   isolated homes/worlds, and leave the prepared content unchanged.
 
-## Current orientation and wrench checkpoint
+## Orientation and wrench checkpoint (previous)
 
 - Formatting, Clippy, 138 standalone Rust tests and 15 Python tooling tests pass.
   Native check/build pass; 198 game tests and 18 native library tests pass.

@@ -69,7 +69,7 @@ pub(super) fn rotate(game: &mut Game<'_>, pos: [i32; 3], face: [i32; 3]) -> bool
         }
         return game.native_set_block_property(pos, "facing", new_facing);
     }
-    if !matches!(block.as_str(), CHARGER | DRIVE) {
+    if !matches!(block.as_str(), CHARGER | DRIVE | "ae2:inscriber") {
         return false;
     }
     let Some(spin) = game

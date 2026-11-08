@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-orientation-pezwdwla",
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/charger-orientation-dcv1cnhm",
   "checks": [
     {
       "name": "charger horizontal facing north spin 0",
@@ -99,13 +99,93 @@
       }
     },
     {
-      "name": "all 24 orientation models bound for charger and drive",
+      "name": "inscriber horizontal orientation and dry state",
+      "value": {
+        "block": "ae2:inscriber[facing=north,spin=0,waterlogged=false]",
+        "target": [
+          8,
+          73,
+          6
+        ],
+        "player": [
+          8.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "inscriber source steep placement spin",
+      "value": {
+        "block": "ae2:inscriber[facing=up,spin=3,waterlogged=false]",
+        "target": [
+          10,
+          72,
+          7
+        ],
+        "player": [
+          11.05,
+          73,
+          7.5
+        ]
+      }
+    },
+    {
+      "name": "inscriber retains the source fluid before placement",
+      "value": {
+        "block": "ae2:inscriber[facing=north,spin=0,waterlogged=true]",
+        "target": [
+          8,
+          73,
+          6
+        ],
+        "player": [
+          8.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "charger item state overrides placement orientation",
+      "value": {
+        "block": "ae2:charger[facing=east,spin=2]",
+        "target": [
+          8,
+          73,
+          6
+        ],
+        "player": [
+          8.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "inscriber item state overrides orientation and source water",
+      "value": {
+        "block": "ae2:inscriber[facing=east,spin=2,waterlogged=false]",
+        "target": [
+          8,
+          73,
+          6
+        ],
+        "player": [
+          8.5,
+          73,
+          4.5
+        ]
+      }
+    },
+    {
+      "name": "24 charger/drive models and 48 inscriber models bound",
       "value": {
         "log": "clean"
       }
     }
   ],
-  "scope": "Native source FacingWithSpinStrategy placement for ae2:charger and ae2:drive",
+  "scope": "Native source FacingWithSpinStrategy placement, item state precedence and Inscriber source water",
   "limits": [
     "Player-facing placement through horizon-ctl; not independent multiplayer",
     "The client prediction path still uses the engine template state until the server update",

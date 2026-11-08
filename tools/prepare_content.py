@@ -20,7 +20,8 @@ MARKER = ".horizon-ae2-generated.json"
 ORIENTED_FACINGS = ["north", "east", "south", "west", "up", "down"]
 CRAFTING = ["network/blocks/crystal_processing_charger.json", "network/blocks/crank.json",
             "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json",
-            "network/blocks/storage_drive.json"]
+            "network/blocks/storage_drive.json", "network/blocks/controller.json",
+            "network/blocks/inscribers.json"]
 
 
 def write_json(path, data):
@@ -121,6 +122,17 @@ def fit(content, jar, platform):
         data["max_stack_size"] = 1 if path.stem in UNSTACKABLE else 64
         write_json(path, data)
     blocks = content / "data/ae2/horizon/block"
+    # AEBlocks: plain Sky Stone is deliberately harder than its smooth form.
+    # Both are ordinary AEBaseBlock cubes; Athena connected textures remain
+    # an optional renderer integration, not a reason to omit their items.
+    for name, hardness, color in [("sky_stone_block", 50, 11),
+                                  ("smooth_sky_stone_block", 5, 29)]:
+        write_json(blocks / f"{name}.json", {
+            "template": "minecraft:stone",
+            "properties": {"hardness": hardness, "explosion_resistance": 150,
+                           "requires_tool": True, "map_color": color,
+                           "sounds": "minecraft:stone"},
+        })
     # AE2 uses the same (height, inset), facing/waterlogged schema, default,
     # support and placement rules as the matching vanilla amethyst stage.
     # Keep the original AE2 models/loot tables, not the template's outputs.
@@ -152,11 +164,14 @@ def fit(content, jar, platform):
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.
-    for name in ["charger", "crank", "drive"]:
+    for name in ["charger", "crank", "drive", "inscriber"]:
         data = {
             "template": "minecraft:dispenser",
             "properties": {"light": 0, "hardness": 2.2},
         }
+        if name == "inscriber":
+            data["properties"].update({"explosion_resistance": 11, "requires_tool": False,
+                                       "map_color": 6, "sounds": "minecraft:iron_block"})
         if name == "crank":
             # CrankBlock.createShape: a 0.7-wide box shifted 0.15 away from
             # the attached side along the facing vector.
@@ -184,13 +199,16 @@ def fit(content, jar, platform):
             "fallback": {"type": "minecraft:model", "model": f"ae2:block/{name}_0"},
         }})
 
-    for name in ["charger", "drive"]:
+    for name in ["charger", "drive", "inscriber"]:
         original = json.loads((states / f"{name}.json").read_text())
         # Upstream's generated drive.json is empty: DriveBakedModel composes
         # the base, cell chassis and LEDs at runtime. Carry the actual base
         # housing now; dynamic cells/LEDs remain open.
         model = "ae2:block/drive/drive_base" if name == "drive" else None
         variants = block_orientation.oriented_variants(original, model)
+        if name == "inscriber":
+            variants = {key + ",waterlogged=" + wet: value
+                        for key, value in variants.items() for wet in ["false", "true"]}
         write_json(states / f"{name}.json", {"variants": variants})
     # CrankBlockEntityRenderer uses a separate handle model. Static preview only
     # for this milestone; the exact animation needs render/sync work.

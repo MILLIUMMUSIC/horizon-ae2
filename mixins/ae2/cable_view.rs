@@ -120,6 +120,7 @@ fn external(registry: &BlockRegistry, world: &World, q: [i32; 3]) -> CableType {
         Some("ae2:drive") => CableType::Smart,
         Some(
             "ae2:charger"
+            | "ae2:inscriber"
             | "ae2:energy_cell"
             | "ae2:dense_energy_cell"
             | "ae2:creative_energy_cell",

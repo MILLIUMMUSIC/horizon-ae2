@@ -73,3 +73,6 @@ pub mod ae2_adventure_snbt;
 
 #[path = "../mixins/ae2/quartz.rs"]
 pub mod ae2_quartz;
+
+#[path = "../mixins/ae2/inscriber.rs"]
+pub mod ae2_inscriber;

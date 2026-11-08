@@ -17,6 +17,7 @@ struct Dimension {
     network: Network,
     drives: super::ae2_drive_glue::Drives,
     chargers: super::ae2_charger_inventory::Inventories,
+    inscribers: super::ae2_inscriber_glue::Inventories,
     cells: super::ae2_energy_cell_glue::Displays,
     cables: super::ae2_cable_bus::Hosts,
 }
@@ -85,6 +86,7 @@ pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     let state = networks.entry(dimension.to_owned()).or_default();
     state.chargers.sync(game);
+    state.inscribers.sync(game);
     state.drives.read(game);
     let nodes = snapshots(game, state);
     state.network.sync(nodes);
@@ -133,6 +135,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
             return;
         };
         state.chargers.sync(game);
+        state.inscribers.sync(game);
         state.drives.read(game);
         let nodes = snapshots(game, state);
         state.network.sync(nodes);
@@ -272,6 +275,36 @@ pub(super) fn node_placed(dimension: &str, pos: [i32; 3]) {
         .get_mut(dimension)
     {
         state.network.forget_node(pos);
+        state.inscribers.forget(pos);
+    }
+}
+pub(super) fn inscriber_ready(dimension: &str, pos: [i32; 3]) -> bool {
+    NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get(dimension)
+        .is_some_and(|state| state.network.node_service(pos).is_some())
+}
+pub(super) fn note_inscriber(
+    dimension: &str,
+    pos: [i32; 3],
+    be: &horizon_client::containers::ModBlockEntity,
+) {
+    if let Some(state) = NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get_mut(dimension)
+    {
+        state.inscribers.note(pos, be);
+    }
+}
+pub(super) fn sync_inscribers(game: &mut Game<'_>) {
+    if let Some(state) = NETWORKS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .get_mut(game.dim.id())
+    {
+        state.inscribers.sync(game);
     }
 }
 pub(super) fn flush_drives(game: &mut Game<'_>) {

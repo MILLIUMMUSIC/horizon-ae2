@@ -78,11 +78,11 @@ def main():
     def off(tick):
         ctl('wait', tick)
 
-    def setup(support, target, player, item):
+    def setup(support, target, player, item, target_state='air'):
         ctl('server-hold', 'on')
         try:
             ctl('setblock', *support, 'minecraft:stone')
-            ctl('setblock', *target, 'air')
+            ctl('setblock', *target, target_state)
             ctl('command', f'item replace entity @s hotbar.0 with {item}')
             ctl('select', 1)
             ctl('tp', *player)
@@ -99,8 +99,8 @@ def main():
         off(3)
         return ctl('block', *target).get('state')
 
-    def case(name, support, target, player, item, expected):
-        setup(support, target, player, item)
+    def case(name, support, target, player, item, expected, target_state='air'):
+        setup(support, target, player, item, target_state)
         state = placed(target)
         assert state == expected, (name, state, expected)
         check(name, {'block': state, 'target': list(target), 'player': list(player)})
@@ -152,19 +152,36 @@ def main():
         case('drive steep look places facing up spin 3',
              (11, 71, 9), (11, 72, 9), (12.05, 73, 9.5), 'ae2:drive',
              'ae2:drive[facing=up,spin=3]')
+        case('inscriber horizontal orientation and dry state',
+             (8,73,7), (8,73,6), (8.5,73,4.5), 'ae2:inscriber',
+             'ae2:inscriber[facing=north,spin=0,waterlogged=false]')
+        case('inscriber source steep placement spin',
+             (10,71,7), (10,72,7), (11.05,73,7.5), 'ae2:inscriber',
+             'ae2:inscriber[facing=up,spin=3,waterlogged=false]')
+        case('inscriber retains the source fluid before placement',
+             (8,73,7), (8,73,6), (8.5,73,4.5), 'ae2:inscriber',
+             'ae2:inscriber[facing=north,spin=0,waterlogged=true]', 'minecraft:water')
+        case('charger item state overrides placement orientation',
+             (8,73,7), (8,73,6), (8.5,73,4.5),
+             'ae2:charger[minecraft:block_state={facing:"east",spin:"2"}]',
+             'ae2:charger[facing=east,spin=2]')
+        case('inscriber item state overrides orientation and source water',
+             (8,73,7), (8,73,6), (8.5,73,4.5),
+             'ae2:inscriber[minecraft:block_state={facing:"east",spin:"2",waterlogged:"false"}]',
+             'ae2:inscriber[facing=east,spin=2,waterlogged=false]', 'minecraft:water')
         ctl('quit')
         logs[-1].close()
         logs.pop()
         text = (work / 'game.log').read_text(errors='replace')
-        for namespace in ('charger', 'drive'):
+        for namespace in ('charger', 'drive', 'inscriber'):
             assert f'blockstate definition of ae2:{namespace} not loaded' not in text, \
                 f'ae2:{namespace} blockstate did not load'
-        check('all 24 orientation models bound for charger and drive', {'log': 'clean'})
+        check('24 charger/drive models and 48 inscriber models bound', {'log': 'clean'})
         report = {
             'passed': True,
             'logs': str(work),
             'checks': checks,
-            'scope': 'Native source FacingWithSpinStrategy placement for ae2:charger and ae2:drive',
+            'scope': 'Native source FacingWithSpinStrategy placement, item state precedence and Inscriber source water',
             'limits': [
                 'Player-facing placement through horizon-ctl; not independent multiplayer',
                 'The client prediction path still uses the engine template state until the server update',

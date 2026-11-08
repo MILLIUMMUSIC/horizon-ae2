@@ -6,7 +6,7 @@ rewritten in Rust. Horizon runs no Java, so AE2's code is ported to Rust and bui
 **native mod** (a [horizon-mixins](https://github.com/horizon-rust/horizon-mixins) bundle). Its blocks,
 items, recipes, models and textures are prepared from **your own AE2 jar** as a content mod.
 
-Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, and cable
+Status: **ME network and storage foundations, Charger, energy cells, Drive, Controller, Inscriber processing, and cable
 centers** are ported in part and checked in isolated game worlds. Cable items support placement,
 survival drops, names, waterlogging/buckets and persistent ownership. The current input layer adds
 the configurable opposite-side key, synchronized server state and center-part Pick Block. Center
@@ -27,7 +27,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 1. Toolchain and delivery | Pinned sources, original content preparation, native builds and deterministic packages | Launcher installation/rebuild verification and release workflow |
 | 2. Keys, cells and persistence | Component-aware item/fluid keys; all 23 built-in basic, portable, creative and tool cell profiles; Drive backends | Complete registry recovery, Cell Workbench, config writers and upgrade lifecycle |
 | 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers, item placement/drop and waterlogging | Complete part interactions, side parts/facades, full source events, collision and lighting paths |
-| 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power, source Charger/Drive orientation | Energy Acceptor, Inscriber, Vibration Chamber, external power capabilities and complete machine behavior |
+| 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power, source Charger/Drive orientation, Inscriber recipes and automation | Energy Acceptor, Vibration Chamber, complete machine menus/rendering, external capabilities and lifecycle |
 | 5. Storage and terminals | Ten-slot Drive, cell mounting, priorities in the storage core, filtered screen and automation | Terminals, ME Chest, storage buses, priority UI and complete storage interactions |
 | 6. Autocrafting | Pending | Patterns, providers, assemblers, crafting CPUs, planning and job lifecycle |
 | 7. Other network services | Pending | P2P, quantum links, wireless, security, spatial I/O and buses |
@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 115 partially ported classes. That count is not a gameplay completion percentage.
+files, including 119 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -49,6 +49,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Storage providers, mounts and network storage service | `mounts.rs`, `service.rs`, `drive.rs`: mounting, priorities, public/private storage and provider changes |
 | Charger and Wooden Crank | `charger.rs`, `glue.rs`, `charger_inventory.rs`: recipe work, crank rules, local/grid power, original inventory persistence, source crank facing states and per-facing shape; complete crank placement/animation remains open |
 | Charger/Drive/Crank orientation and wrench turns | `block_states.rs`, `orientation.rs`, `wrench.rs`, `block_orientation.py`: 24 source facing/spin states, six crank facing states with source shapes, inherited identity structure hooks, source placement and Certus Quartz Wrench turns; client prediction, crank placement/animation, disassembly and permissions remain open |
+| Inscriber | `inscriber.rs`, `inscriber_glue.rs`: four source slots, 15 original recipes, press/inscribe modes, private/grid/crank power, speed-card rules, capacities, separated automation and auto-export; source menu, name presses, upgrade lifecycle and complete packets remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
@@ -60,6 +61,10 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Certus buds and cluster drops | `quartz.rs`, `survival_loot.rs`: original loot tables and native tool/random-sequence handling, missing-entity refusal, matching stage states/shapes; natural growth and full source block lifecycle remain open |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
+
+The Inscriber currently operates through automation and its original four inventory slots. Its source
+menu and name-press workflow are still pending. Controller and Inscriber crafting recipes and the
+original sky-stone materials are registered.
 
 The Drive supports all 23 built-in cell profiles, but portable and tool cells do not yet have their
 complete handheld behavior. Its screen exposes ten real slots; priority controls and the complete
@@ -85,6 +90,8 @@ mixins/ae2/
                         storage providers, mounts and Drive rules
   charger.rs, controller.rs, cable.rs
                         machine, Controller and cable rules
+  inscriber.rs, inscriber_glue.rs
+                        source processing callbacks, recipes, inventory and power/automation
   cube_builder.rs, cable_render.rs
                         source-derived cable geometry and textures
   *_glue.rs, glue.rs    Horizon world, inventory, energy and lifecycle adapters

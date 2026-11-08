@@ -21,12 +21,21 @@ pub(super) fn block_entity(block: &str, entity: &mut Option<(String, Compound)>)
 }
 
 pub(super) fn ticks(block: &str, ticks: &mut bool) {
-    if matches!(block, CHARGER | CRANK) {
+    if matches!(block, CHARGER | CRANK | "ae2:inscriber") {
         *ticks = true;
     }
 }
 
 pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
+    if block == "ae2:inscriber" {
+        *out = Some(ModContainer {
+            slots: 4,
+            faces: std::array::from_fn(|_| (0..4).collect()),
+            inputs: vec![0, 1, 2],
+            outputs: vec![3],
+            menu: None,
+        });
+    }
     if block == "ae2:drive" {
         // The wire menu carries 18 slots; the native screen and server hide
         // 10..18. Only the original ten slots are mounted as storage cells.
@@ -104,8 +113,10 @@ fn facing(game: &Game<'_>, pos: Pos) -> Pos {
 pub(super) fn crankable_attached(game: &Game<'_>, pos: Pos, facing: &str) -> Option<Pos> {
     let dir = direction(facing);
     let target = std::array::from_fn(|i| pos[i] - dir[i]);
-    (game.native_block(target) == CHARGER
-        && game.native_block_property(target, "facing").as_deref() != Some(facing))
+    (matches!(
+        game.native_block(target).as_str(),
+        CHARGER | "ae2:inscriber"
+    ) && game.native_block_property(target, "facing").as_deref() != Some(facing))
     .then_some(target)
 }
 
@@ -195,13 +206,14 @@ fn charger_work(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity, power: &
 
 pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
     match be.id.as_str() {
+        "ae2:inscriber" => super::ae2_inscriber_glue::tick(game, pos, be),
         CRANK => {
             let mut crank = read_crank(be);
             if crank.tick()
                 && let Some(target) = crank_target(game, pos)
             {
                 game.native_with_mod_block_entity(target, |target| {
-                    if target.id == CHARGER {
+                    if matches!(target.id.as_str(), CHARGER | "ae2:inscriber") {
                         let value =
                             (energy(&target.nbt) + rules::POWER_PER_TURN).min(rules::POWER_MAXIMUM);
                         set_energy(&mut target.nbt, value);

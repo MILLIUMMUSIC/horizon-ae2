@@ -73,6 +73,7 @@ enum Definition {
     DenseEnergyCell,
     CreativeEnergyCell,
     Charger,
+    Inscriber,
     Drive,
     Crank,
 }
@@ -85,6 +86,7 @@ impl Definition {
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
             "ae2:charger" => Some(Self::Charger),
+            "ae2:inscriber" => Some(Self::Inscriber),
             "ae2:drive" => Some(Self::Drive),
             "ae2:crank" => Some(Self::Crank),
             _ => None,
@@ -98,6 +100,7 @@ impl Definition {
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Charger => "ae2:charger",
+            Self::Inscriber => "ae2:inscriber",
             Self::Drive => "ae2:drive",
             Self::Crank => "ae2:crank",
         }
@@ -105,7 +108,7 @@ impl Definition {
     fn template(self) -> &'static str {
         match self {
             Self::CableBus => "minecraft:glass",
-            Self::Charger | Self::Drive | Self::Crank => "minecraft:dispenser",
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank => "minecraft:dispenser",
             _ => "minecraft:iron_block",
         }
     }
@@ -114,6 +117,7 @@ impl Definition {
             Self::Controller => ae2_controller::VARIANTS,
             Self::CableBus => 32,
             Self::CreativeEnergyCell => 1,
+            Self::Inscriber => 48,
             Self::Charger | Self::Drive => 24,
             Self::Crank => 6,
             _ => 5,
@@ -122,7 +126,7 @@ impl Definition {
     /// Rows the pinned template initially contributes for this block.
     fn source_rows(self) -> usize {
         match self {
-            Self::Charger | Self::Drive | Self::Crank => 12,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank => 12,
             _ => 1,
         }
     }
@@ -133,6 +137,7 @@ impl Definition {
             // The dispenser template orders (north, east, south, west, up,
             // down) with its untriggered row second. Full orientation streams
             // spin fastest; the Crank has only the facing property.
+            Self::Inscriber => (index / 8) * 2 + 1,
             Self::Charger | Self::Drive => (index / 4) * 2 + 1,
             Self::Crank => index * 2 + 1,
             _ => 0,
@@ -142,6 +147,7 @@ impl Definition {
     /// collapse onto the same spin-zero orientation.
     fn old_to_new(self, old: usize) -> usize {
         match self {
+            Self::Inscriber => old / 2 * 8,
             Self::Charger | Self::Drive => old / 2 * 4,
             Self::Crank => old / 2,
             _ => 0,
@@ -150,11 +156,14 @@ impl Definition {
     /// Source hosts whose concrete default is facing north (and spin zero
     /// where present). Structure rotate/mirror are separate inherited hooks.
     fn oriented(self) -> bool {
-        matches!(self, Self::Charger | Self::Drive | Self::Crank)
+        matches!(
+            self,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank
+        )
     }
     /// Full orientation adds the source spin property.
     fn full(self) -> bool {
-        matches!(self, Self::Charger | Self::Drive)
+        matches!(self, Self::Charger | Self::Inscriber | Self::Drive)
     }
     fn properties(self, index: usize) -> Value {
         match self {
@@ -163,6 +172,11 @@ impl Definition {
                 json!({"light_level":(index/2).to_string(),"waterlogged":(index%2==1).to_string()})
             }
             Self::CreativeEnergyCell => json!({}),
+            Self::Inscriber => json!({
+                "facing": ORIENTED_FACINGS[index / 8],
+                "spin": ((index / 2) % 4).to_string(),
+                "waterlogged": (index % 2 == 1).to_string(),
+            }),
             Self::Charger | Self::Drive => json!({
                 "facing": ORIENTED_FACINGS[index / 4],
                 "spin": (index % 4).to_string(),
@@ -180,6 +194,11 @@ impl Definition {
             Self::CableBus => {
                 json!({"light_level":{"integer":[0,15]},"waterlogged":{"named":["false","true"]}})
             }
+            Self::Inscriber => json!({
+                "facing":{"named":ORIENTED_FACINGS},
+                "spin":{"integer":[0,3]},
+                "waterlogged":{"named":["false","true"]},
+            }),
             Self::Charger | Self::Drive => json!({
                 "facing":{"named":ORIENTED_FACINGS},
                 "spin":{"integer":[0,3]},
@@ -200,6 +219,11 @@ impl Definition {
                     "light_level",
                     (0..16).map(|i| i.to_string()).collect::<Vec<_>>()
                 ],
+                ["waterlogged", ["false", "true"]]
+            ]),
+            Self::Inscriber => json!([
+                ["facing", ORIENTED_FACINGS],
+                ["spin", ["0", "1", "2", "3"]],
                 ["waterlogged", ["false", "true"]]
             ]),
             Self::Charger | Self::Drive => {
@@ -392,7 +416,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             layout.rows(&mut doc["states"])?;
             for i in 0..layout.kind.variants() {
                 doc["states"][layout.first + i][4]["properties"] = layout.kind.properties(i);
-                if layout.kind == Definition::CableBus {
+                if matches!(layout.kind, Definition::CableBus | Definition::Inscriber) {
                     doc["states"][layout.first + i][2] = json!(i % 2 == 1);
                 }
             }
@@ -413,6 +437,11 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 .enumerate()
             {
                 row["block_entity"] = json!(true);
+                if layout.kind == Definition::Inscriber {
+                    row["dampening"] = json!(2);
+                    row["can_occlude"] = json!(false);
+                    row["solid_render"] = json!(false);
+                }
                 if layout.kind == Definition::CableBus {
                     row["emission"] = json!(i / 2);
                     row["full_collision"] = json!(false);
@@ -431,17 +460,21 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 .iter()
                 .position(|v| v.as_str() == Some("minecraft:water"))
                 .ok_or("missing water fluid")?;
-            if layout.kind == Definition::CableBus {
+            if matches!(layout.kind, Definition::CableBus | Definition::Inscriber) {
                 let blocks = doc["blocks"]
                     .as_array_mut()
                     .ok_or("missing behaviour blocks")?;
                 let block = blocks
                     .iter_mut()
-                    .find(|b| b["name"] == "ae2:cable_bus")
-                    .ok_or("missing CableBus behaviour")?;
+                    .find(|b| b["name"] == layout.kind.block())
+                    .ok_or("missing waterlogged host behaviour")?;
+                if layout.kind == Definition::Inscriber {
+                    // AEBaseEntityBlock extends Block, not DispenserBlock.
+                    block["class"] = json!(["Block"]);
+                }
                 let interfaces = block["interfaces"]
                     .as_array_mut()
-                    .ok_or("missing CableBus interfaces")?;
+                    .ok_or("missing waterlogged host interfaces")?;
                 for name in [
                     "SimpleWaterloggedBlock",
                     "LiquidBlockContainer",
@@ -455,7 +488,7 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             for i in 0..layout.kind.variants() {
                 let row = &mut doc["states"][layout.first + i];
                 let flags = row[1].as_u64().ok_or("no behaviour flags")?;
-                if layout.kind == Definition::CableBus {
+                if matches!(layout.kind, Definition::CableBus | Definition::Inscriber) {
                     row[2] = json!(if i % 2 == 1 { water } else { 0 });
                     row[3] = json!(if i % 2 == 1 { 8 } else { 0 });
                     row[4] = json!(false);
@@ -1032,6 +1065,106 @@ mod tests {
                         .is_empty()
                 );
             }
+        }
+    }
+    #[test]
+    fn inscriber_has_all_48_orientations_fluids_and_source_block_behavior() {
+        let scratch = Scratch::new();
+        let base = PathBuf::from(std::env::var_os("HORIZON_RESOURCES").unwrap());
+        let kind = Definition::Inscriber;
+        let variants = (0..48)
+            .map(|i| {
+                let p = kind.properties(i);
+                (
+                    format!(
+                        "facing={},spin={},waterlogged={}",
+                        p["facing"].as_str().unwrap(),
+                        p["spin"].as_str().unwrap(),
+                        p["waterlogged"].as_str().unwrap()
+                    ),
+                    json!({"model":"ae2:block/inscriber"}),
+                )
+            })
+            .collect::<serde_json::Map<_, _>>();
+        let ae2 = content_assets(
+            &scratch.0.join("ae2"),
+            "ae2",
+            &[("inscriber", json!({"template":"minecraft:dispenser"}))],
+            &[
+                (
+                    "assets/ae2/blockstates/inscriber.json",
+                    json!({"variants":variants}),
+                ),
+                (
+                    "assets/ae2/models/block/inscriber.json",
+                    json!({"elements":[]}),
+                ),
+            ],
+        );
+        let out = scratch.0.join("root");
+        super::super::build(&base, &[ae2], &out).unwrap();
+        let facts = read_json(&out, "facts.json").unwrap();
+        let rows = facts["states"].as_array().unwrap();
+        let first = facts["defaults"][kind.block()].as_u64().unwrap() as usize;
+        assert_eq!(rows.iter().filter(|r| r[0] == kind.block()).count(), 48);
+        let behavior = read_json(&out, "block-behaviours.json").unwrap();
+        let water = behavior["fluids"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .position(|f| f == "minecraft:water")
+            .unwrap();
+        let block = behavior["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|b| b["name"] == kind.block())
+            .unwrap();
+        assert_eq!(block["class"], json!(["Block"]));
+        assert!(
+            block["interfaces"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|i| i == "SimpleWaterloggedBlock")
+        );
+        let gameplay = read_json(&out, "gameplay-facts.json").unwrap();
+        for i in 0..48 {
+            assert_eq!(rows[first + i][4]["properties"], kind.properties(i));
+            assert_eq!(rows[first + i][2], i % 2 == 1);
+            assert_eq!(
+                behavior["states"][first + i][2],
+                if i % 2 == 1 { water } else { 0 }
+            );
+            assert_eq!(
+                behavior["states"][first + i][3],
+                if i % 2 == 1 { 8 } else { 0 }
+            );
+            assert_eq!(gameplay["states"][first + i]["dampening"], 2);
+            assert_eq!(gameplay["states"][first + i]["can_occlude"], false);
+        }
+        let assets = crate::assets::Assets::load(&out).unwrap();
+        let table = horizon_world::level::StateTable::new(assets.registry).unwrap();
+        let block = table.block_by_name(kind.block()).unwrap();
+        assert_eq!(table.default_state(block).0 as usize, first);
+        let mut sprites = horizon_client_render::sprites::Sprites::default();
+        let models = horizon_client_render::models::catalog::StateModels::load(
+            &out,
+            assets.registry,
+            &[kind.block()],
+            &mut sprites,
+        )
+        .unwrap();
+        for i in 0..48 {
+            assert!(
+                !models
+                    .collect(
+                        horizon_world::registry::BlockStateId((first + i) as u32),
+                        horizon_core::position::BlockPos::new(0, 0, 0)
+                    )
+                    .unwrap()
+                    .is_empty()
+            );
         }
     }
     #[test]

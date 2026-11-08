@@ -67,6 +67,7 @@ def package():
                  'tools/smoke_adventure.py', 'docs/adventure-world-smoke.json',
                  'tools/block_orientation.py', 'tools/orientation_oracle.py', 'examples/orientation_oracle.rs', 'docs/orientation-oracle.json',
                  'tools/smoke_quartz.py', 'docs/quartz-world-smoke.json',
+                 'tools/inscriber_oracle.py', 'examples/inscriber_oracle.rs', 'docs/inscriber-oracle.json', 'tools/smoke_controller_craft.py', 'docs/controller-craft-world-smoke.json', 'tools/smoke_inscriber.py', 'docs/inscriber-world-smoke.json',
                  'tools/smoke_cell_1k.py', 'docs/cell-1k-world-smoke.json', 'tools/smoke_charge_certus.py', 'docs/charge-certus-world-smoke.json',
                  'tools/smoke_charger_orientation.py', 'tools/smoke_wrench_rotation.py', 'tools/smoke_crank_states.py',
                  'docs/charger-orientation-world-smoke.json', 'docs/wrench-rotation-world-smoke.json', 'docs/crank-states-world-smoke.json',

@@ -6,6 +6,15 @@ fn ae2_automation_take(
     let Some((pos, index)) = view.locate(slot) else {
         return core::ops::ControlFlow::Continue(());
     };
+    if game.native_block([pos.0, pos.1, pos.2]) == "ae2:inscriber" {
+        crate::game::ae2_grid_glue::sync_inscribers(game);
+        if !matches!(game.world.block_entities.get(&pos), Some(horizon_client::containers::BlockEntity::Mod(be))
+            if be.id == "ae2:inscriber" && crate::game::ae2_inscriber_glue::allow_take(be, index))
+        {
+            return core::ops::ControlFlow::Break(None);
+        }
+        return core::ops::ControlFlow::Continue(());
+    }
     if game.native_block([pos.0, pos.1, pos.2]) != "ae2:charger" {
         return core::ops::ControlFlow::Continue(());
     }

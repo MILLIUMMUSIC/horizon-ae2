@@ -1172,3 +1172,43 @@ id = "quartz-loot-tests"
 file = "crates/horizon-items/src/items.rs"
 name = "ae2_quartz_loot_tests"
 source = "quartz_loot_tests.rs"
+
+[[module]]
+id = "inscriber-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inscriber"
+source = "inscriber.rs"
+
+[[module]]
+id = "inscriber-world"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inscriber_glue"
+source = "inscriber_glue.rs"
+
+[[injection]]
+id = "inscriber-sided-container"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::machines::Containers<'_>::view"
+helper = "inscriber_view.rs"
+bindings = [
+ { name = "containers", ty = "&crate::game::machines::Containers<'_>", value = "&*self" },
+ { name = "pos", ty = "(i32, i32, i32)", value = "pos" },
+]
+
+[[module]]
+id = "inscriber-placement-fluid"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_inscriber_placement"
+source = "inscriber_placement.rs"
+
+[[injection]]
+id = "inscriber-hand-fluid"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::Game<'_>::use_hand"
+helper = "inscriber_hand.rs"
+bindings = [
+ { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+ { name = "hit", ty = "Option<&crate::game::Hit>", value = "block_hit" },
+]

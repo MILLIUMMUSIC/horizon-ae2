@@ -7,6 +7,32 @@ fn ae2_automation_insert(
     let Some((pos, index)) = view.locate(slot) else {
         return core::ops::ControlFlow::Continue(());
     };
+    if game.native_block([pos.0, pos.1, pos.2]) == "ae2:inscriber" {
+        crate::game::ae2_grid_glue::sync_inscribers(game);
+        let limit = match game.world.block_entities.get(&pos) {
+            Some(horizon_client::containers::BlockEntity::Mod(be))
+                if be.id == "ae2:inscriber"
+                    && crate::game::ae2_inscriber_glue::allow_insert(game, be, index, stack) =>
+            {
+                crate::game::ae2_inscriber_glue::input_capacity(be).min(
+                    game.items()
+                        .get(&stack.item)
+                        .map_or(64, |i| i.max_stack)
+                        .max(1),
+                )
+            }
+            _ => return core::ops::ControlFlow::Break(Some(stack.clone())),
+        };
+        let Some(target) = game.slot_mut_at(view, slot) else {
+            return core::ops::ControlFlow::Break(Some(stack.clone()));
+        };
+        let (rest, changed) =
+            crate::game::ae2_inscriber_glue::insert_stack(target, stack.clone(), limit);
+        if changed {
+            game.view_changed(view);
+        }
+        return core::ops::ControlFlow::Break(rest);
+    }
     if game.native_block([pos.0, pos.1, pos.2]) == "ae2:charger" {
         crate::game::ae2_grid_glue::sync_chargers(game);
         let usable = matches!(game.world.block_entities.get(&pos),

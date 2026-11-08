@@ -14,9 +14,39 @@ pub fn signal(counts: impl IntoIterator<Item = u32>, slots: usize) -> i32 {
     ((fullness * 14.0).floor() as i32).wrapping_add(i32::from(fullness > 0.0))
 }
 
+/// ContainerAdapter takes the minimum of the host's slot limits, then the
+/// vanilla comparator takes min(container limit, each item's max stack size).
+pub fn signal_with_limits(stacks: impl IntoIterator<Item = (u32, u32)>, slots: usize) -> i32 {
+    if slots == 0 {
+        return 0;
+    }
+    let mut fullness = 0.0_f32;
+    for (count, limit) in stacks.into_iter().take(slots) {
+        if count > 0 {
+            fullness += count as f32 / limit as f32;
+        }
+    }
+    fullness /= slots as f32;
+    ((fullness * 14.0).floor() as i32).wrapping_add(i32::from(fullness > 0.0))
+}
+
 #[cfg(test)]
 mod tests {
     use super::signal;
+
+    #[test]
+    fn inscriber_uses_minimum_container_limit_even_for_its_larger_output_slot() {
+        use super::signal_with_limits as level;
+        assert_eq!(level([(1, 64), (0, 64), (0, 64), (0, 64)], 4), 1);
+        assert_eq!(level([(1, 4), (0, 4), (0, 4), (0, 4)], 4), 1);
+        assert_eq!(level([(1, 1), (0, 1), (0, 1), (0, 1)], 4), 4);
+        assert_eq!(level([(1, 1); 4], 4), 15);
+        assert_eq!(level([(4, 4); 4], 4), 15);
+        assert_eq!(level([(64, 64); 4], 4), 15);
+        // A normal output stack still divides by the configured input limit;
+        // preserve the source result, rather than silently clamp fullness.
+        assert_eq!(level([(0, 1), (0, 1), (0, 1), (64, 1)], 4), 225);
+    }
 
     #[test]
     fn all_drive_occupancies_use_ten_real_slots_and_ignore_transport_padding() {

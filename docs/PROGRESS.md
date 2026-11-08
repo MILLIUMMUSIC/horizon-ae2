@@ -35,6 +35,13 @@ dispenser template's triggered dimension. Client-predicted orientation, crank
 placement/survival/animation, shift-disassembly, permissions and the network
 tool UI remain open.
 
+Inscriber recipe processing and automation are now native. Its callback state
+machine matches four verbatim Java methods in 4,504 scenarios, 261,592 callbacks
+and 4,504 initial sleeping queries. All 15 built-in recipes retain their source
+inputs, result counts and press/inscribe consumption rules. The source machine
+menu, dynamic name presses, complete upgrades/drop callbacks and render packets
+remain required work.
+
 ## Verified foundations
 
 | Layer | Evidence and current boundary |
@@ -52,11 +59,12 @@ tool UI remain open.
 | Controller | Public 8,000 AE store, 3 AE/tick idle, source flags/validation/channel rules, 18 states/models, conflict/restart world checks; menus/capabilities/full lifecycle remain open |
 | Drive | Ten real cell slots, all 23 built-in backend profiles, source inventory, power/channel gating, filtered screen, automation and restart; full menu/capability/render lifecycle remains open |
 | Charger | Recipe and powered-item work, original inventory, automation, grid/local power and item energy display/sync; full-orientation states and placement; complete geometry/effects/config/capabilities remain open |
+| Inscriber | Four original slots, 15 carried recipes, source callback state machine, private/grid/crank power, capacities, speed-card saved data, sided automation, auto-export, configured comparator and 48 wet/oriented states; source menu, name-press components and full lifecycle remain open |
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Certus quartz loot | Original carried bud/cluster tables, source missing-entity refusal and matching stage templates; growth/decay and complete explosion actor context remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 143 standalone Rust tests, 198 native game tests, 18 native
+Current validation: 144 standalone Rust tests, 203 native game tests, 19 native
 library tests, 7 native item-crate tests and 15 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
@@ -68,7 +76,7 @@ The adventure world check passes 24 actual-hand/client/server scenarios,
 including generic PASS/offhand fallback, enum/integer domains, original compound/
 SNBT masks and real Energy Cell/chest entities. It exercises the registered
 client BE constructor on demand; complete source BE defaults/codecs and mutable
-component-object cache remain required. The same final binary also passes the
+component-object cache remain required. The earlier adventure checkpoint also includes its
 14-case survival/creative center-action regression.
 See `VALIDATION.md` for evidence and the exact boundaries of these runs.
 
@@ -80,7 +88,9 @@ CableBus part interactions, partial removal, facades, full source visual packets
 and source event/readiness model. Finish Charger/Drive client-prediction
 orientation, wrench disassembly/permissions, crank placement/animation and their
 complete menu/model behavior. Continue
-with missing storage hosts/terminals, capabilities, menu/render gaps, crafting,
+with the remaining Inscriber menu/name-press/upgrades lifecycle, real storage
+hosts/terminal parts and menus, fluid-transform entity lifecycle, quartz growth,
+meteorite admission/press loot, capabilities, menu/render gaps, crafting,
 security, wireless/spatial services, tools, world content, addons, and full
 survival/multiplayer validation. The full plan is unchanged.
 

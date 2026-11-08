@@ -15,6 +15,7 @@ pub type Pos = [i32; 3];
 pub enum Kind {
     Controller,
     Charger,
+    Inscriber,
     EnergyCell,
     DenseEnergyCell,
     CreativeEnergyCell,
@@ -26,6 +27,7 @@ impl Kind {
         match id {
             "ae2:controller" => Some(Self::Controller),
             "ae2:charger" => Some(Self::Charger),
+            "ae2:inscriber" => Some(Self::Inscriber),
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
@@ -37,6 +39,7 @@ impl Kind {
         match self {
             Self::Controller => super::ae2_controller::BLOCK,
             Self::Charger => "ae2:charger",
+            Self::Inscriber => "ae2:inscriber",
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
@@ -47,7 +50,7 @@ impl Kind {
     pub fn capacity(self) -> f64 {
         match self {
             Self::Controller => super::ae2_controller::CAPACITY,
-            Self::Charger => 1600.0,
+            Self::Charger | Self::Inscriber => 1600.0,
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
@@ -84,7 +87,7 @@ impl Kind {
                 self.capacity(),
                 super::ae2_controller::STORAGE_PRIORITY,
             )),
-            Self::Charger | Self::Drive | Self::Cable(_) => None,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Cable(_) => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
                 self.capacity(),
@@ -121,7 +124,8 @@ pub struct Snapshot {
 impl Snapshot {
     fn exposes(self, direction: Direction) -> bool {
         self.exposed & (1 << direction as u8) != 0
-            && (!matches!(self.kind, Kind::Charger | Kind::Drive) || self.front != direction)
+            && (!matches!(self.kind, Kind::Charger | Kind::Inscriber | Kind::Drive)
+                || self.front != direction)
     }
 }
 #[derive(Clone, Copy, Debug)]

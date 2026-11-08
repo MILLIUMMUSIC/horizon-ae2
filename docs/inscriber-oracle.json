@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "cases": 4504,
+  "callbacks": 261592,
+  "initial_requests": 4504,
+  "source": "src/main/java/appeng/blockentity/misc/InscriberBlockEntity.java",
+  "source_sha256": "f26bf81a5c4ca9ead16af9d59f8160837d451b067769066c340bdb16eed8785c",
+  "method_sha256": [
+    "49e98869b39dd3e920c6c70b8bac794737b8375b7242600b73667771f47c70ea",
+    "dc289803bbac52ab2799492287fdba11b1f92c773e78b76ab73f444a4068587a",
+    "00e7777590f87f5c34804e3969ba2a17e1b87bb57e552827347ed8ad891e3317",
+    "9f7555a9c3014e57a5ef92731b7ccb36a565f36d8dd5be9ba9e7f507fe29c951"
+  ],
+  "binding_sha256": "7d8ae43a7cba29bed2cfe025821b1c8822ddaeaaa667fa80f253e84de8751893",
+  "rust_sha256": "2ca675e4580eaa2079a5927757ed610f647e8d0b33d6cb6740a78b1a1b0a8cf2",
+  "driver_sha256": "294b8661eca868ae78c13050c06bf0143ca9be985f025dd7ee67983ac4872ee8",
+  "input_sha256": "6e79782b83ef75fc6330da18bd8bf07b90457d2cf8b35430d9fc66f563466da3",
+  "output_sha256": "09d34f91683923102c8732d54872c5a854fedf8663528b3c55c0ab9ffefb8a8c",
+  "scope": "verbatim tickingRequest, hasCraftWork, hasAutoExportWork and getTickingRequest methods; state and callback order",
+  "limits": [
+    "controlled inventories, recipes, energy interfaces and notifications",
+    "pushOutResult uses a controlled result; external inventories are not executed",
+    "native TickManager scheduling, configuration, menus, rendering and world lifecycle are separate"
+  ]
+}

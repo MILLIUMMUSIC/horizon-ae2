@@ -5,12 +5,12 @@
       "pending": 244
     },
     "block": {
-      "partial": 9,
-      "pending": 45
+      "partial": 10,
+      "pending": 44
     },
     "blockentity": {
-      "partial": 11,
-      "pending": 39
+      "partial": 13,
+      "pending": 37
     },
     "client": {
       "partial": 6,
@@ -85,8 +85,8 @@
       "pending": 73
     },
     "recipes": {
-      "partial": 0,
-      "pending": 36
+      "partial": 1,
+      "pending": 35
     },
     "server": {
       "partial": 0,
@@ -1923,8 +1923,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/misc/InscriberBlock.java",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "48 source facing/spin/waterlogged states, source default, inherited identity structure hooks, metal properties/light blocking, server placement and item-state precedence; complete client prediction, menu, water/event lifecycle and render packets pending",
       "sha256": "b9f9066ace85d5ffc8d6845eff88ab1078db869921dae339aaf087ce60f46565",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2303,14 +2305,18 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/InscriberBlockEntity.java",
+      "port": "mixins/ae2/inscriber_glue.rs",
+      "scope": "four original inventory slots, press/inscribe processing, strict >200 threshold, 16-callback smash, private/grid/crank power, four speed-card slots, input capacity, separate-side automation, auto-export and comparator; source callback Java oracle; full menu/upgrades/drop callbacks, packets and managed-node lifecycle pending",
       "sha256": "f26bf81a5c4ca9ead16af9d59f8160837d451b067769066c340bdb16eed8785c",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/InscriberRecipes.java",
+      "port": "mixins/ae2/inscriber_glue.rs",
+      "scope": "original custom-recipe ingredients, optional/reversible plates and source base-filter admission; dynamic name-press Component recipes, recipe-cache identity and live reload/order remain pending",
       "sha256": "3cb5fd437387701dedce5663b445e4bff40c62a010300a637f41b0e1594ebd2d",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
@@ -3851,8 +3857,8 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/definitions/AEBlocks.java",
-      "port": "mixins/ae2/item_energy.rs",
-      "scope": "normal/dense energy-cell fixed capacity/rate/priority and corresponding block-item power profiles; source-audited constructors, remaining block registration/settings API pending",
+      "port": "tools/prepare_content.py",
+      "scope": "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; full registration/settings and optional Athena connected textures pending",
       "sha256": "350ecdb536e2a57f3380aae04639ab761d64467f573f134b069e0a0c898a5d58",
       "status": "partial"
     },
@@ -7889,8 +7895,10 @@
     {
       "family": "recipes",
       "path": "src/main/java/appeng/recipes/handlers/InscriberRecipe.java",
+      "port": "mixins/ae2/inscriber_glue.rs",
+      "scope": "native execution of carried middle/top/bottom/result/mode data; press consumes one of each input and inscribe retains plates; arbitrary component results, complete original codec/stream API and addon recovery remain pending",
       "sha256": "4b662db6482ef4aa8a5828fb0e28f86d0d77f144d250bd68a8103d4887bcee14",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "recipes",
