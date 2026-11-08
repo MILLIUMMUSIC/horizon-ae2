@@ -1,0 +1,94 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/quartz-pe4rzb9j",
+  "checks": [
+    {
+      "block": "ae2:quartz_cluster",
+      "silk_touch": false,
+      "drops": {
+        "ae2:certus_quartz_crystal": 4
+      }
+    },
+    {
+      "block": "ae2:quartz_cluster",
+      "silk_touch": true,
+      "drops": {
+        "ae2:quartz_cluster": 1
+      }
+    },
+    {
+      "block": "ae2:small_quartz_bud",
+      "silk_touch": false,
+      "drops": {
+        "ae2:certus_quartz_dust": 1
+      }
+    },
+    {
+      "block": "ae2:small_quartz_bud",
+      "silk_touch": true,
+      "drops": {
+        "ae2:small_quartz_bud": 1
+      }
+    },
+    {
+      "block": "ae2:medium_quartz_bud",
+      "silk_touch": false,
+      "drops": {
+        "ae2:certus_quartz_dust": 1
+      }
+    },
+    {
+      "block": "ae2:medium_quartz_bud",
+      "silk_touch": true,
+      "drops": {
+        "ae2:medium_quartz_bud": 1
+      }
+    },
+    {
+      "block": "ae2:large_quartz_bud",
+      "silk_touch": false,
+      "drops": {
+        "ae2:certus_quartz_dust": 1
+      }
+    },
+    {
+      "block": "ae2:large_quartz_bud",
+      "silk_touch": true,
+      "drops": {
+        "ae2:large_quartz_bud": 1
+      }
+    },
+    {
+      "block": "ae2:quartz_cluster",
+      "fortune": 3,
+      "drops": {
+        "ae2:certus_quartz_crystal": 4
+      }
+    },
+    {
+      "block": "ae2:quartz_cluster",
+      "support_removed": true,
+      "drops": {}
+    },
+    {
+      "block": "ae2:small_quartz_bud",
+      "support_removed": true,
+      "drops": {}
+    },
+    {
+      "block": "ae2:medium_quartz_bud",
+      "support_removed": true,
+      "drops": {}
+    },
+    {
+      "block": "ae2:large_quartz_bud",
+      "support_removed": true,
+      "drops": {}
+    }
+  ],
+  "limits": [
+    "integrated server only; independent multiplayer is not covered",
+    "natural quartz growth/decay and full world generation are not implemented",
+    "explosion source-entity semantics and AE2 loot-mine commands remain open"
+  ]
+}

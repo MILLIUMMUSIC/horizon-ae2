@@ -24,6 +24,7 @@ The full mod is not yet complete.
 | Charger | Source recipe work, local/grid/refill power order, powered items, original inventory, automation, comparator, full-orientation placement and wrench turns | Live config, capability API, exact render geometry/effects/drop RNG, wrench disassembly and complete lifecycle |
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules, Charger-side restriction, source six facing states, per-facing shape boxes and wrench turns | Placement/survival/fake-player/statistics, animation, synchronization and full lifecycle |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
+| Certus quartz buds/clusters | Matching amethyst-stage facing/waterlogged states, geometry and original loot tables; missing-entity guard, plain/Silk Touch/Fortune tool handling | Natural budding growth/decay, richer explosion actor contexts, complete source APIs and independent multiplayer |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
 ## Components, keys, and inventories
@@ -336,3 +337,25 @@ they do not prove the complete mod, registry codecs, game events or GPU behavior
 Native tests and actual isolated game checks are documented separately in
 `../VALIDATION.md`. A successful package check validates the archive contract,
 not the gameplay of every carried item.
+
+
+## Certus quartz loot
+
+`CertusQuartzClusterBlock.getDrops` returns no drops when THIS_ENTITY is absent.
+The mod injects that guard at the native item catalog before table evaluation or
+named-sequence allocation. Player contexts use the original carried tables and
+native evaluator unchanged: the actual passed tool controls Silk Touch/Fortune,
+clusters yield four crystals plus the uniform Fortune bonus, and smaller buds
+yield one dust. A zero-Fortune cluster still consumes its nextInt(1) draw;
+Silk Touch and the smaller buds do not use that bonus function. The level random
+is not a substitute for the table's named random sequence.
+
+Normal content preparation binds each stage to its corresponding vanilla
+amethyst stage, preserving source dimensions, facing/waterlogged properties,
+default up direction and support behavior. It retains AE2's models and loot.
+Smoke tests consume the prepared content read-only; they must not rewrite it or
+turn off source tool requirements to pass. Natural budding growth/decay is not
+yet wired. The native loot context currently represents THIS_ENTITY as a boolean
+for player breaks; full nonplayer explosion-actor semantics remain unfinished. The native `/loot mine`
+route also constructs vanilla-only table IDs and omits the actor; its AE2 command
+integration is not yet ported. Direct table rolling is distinct from block getDrops.

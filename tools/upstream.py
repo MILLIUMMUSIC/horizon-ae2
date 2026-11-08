@@ -230,6 +230,16 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "api/orientation/FacingWithSpinStrategy.java": ("mixins/ae2/orientation.rs", "source 65-degree placement thresholds, widened float yaw and SpinMapping direction composition; native Charger/Drive placement and wrench strategy, 105489 Java cases; full strategy interface/client prediction and other hosts pending"),
+    "block/orientation/SpinMapping.java": ("mixins/ae2/orientation.rs", "source facing/spin/up lookup and direction rotation for supported full-orientation hosts; complete BlockOrientation/quaternion and host interface remain separate"),
+    "hooks/WrenchHook.java": ("mixins/ae2/wrench.rs", "main-hand nonspectator common-tag turns for Charger/Drive/Crank in one state write; unchanged-state fallthrough and crank attachment checks; permissions, shift-disassembly, remaining oriented hosts and complete lifecycle pending"),
+    "block/misc/ChargerBlock.java": ("mixins/ae2/orientation.rs", "single item interactions and source 24-state placement/wrench strategy; client prediction, full geometry/effects and complete base-block lifecycle pending"),
+    "block/misc/CrankBlock.java": ("mixins/ae2/block_states.rs", "six facing-only states and per-facing source shape boxes, inherited identity structure hooks, crank dispatch and wrench attachment checks; placement/canSurvive, fake-player/statistic, animation and synchronization pending"),
+    "decorative/solid/CertusQuartzClusterBlock.java": ("mixins/ae2/survival_loot.rs", "missing-THIS_ENTITY loot guard before table RNG allocation; original carried bud/cluster tables and matching amethyst stage state/shape/placement bindings; complete source API, explosion actor context and independent multiplayer pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

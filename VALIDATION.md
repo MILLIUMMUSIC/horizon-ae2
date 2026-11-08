@@ -3,6 +3,32 @@
 Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
+## Current certus quartz loot checkpoint
+
+- Formatting, Clippy with warnings denied, 143 standalone Rust tests, 15 Python
+  tooling tests and source/stack-limit audits pass. Native compilation/build
+  passes; 198 game tests, 18 native client-library tests and 7 native item-crate
+  tests pass. Item tests use `tools/horizon.py test --package horizon-items`.
+- Native item-catalog regressions verify that the missing-entity path returns
+  before RNG draws or named-sequence creation and leaves vanilla blocks alone.
+  Supplied Silk Touch/Fortune tools, sequence selection, untouched level RNG and
+  the mandatory zero-Fortune nextInt(1) draw are checked through the real native
+  evaluator. Those unit tables are controlled fixtures; the world scenario uses
+  the actual carried AE2 tables from the pinned jar.
+- [Quartz world scenario](docs/quartz-world-smoke.json): 13 checks cover plain
+  and Silk Touch harvesting of the cluster and all three buds, Fortune III's
+  four-to-seven cluster crystals, and support loss with no drops for all stages.
+  Source tool requirements remain enabled. The test uses the normally prepared
+  content read-only, with an isolated game/home and verified loaded floor.
+- Normal preparation uses the matching small/medium/large/cluster amethyst
+  templates for the original dimensions and facing/waterlogged state schema,
+  retaining AE2's models, loot and stage light levels. The old stairs template
+  and test-local full-cluster substitution are no longer used for these blocks.
+- Limits: natural budding growth/decay, complete source block properties/APIs,
+  full nonplayer explosion-actor loot contexts, AE2 `/loot mine` integration and
+  independent multiplayer remain open. The unused, incorrect growth helper is
+  excluded until its actual random-tick adapter is ported and verified.
+
 ## Crafting and crank charging regressions
 
 - [Crafting-table scenario](docs/cell-1k-world-smoke.json): the actual native

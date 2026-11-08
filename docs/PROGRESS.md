@@ -53,10 +53,11 @@ tool UI remain open.
 | Drive | Ten real cell slots, all 23 built-in backend profiles, source inventory, power/channel gating, filtered screen, automation and restart; full menu/capability/render lifecycle remains open |
 | Charger | Recipe and powered-item work, original inventory, automation, grid/local power and item energy display/sync; full-orientation states and placement; complete geometry/effects/config/capabilities remain open |
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
+| Certus quartz loot | Original carried bud/cluster tables, source missing-entity refusal and matching stage templates; growth/decay and complete explosion actor context remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 138 standalone Rust tests, 198 native game tests, 18 native
-library tests and 15 Python tests. Native check/build and the isolated CableBus
+Current validation: 143 standalone Rust tests, 198 native game tests, 18 native
+library tests, 7 native item-crate tests and 15 Python tests. Native check/build and the isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.

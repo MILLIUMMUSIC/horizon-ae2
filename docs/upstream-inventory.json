@@ -1,12 +1,12 @@
 {
   "families": {
     "api": {
-      "partial": 27,
-      "pending": 245
+      "partial": 28,
+      "pending": 244
     },
     "block": {
-      "partial": 8,
-      "pending": 46
+      "partial": 9,
+      "pending": 45
     },
     "blockentity": {
       "partial": 11,
@@ -33,8 +33,8 @@
       "pending": 12
     },
     "decorative": {
-      "partial": 0,
-      "pending": 7
+      "partial": 1,
+      "pending": 6
     },
     "entity": {
       "partial": 0,
@@ -49,8 +49,8 @@
       "pending": 26
     },
     "hooks": {
-      "partial": 0,
-      "pending": 19
+      "partial": 1,
+      "pending": 18
     },
     "hotkeys": {
       "partial": 0,
@@ -1275,8 +1275,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/orientation/FacingWithSpinStrategy.java",
+      "port": "mixins/ae2/orientation.rs",
+      "scope": "source 65-degree placement thresholds, widened float yaw and SpinMapping direction composition; native Charger/Drive placement and wrench strategy, 105489 Java cases; full strategy interface/client prediction and other hosts pending",
       "sha256": "f93427fb3e8ced33a50b35e67e81aa85d028e677c22ac1771acd75f63a9ab3e2",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -1893,8 +1895,8 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/misc/ChargerBlock.java",
-      "port": "mixins/ae2/glue.rs",
-      "scope": "single item insert/retrieve; no tools, particles, full orientation or exact drop motion",
+      "port": "mixins/ae2/orientation.rs",
+      "scope": "single item interactions and source 24-state placement/wrench strategy; client prediction, full geometry/effects and complete base-block lifecycle pending",
       "sha256": "803e5d4d1af094dc922ea34e83ef61f8691ac46b2401eda5bdf7407ef0fe55f4",
       "status": "partial"
     },
@@ -1907,8 +1909,8 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/misc/CrankBlock.java",
-      "port": "mixins/ae2/glue.rs",
-      "scope": "click dispatch and charger target; no placement/survival, fake-player rule or animation",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "six facing-only states and per-facing source shape boxes, inherited identity structure hooks, crank dispatch and wrench attachment checks; placement/canSurvive, fake-player/statistic, animation and synchronization pending",
       "sha256": "fb89977b57ad5c4c70cb4b31ca96ca780d4c3e5f87ae504057c6e8f3258cd332",
       "status": "partial"
     },
@@ -2027,8 +2029,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/orientation/SpinMapping.java",
+      "port": "mixins/ae2/orientation.rs",
+      "scope": "source facing/spin/up lookup and direction rotation for supported full-orientation hosts; complete BlockOrientation/quaternion and host interface remain separate",
       "sha256": "d460e7e10f9cecaba9e8c239420ee8a23589e5ebb03c77cb45a593e58d150d28",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -4701,8 +4705,10 @@
     {
       "family": "decorative",
       "path": "src/main/java/appeng/decorative/solid/CertusQuartzClusterBlock.java",
+      "port": "mixins/ae2/survival_loot.rs",
+      "scope": "missing-THIS_ENTITY loot guard before table RNG allocation; original carried bud/cluster tables and matching amethyst stage state/shape/placement bindings; complete source API, explosion actor context and independent multiplayer pending",
       "sha256": "ed32fcb4bba26618e903ab1b459f7bfb6801843571f3c20822af3981f72e0a04",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "decorative",
@@ -5001,8 +5007,10 @@
     {
       "family": "hooks",
       "path": "src/main/java/appeng/hooks/WrenchHook.java",
+      "port": "mixins/ae2/wrench.rs",
+      "scope": "main-hand nonspectator common-tag turns for Charger/Drive/Crank in one state write; unchanged-state fallthrough and crank attachment checks; permissions, shift-disassembly, remaining oriented hosts and complete lifecycle pending",
       "sha256": "cc4c637ecb6b49a1f232104094f6bf8416090094460f0aabe27dbb3ae1f0f65e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "hooks",

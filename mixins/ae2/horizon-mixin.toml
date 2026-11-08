@@ -1151,17 +1151,24 @@ source="adventure_native.rs"
 
 [[module]]
 id = "quartz"
-file = "crates/horizon-client/src/game.rs"
+file = "crates/horizon-items/src/items.rs"
 name = "ae2_quartz"
 source = "quartz.rs"
 
 [[injection]]
-id = "quartz-player-loot"
+id = "quartz-loot-entity-context"
 kind = "HEAD"
 cancellable = true
-target = "horizon_client::game::Game<'_>::block_loot_at"
+target = "horizon_items::items::Items::block_drops_raw"
 helper = "survival_loot.rs"
 bindings = [
-  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "registry", ty = "&horizon_world::registry::BlockRegistry", value = "registry" },
   { name = "state", ty = "horizon_world::registry::BlockStateId", value = "state" },
+  { name = "has_entity", ty = "bool", value = "breaker" },
 ]
+
+[[module]]
+id = "quartz-loot-tests"
+file = "crates/horizon-items/src/items.rs"
+name = "ae2_quartz_loot_tests"
+source = "quartz_loot_tests.rs"

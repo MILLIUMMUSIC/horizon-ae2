@@ -121,7 +121,11 @@ def main():
     parser.add_argument("--target-dir", type=Path, default=ROOT / "target/horizon-cargo")
     parser.add_argument("--no-audio", action="store_true", help="drop audio and controllers (a server build)")
     parser.add_argument("--library", action="store_true", help="test native library payloads instead of the game binary")
+    parser.add_argument("--package", choices=["horizon-client", "horizon-items"], default="horizon-client",
+                        help="native crate to test (non-default is valid only with test)")
     args = parser.parse_args()
+    if args.package != "horizon-client" and args.action != "test":
+        parser.error("--package is only valid with test")
     if args.library and args.action != "test":
         parser.error("--library is only valid with test")
     horizon = args.horizon.resolve()
@@ -136,8 +140,8 @@ def main():
         report = {"stage": str(output), "stage_changed": changed,
                   "horizon_revision": PIN, "staging_seconds": time.monotonic()-started}
         if args.action != "stage":
-            command = ["cargo", args.action, "--locked", "--offline", "-p", "horizon-client"]
-            command.extend(["--lib"] if args.library else ["--bin", "horizon-client"])
+            command = ["cargo", args.action, "--locked", "--offline", "-p", args.package]
+            command.extend(["--lib"] if args.library or args.package != "horizon-client" else ["--bin", "horizon-client"])
             command.extend(["--target-dir", str(target)])
             if args.no_audio:
                 command.append("--no-default-features")
@@ -150,7 +154,7 @@ def main():
                 result = subprocess.run(command, cwd=output, capture_output=True, text=True)
             report.update(cargo_seconds=time.monotonic()-run_start, cargo_command=command,
                           cargo_exit=result.returncode)
-            log = ROOT / "target" / f"horizon-{args.action}{'-lib' if args.library else ''}.log"
+            log = ROOT / "target" / f"horizon-{args.action}{'-lib' if args.library else ''}{'-items' if args.package == 'horizon-items' else ''}.log"
             log.write_text(result.stdout + result.stderr)
             report["cargo_log"] = str(log)
             if result.returncode:

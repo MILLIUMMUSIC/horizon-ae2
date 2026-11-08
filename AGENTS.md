@@ -193,6 +193,16 @@ item/fluid keys. Preserve simulation/commit semantics, long counts, partial
 insertion, byte rounding, type limits, partition/extraction rules and nested-cell
 restrictions. Never fake ME channels, energy, crafting jobs or security permissions.
 
+quartz.rs/survival_loot.rs guard missing THIS_ENTITY in the native item catalog,
+before allocating/drawing its loot sequence. Keep the original carried tables,
+actual passed tool and native evaluator; never substitute game.held or the level
+RNG. Fortune zero still draws nextInt(1) for clusters; buds have no bonus roll.
+Content preparation uses the matching small/medium/large/cluster amethyst stage
+for source dimensions and facing/waterlogged states, retaining AE2 models/loot.
+Natural growth/decay is not wired, and complete nonplayer explosion-actor context
+is still missing. Smoke tools must never rewrite the tested prepared content.
+Native item-crate payload tests run with tools/horizon.py test --package horizon-items.
+
 Use upstream LGPL-3.0-or-later for derived behaviour; preserve notices and licences.
 Assets come from the pinned jar into ignored target/content only. Do not commit
 jars, Minecraft resources, models, textures, exported sources or binaries.

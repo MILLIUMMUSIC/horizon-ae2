@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 111 partially ported classes. That count is not a gameplay completion percentage.
+files, including 115 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -58,6 +58,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Cable placement results | `part_use.rs`, `cable_actions.rs`, `cable_prediction.rs`: ordered source results, client preview, server consumption and sequence-based correction |
 | Adventure stack use | `adventure.rs`, `adventure_snbt.rs`, `adventure_native.rs`: actual-hand PASS gate, original saved predicates, typed property ranges and NBT comparison; component cache and complete BE codecs remain open |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
+| Certus buds and cluster drops | `quartz.rs`, `survival_loot.rs`: original loot tables and native tool/random-sequence handling, missing-entity refusal, matching stage states/shapes; natural growth and full source block lifecycle remain open |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
 The Drive supports all 23 built-in cell profiles, but portable and tool cells do not yet have their

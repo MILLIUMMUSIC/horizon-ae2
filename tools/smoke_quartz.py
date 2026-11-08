@@ -1,38 +1,19 @@
 #!/usr/bin/env python3
-"""Break an ae2:quartz_cluster with an unenchanted pickaxe.
+"""Check original certus bud/cluster loot in a private native world.
 
-A survival break without Silk Touch must put exactly four
-ae2:certus_quartz_crystal into the break drops or the player inventory.
+Verifies plain, Silk Touch and Fortune player breaks and support-loss refusal.
+Uses prepared content unchanged; quartz growth and worldgen are separate work.
 """
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-PREPARED = Path("/home/cachyfire/.ao/data/worktrees/horizon-ae2/horizon-ae2-2/target/content/ae2")
 CLUSTER = (8, 73, 8)
 CRYSTAL = "ae2:certus_quartz_crystal"
-
-
-def ensure_content():
-    content = ROOT / "target/content/ae2"
-    if not (content / "ae2-recipe-map.json").is_file():
-        if content.exists():
-            shutil.rmtree(content)
-        shutil.copytree(PREPARED, content, symlinks=True)
-    budding = content / "data/ae2/horizon/block/flawless_budding_quartz.json"
-    budding.write_text(json.dumps({"template": "minecraft:budding_amethyst"}) + "\n")
-    for name in ("small_quartz_bud", "medium_quartz_bud", "large_quartz_bud", "quartz_cluster"):
-        path = content / "data/ae2/horizon/block" / f"{name}.json"
-        path.write_text(json.dumps({
-            "template": "minecraft:amethyst_cluster",
-            "properties": {"requires_tool": False},
-        }) + "\n")
-    return content
 
 
 def main():
@@ -41,10 +22,13 @@ def main():
     parser.add_argument("--ctl", type=Path, required=True)
     parser.add_argument("--resources", type=Path, required=True)
     parser.add_argument("--game", type=Path, default=ROOT / "target/horizon-cargo/fast/horizon-client")
+    parser.add_argument("--content", type=Path, default=ROOT / "target/content/ae2")
     args = parser.parse_args()
-    content = ensure_content()
+    content = args.content.resolve()
+    if not (content / "ae2-recipe-map.json").is_file():
+        parser.error("--content must name a prepared AE2 content mod")
     parent = ROOT / "target/smoke"
-    parent.mkdir(exist_ok=True)
+    parent.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="quartz-", dir=parent))
     game_dir = work / "game"
     game_dir.mkdir()
@@ -86,69 +70,79 @@ def main():
                 time.sleep(0.1)
         raise RuntimeError("game did not become ready")
 
+    def visible():
+        counts = dict(ctl("inventory").get("counts") or {})
+        for entity in ctl("entities", 16, "minecraft:item").get("entities") or []:
+            stack = entity.get("item") or {}
+            if stack.get("item"):
+                item = stack["item"]
+                counts[item] = counts.get(item, 0) + int(stack.get("count") or 0)
+        return {item: count for item, count in counts.items()
+                if item.startswith("ae2:") and count}
+
+    def setup(block, enchantment=None):
+        ctl("command", "kill @e[type=minecraft:item]")
+        ctl("command", "clear @s")
+        ctl("setblock", 8, 72, 8, "minecraft:stone")
+        ctl("setblock", *CLUSTER, block + "[facing=up,waterlogged=false]")
+        ctl("command", "item replace entity @s hotbar.0 with minecraft:diamond_pickaxe 1")
+        ctl("select", 1)
+        ctl("wait", 3)
+        if enchantment:
+            ctl("command", f"enchant @s {enchantment[0]} {enchantment[1]}")
+        ctl("wait", 3)
+        assert ctl("block", *CLUSTER)["block"] == block
+        assert not visible(), "each case must start without previous AE2 drops"
+
     try:
         launch()
-        ctl("tp", CLUSTER[0] + 0.5, CLUSTER[1], CLUSTER[2] - 2.5)
-        for _ in range(30):
+        ctl("tp", 8.5, 82, 5.5)
+        for _ in range(60):
             if ctl("block", *CLUSTER).get("loaded"):
                 break
             ctl("wait", 5)
         else:
-            raise AssertionError(f"cluster chunk did not load: {ctl('block', *CLUSTER)}")
+            raise AssertionError("fixture chunk did not load")
         ctl("command", "fill 4 72 4 12 72 12 stone")
         ctl("command", "fill 4 73 4 12 78 12 air")
-        ctl("setblock", *CLUSTER, "ae2:quartz_cluster[facing=up,waterlogged=false]")
-        placed = None
-        for _ in range(40):
-            placed = ctl("block", *CLUSTER)
-            if placed.get("block") == "ae2:quartz_cluster":
-                break
-            ctl("wait", 5)
-        else:
-            below = ctl("block", CLUSTER[0], CLUSTER[1] - 1, CLUSTER[2])
-            raise AssertionError(f"cluster was not placed: {placed}; below: {below}")
+        assert ctl("getblock", 8, 72, 8)["block"] == "minecraft:stone"
+        ctl("tp", 8.5, 73, 6.8)
         ctl("command", "gamemode survival")
-        ctl("command", "item replace entity @s hotbar.0 with minecraft:diamond_pickaxe 1")
-        held = None
-        for _ in range(20):
-            held = ctl("select", 1).get("held")
-            if isinstance(held, dict) and held.get("item") == "minecraft:diamond_pickaxe":
-                break
-            ctl("wait", 2)
-        else:
-            raise AssertionError(f"diamond pickaxe was not in the hotbar: {held}")
-        ctl("tp", CLUSTER[0] + 0.5, CLUSTER[1], CLUSTER[2] - 1.2)
         ctl("wait", 5)
-        broken = ctl("break", *CLUSTER)
-
-        def reported():
-            drops = int((broken.get("drops") or {}).get(CRYSTAL, 0))
-            picked = int((broken.get("picked_up") or {}).get(CRYSTAL, 0))
-            return drops + picked
-
-        def visible():
-            inventory = int((ctl("inventory").get("counts") or {}).get(CRYSTAL, 0))
-            ground = 0
-            entities = ctl("entities", 16, "minecraft:item").get("entities") or []
-            for entity in entities:
-                stack = entity.get("item") or {}
-                if stack.get("item") == CRYSTAL:
-                    ground += int(stack.get("count") or 0)
-            return inventory + ground
-
-        count = max(reported(), visible())
-        for _ in range(40):
-            if count == 4:
-                break
+        checks = []
+        buds = ["ae2:small_quartz_bud", "ae2:medium_quartz_bud", "ae2:large_quartz_bud"]
+        for block in ["ae2:quartz_cluster", *buds]:
+            for silk in [False, True]:
+                setup(block, ("minecraft:silk_touch", 1) if silk else None)
+                result = ctl("break", *CLUSTER)
+                ctl("wait", 3)
+                expected = {block: 1} if silk else (
+                    {CRYSTAL: 4} if block == "ae2:quartz_cluster"
+                    else {"ae2:certus_quartz_dust": 1})
+                actual = visible()
+                assert actual == expected, (block, silk, expected, actual, result)
+                checks.append({"block": block, "silk_touch": silk, "drops": actual})
+        setup("ae2:quartz_cluster", ("minecraft:fortune", 3))
+        result = ctl("break", *CLUSTER)
+        ctl("wait", 3)
+        actual = visible()
+        assert set(actual) == {CRYSTAL} and 4 <= actual[CRYSTAL] <= 7, (actual, result)
+        checks.append({"block": "ae2:quartz_cluster", "fortune": 3, "drops": actual})
+        for block in ["ae2:quartz_cluster", *buds]:
+            setup(block)
+            ctl("setblock", 8, 72, 8, "minecraft:air")
             ctl("wait", 5)
-            count = max(reported(), visible())
-        if count != 4:
-            raise AssertionError(
-                f"cluster put {count} certus quartz crystals in drops or inventory, source loot is 4: {broken}"
-            )
-        report = {"passed": True, "logs": str(work), "cluster": CLUSTER, "crystals": count}
+            assert ctl("getblock", *CLUSTER)["block"] == "minecraft:air"
+            actual = visible()
+            assert not actual, (block, actual)
+            checks.append({"block": block, "support_removed": True, "drops": actual})
+        report = {"passed": True, "logs": str(work), "checks": checks,
+                  "limits": ["integrated server only; independent multiplayer is not covered",
+                             "natural quartz growth/decay and full world generation are not implemented",
+                             "explosion source-entity semantics and AE2 loot-mine commands remain open"]}
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
-        print(f"PASS: harvested 4 {CRYSTAL}; logs: {work}", flush=True)
+        print(json.dumps(report, indent=2))
+        ctl("quit")
     finally:
         for process in processes:
             if process.poll() is None:
@@ -157,6 +151,7 @@ def main():
                     process.wait(timeout=10)
                 except subprocess.TimeoutExpired:
                     process.kill()
+                    process.wait(timeout=10)
         for log in logs:
             log.close()
         socket.unlink(missing_ok=True)

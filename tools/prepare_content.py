@@ -121,6 +121,20 @@ def fit(content, jar, platform):
         data["max_stack_size"] = 1 if path.stem in UNSTACKABLE else 64
         write_json(path, data)
     blocks = content / "data/ae2/horizon/block"
+    # AE2 uses the same (height, inset), facing/waterlogged schema, default,
+    # support and placement rules as the matching vanilla amethyst stage.
+    # Keep the original AE2 models/loot tables, not the template's outputs.
+    for name, template, light in [
+        ("small_quartz_bud", "small_amethyst_bud", 1),
+        ("medium_quartz_bud", "medium_amethyst_bud", 2),
+        ("large_quartz_bud", "large_amethyst_bud", 4),
+        ("quartz_cluster", "amethyst_cluster", 5),
+    ]:
+        write_json(blocks / f"{name}.json", {
+            "template": f"minecraft:{template}",
+            "properties": {"hardness": 1.5, "explosion_resistance": 1.5,
+                           "requires_tool": True, "light": light},
+        })
     # The native state adapter registers Controller's original state/type
     # product over this cube's physical rows. Keep its original assets intact.
     write_json(blocks / "controller.json", {
