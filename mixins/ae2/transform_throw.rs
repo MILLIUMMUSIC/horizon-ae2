@@ -7,183 +7,96 @@
 // the trigger's bounding-box center, not a block-id comparison.
 // Copyright (c) AlgorithmX2 / AE2 contributors; 2026 Horizon port contributors.
 
-/// `FluidTags.WATER`. Codec default when `circumstance` is absent.
-pub const WATER_TAG: &str = "minecraft:water";
-
-pub const CHARGED_CERTUS: &str = "ae2:charged_certus_quartz_crystal";
-pub const REDSTONE: &str = "minecraft:redstone";
-pub const NETHER_QUARTZ: &str = "minecraft:quartz";
-pub const FLUIX_CRYSTAL: &str = "ae2:fluix_crystal";
-
 /// Server `ItemEntityMixin` calls the throw only after `ae2_transformTime > 60`.
-pub const FLUID_TICKS_BEFORE_TRY: u32 = 60;
+pub const FLUID_TICKS_BEFORE_TRY: i32 = 60;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Circumstance {
-    /// Field omitted. Resolves to [`WATER_TAG`].
-    Missing,
-    Fluid(&'static str),
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Recipe {
-    pub id: &'static str,
-    pub ingredients: &'static [&'static str],
-    pub result: &'static str,
-    pub count: u32,
-    pub circumstance: Circumstance,
-}
-
-/// Charged certus, redstone, and nether quartz. Circumstance is omitted, so
-/// the fluid tag is minecraft:water. The result is two fluix crystals.
-pub const FLUIX_CRYSTALS: Recipe = Recipe {
-    id: "ae2:transform/fluix_crystals",
-    ingredients: &[CHARGED_CERTUS, REDSTONE, NETHER_QUARTZ],
-    result: FLUIX_CRYSTAL,
-    count: 2,
-    circumstance: Circumstance::Missing,
-};
-
-pub fn circumstance_tag(circumstance: Circumstance) -> &'static str {
-    match circumstance {
-        Circumstance::Missing => WATER_TAG,
-        Circumstance::Fluid(tag) => tag,
+/// The mixin's transient Java int is attached to the entity, never its stack.
+/// Ineligible stacks leave it unchanged; only a failed attempt resets it.
+pub fn fluid_tick(
+    counter: &mut i32,
+    removed: bool,
+    eligible: bool,
+    valid_fluid: bool,
+    attempt: impl FnOnce() -> bool,
+) {
+    if removed || !eligible {
+        return;
+    }
+    if valid_fluid {
+        *counter = counter.wrapping_add(1);
+        if *counter > FLUID_TICKS_BEFORE_TRY && !attempt() {
+            *counter = 0;
+        }
+    } else {
+        *counter = 0;
     }
 }
 
-/// One item entity already inside the trigger's ±1 block region.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ThrownItem<'a> {
-    pub item: &'a str,
-    pub count: u32,
-    pub alive: bool,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Product {
-    pub item: &'static str,
-    pub count: u32,
-}
-
-/// Consume one of each fluix ingredient when `trigger` is the charged certus
-/// entity and `fluid_tags` contains the recipe fluid tag. An empty tag list
-/// is an empty fluid state. A successful throw discards entities left empty.
-pub fn try_fluix_throw(
-    items: &mut [ThrownItem<'_>],
-    trigger: usize,
-    fluid_tags: &[&str],
-) -> Option<Product> {
-    let recipe = &FLUIX_CRYSTALS;
-    let tag = circumstance_tag(recipe.circumstance);
-    if !fluid_tags.contains(&tag) {
-        return None;
-    }
-    let trigger_item = items.get(trigger)?;
-    if !trigger_item.alive || trigger_item.count == 0 || trigger_item.item != recipe.ingredients[0]
+/// Source ordered greedy matching. Rows are ingredients, columns are entities
+/// in Level.getEntities order. A repeated ingredient may claim the same entity
+/// several times, but cannot spend more than its current count. No mutation
+/// occurs until the entire recipe has matched.
+pub fn claims(counts: &[u32], matches: &[Vec<bool>], trigger: usize) -> Option<Vec<u32>> {
+    if matches.is_empty()
+        || counts.get(trigger).is_none_or(|n| *n == 0)
+        || !matches[0].get(trigger).copied().unwrap_or(false)
+        || matches.iter().any(|row| row.len() != counts.len())
     {
         return None;
     }
-
-    let mut missing = recipe.ingredients.to_vec();
-    let mut claimed = vec![0u32; items.len()];
-    for (index, stack) in items.iter().enumerate() {
-        if !stack.alive || stack.count == 0 {
-            continue;
-        }
-        let mut cursor = 0;
-        while cursor < missing.len() {
-            if stack.count > claimed[index] && missing[cursor] == stack.item {
-                claimed[index] += 1;
-                missing.remove(cursor);
-            } else {
-                cursor += 1;
+    let mut missing = vec![true; matches.len()];
+    let mut claimed = vec![0; counts.len()];
+    for (entity, count) in counts.iter().enumerate() {
+        for (ingredient, row) in matches.iter().enumerate() {
+            if missing[ingredient] && row[entity] && *count > claimed[entity] {
+                claimed[entity] += 1;
+                missing[ingredient] = false;
             }
         }
     }
-    if !missing.is_empty() {
-        return None;
-    }
-
-    for (stack, taken) in items.iter_mut().zip(claimed) {
-        if taken == 0 {
-            continue;
-        }
-        stack.count -= taken;
-        if stack.count == 0 {
-            stack.alive = false;
-        }
-    }
-    Some(Product {
-        item: recipe.result,
-        count: recipe.count,
-    })
+    (!missing.contains(&true)).then_some(claimed)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn thrown(item: &'static str, count: u32) -> ThrownItem<'static> {
-        ThrownItem {
-            item,
-            count,
-            alive: true,
-        }
-    }
-
-    fn fluix_inputs(charged: u32) -> [ThrownItem<'static>; 3] {
-        [
-            thrown(CHARGED_CERTUS, charged),
-            thrown(REDSTONE, 1),
-            thrown(NETHER_QUARTZ, 1),
-        ]
-    }
-
     #[test]
-    fn water_consumes_one_of_each_and_yields_two_fluix() {
-        assert_eq!(FLUIX_CRYSTALS.circumstance, Circumstance::Missing);
-        assert_eq!(circumstance_tag(Circumstance::Missing), WATER_TAG);
-        let mut items = [
-            thrown(CHARGED_CERTUS, 2),
-            thrown(REDSTONE, 1),
-            thrown(NETHER_QUARTZ, 1),
-            thrown("minecraft:cobblestone", 4),
+    fn strict_threshold_failure_reset_success_retention_and_java_wrap() {
+        let mut counter = 59;
+        fluid_tick(&mut counter, false, true, true, || panic!("early attempt"));
+        assert_eq!(counter, 60);
+        fluid_tick(&mut counter, false, true, true, || true);
+        assert_eq!(counter, 61);
+        fluid_tick(&mut counter, false, true, true, || false);
+        assert_eq!(counter, 0);
+        counter = i32::MAX;
+        fluid_tick(&mut counter, false, true, true, || {
+            panic!("overflow attempt")
+        });
+        assert_eq!(counter, i32::MIN);
+    }
+    #[test]
+    fn removed_or_ineligible_preserve_counter_while_invalid_fluid_resets() {
+        let mut counter = 61;
+        fluid_tick(&mut counter, true, true, true, || panic!("removed entity"));
+        fluid_tick(&mut counter, false, false, false, || {
+            panic!("ineligible entity")
+        });
+        assert_eq!(counter, 61);
+        fluid_tick(&mut counter, false, true, false, || panic!("dry entity"));
+        assert_eq!(counter, 0);
+    }
+    #[test]
+    fn repeated_ingredients_respect_greedy_entity_order_and_available_count() {
+        let matches = vec![
+            vec![true, true, false],
+            vec![true, true, false],
+            vec![false, false, true],
         ];
-        let product = try_fluix_throw(&mut items, 0, &[WATER_TAG]).expect("water match");
-        assert_eq!(
-            product,
-            Product {
-                item: FLUIX_CRYSTAL,
-                count: 2,
-            }
-        );
-        assert_eq!(items[0].count, 1);
-        assert!(items[0].alive);
-        assert_eq!(
-            items[1],
-            ThrownItem {
-                item: REDSTONE,
-                count: 0,
-                alive: false,
-            }
-        );
-        assert_eq!(items[2].count, 0);
-        assert!(!items[2].alive);
-        assert_eq!(items[3].count, 4);
-        assert!(items[3].alive);
-
-        let mut later = fluix_inputs(1);
-        assert!(try_fluix_throw(&mut later, 1, &[WATER_TAG]).is_none());
-        assert!(later.iter().all(|item| item.alive && item.count == 1));
-    }
-
-    #[test]
-    fn out_of_water_rejects_without_consuming() {
-        let original = fluix_inputs(1);
-        for fluid in [&[][..], &["minecraft:lava"][..]] {
-            let mut items = original.clone();
-            assert!(try_fluix_throw(&mut items, 0, fluid).is_none());
-            assert_eq!(items, original);
-        }
+        assert_eq!(claims(&[1, 1, 1], &matches, 0), Some(vec![1, 1, 1]));
+        assert_eq!(claims(&[2, 1, 1], &matches, 1), Some(vec![2, 0, 1]));
+        assert_eq!(claims(&[1, 0, 1], &matches, 0), None);
+        assert_eq!(claims(&[2, 1, 1], &matches, 2), None);
+        assert_eq!(claims(&[2, 1, 1], &[], 0), None);
     }
 }

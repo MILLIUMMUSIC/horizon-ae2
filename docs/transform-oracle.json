@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "cases": 5014,
+  "callbacks": 212490,
+  "source_paths": [
+    "src/main/java/appeng/mixins/ItemEntityMixin.java",
+    "src/main/java/appeng/recipes/transform/TransformLogic.java"
+  ],
+  "source_sha256": [
+    "074188156fd09b4b3ed7afbccaee85c93899b44f0c0736ef44cd1e6196c53f6f",
+    "20e4e88e5a3efdb19e9659e83844983d7c213295a8fd7bb94b94d5ba04594513"
+  ],
+  "method_sha256": [
+    "f335b592805a1073bacd4bd54de097e6440e9be6ddee5df14938bfbe176a7e9b",
+    "8121fd4427d3fc36faeac61c31a3ab42b1036920a53637b9549d9681b191647f"
+  ],
+  "binding_sha256": "67a17ad0d76845dfbcb52ec42e9174c85f77b845152cd3fb2b72ff352d4cb8cb",
+  "rust_sha256": "954c324bccc12855c3a0c8476c6754e4300ddd9caa4d8310922b2a3e6cc8006e",
+  "driver_sha256": "aa2b56553b4216daf9120950c8b8e5697d3a125c7f474ed1ea46081797d22694",
+  "input_sha256": "06baf87ae734f700dd7dda5a8910726ae41b403636fbfad4a8b11c61ee1d7901",
+  "output_sha256": "dfe1657f77db1c9c092940ee18af5ec9b82c58a05a620f105f144add31829cf8",
+  "scope": "Verbatim server handleEntityTransform and tryTransform control flow: counters, greedy claims, discard and six RNG draws",
+  "limits": [
+    "Controlled fluid/cache/query/recipe order, Ingredient tests, stacks, assembly and RNG",
+    "Identity-map iteration order, native physics, lifecycle, packet transport and source client effects are not compared"
+  ]
+}

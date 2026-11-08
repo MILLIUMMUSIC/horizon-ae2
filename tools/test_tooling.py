@@ -308,5 +308,24 @@ class BlockOrientationTests(unittest.TestCase):
             block_orientation.oriented_variants({"variants": {
                 "facing=north,spin=0": {"model": "ae2:block/charger", "x": 90}}})
 
+class ItemTickSourceTests(unittest.TestCase):
+    def test_carried_native_tick_rejects_unmarked_behavior_changes(self):
+        import item_tick_source
+        root = Path(__file__).resolve().parents[1]
+        source = root / 'target/upstream/horizon/crates/horizon-client/src/game.rs'
+        if not source.is_file():
+            self.skipTest('fetch the pinned Horizon source to run the carried-body audit')
+        payload = (root / 'mixins/ae2/item_tick.rs').read_text()
+        self.assertTrue(item_tick_source.audit(source.read_text(), payload)['passed'])
+        changed = payload.replace('item.pickup_delay == 0', 'item.pickup_delay <= 10')
+        self.assertNotEqual(changed, payload)
+        with self.assertRaisesRegex(ValueError, 'differs outside'):
+            item_tick_source.audit(source.read_text(), changed)
+        changed_literal = payload.replace('"minecraft:entity.item.pickup"', '"minecraft:entity.item.pickup "')
+        self.assertNotEqual(changed_literal, payload)
+        with self.assertRaisesRegex(ValueError, 'differs outside'):
+            item_tick_source.audit(source.read_text(), changed_literal)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

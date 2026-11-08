@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/fluix-source-q9tz878v",
+  "recipes_compared": [
+    "ae2:transform/fluix_crystals",
+    "ae2:transform/fluix_crystal"
+  ],
+  "checks": [
+    {
+      "name": "original player throw and pickup",
+      "fluix_total": 2
+    },
+    {
+      "name": "strict 60-tick threshold",
+      "items": {
+        "ae2:charged_certus_quartz_crystal": 1,
+        "minecraft:redstone": 1,
+        "minecraft:quartz": 1
+      }
+    },
+    {
+      "name": "tick 61 consumes one each and creates two Fluix",
+      "items": {
+        "ae2:fluix_crystal": 2
+      }
+    },
+    {
+      "name": "fresh result pickup delay",
+      "pickup_delay": 0
+    },
+    {
+      "name": "second original Fluix Dust recipe",
+      "items": {
+        "ae2:fluix_crystal": 1
+      }
+    },
+    {
+      "name": "first of three sequential successes",
+      "items": {
+        "ae2:fluix_crystal": 2,
+        "ae2:charged_certus_quartz_crystal": 2,
+        "minecraft:redstone": 2,
+        "minecraft:quartz": 2
+      }
+    },
+    {
+      "name": "success retains clock for next tick",
+      "items": {
+        "ae2:fluix_crystal": 4,
+        "ae2:charged_certus_quartz_crystal": 1,
+        "minecraft:redstone": 1,
+        "minecraft:quartz": 1
+      }
+    },
+    {
+      "name": "third success does not wait another 61 ticks",
+      "items": {
+        "ae2:fluix_crystal": 6
+      }
+    },
+    {
+      "name": "last live tick before expiry",
+      "items": {
+        "minecraft:quartz": 1,
+        "minecraft:redstone": 1,
+        "ae2:charged_certus_quartz_crystal": 1
+      }
+    },
+    {
+      "name": "expired trigger cannot transform at tick 61",
+      "items": {
+        "minecraft:quartz": 1,
+        "minecraft:redstone": 1
+      }
+    },
+    {
+      "name": "failed attempt leaves ingredients",
+      "items": {
+        "minecraft:quartz": 1,
+        "ae2:charged_certus_quartz_crystal": 1
+      }
+    },
+    {
+      "name": "failure resets clock",
+      "items": {
+        "ae2:charged_certus_quartz_crystal": 1,
+        "minecraft:quartz": 1,
+        "minecraft:redstone": 1
+      }
+    },
+    {
+      "name": "retry at new threshold",
+      "items": {
+        "ae2:fluix_crystal": 2
+      }
+    },
+    {
+      "name": "fluid sampled after movement",
+      "items": {
+        "ae2:fluix_crystal": 2
+      }
+    },
+    {
+      "name": "dry ingredients never transform",
+      "items": {
+        "ae2:charged_certus_quartz_crystal": 1,
+        "minecraft:redstone": 1,
+        "minecraft:quartz": 1
+      }
+    },
+    {
+      "name": "vanilla merge conserves three dirt",
+      "items": {
+        "minecraft:dirt": 3
+      }
+    },
+    {
+      "name": "vanilla item expiry unchanged",
+      "items": {}
+    },
+    {
+      "name": "vanilla immediate pickup",
+      "dirt": 3
+    }
+  ],
+  "binary_sha256": "eaf73dc765e629c71df52fa5b83f50e6ab4ab154cd7211fa5a7c1d7649de3402",
+  "adapter_sha256": "ea837182d92f6e2cb24ba41c964362c32aea966acf85aa4fc775c5f6d15ad5f0",
+  "limits": [
+    "Supplied ingredients and command-controlled entity lifetime/steps",
+    "Source lightning, explosion transforms, arbitrary fluid tags/components, reload/identity lifecycle and independent multiplayer remain open"
+  ]
+}

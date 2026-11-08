@@ -26,7 +26,40 @@ The full mod is not yet complete.
 | Wooden Crank | Rotation/hits/energy, 18-tick turns, busy window, failure/break rules, Charger-side restriction, source six facing states, per-facing shape boxes and wrench turns | Placement/survival/fake-player/statistics, animation, synchronization and full lifecycle |
 | CableBus | Five types/17 colors, center NBT/geometry/render/sync, item placement/drop, names, water/buckets, owner arrays, synchronized opposite-side key, center Pick Block and center placement prediction/results | Full multipart prediction/settings/security, parts/facades, all shapes/fluid/light and source event/selection lifecycle |
 | Certus quartz buds/clusters | Matching amethyst-stage facing/waterlogged states, geometry and original loot tables; missing-entity guard, plain/Silk Touch/Fortune tool handling | Natural budding growth/decay, richer explosion actor contexts, complete source APIs and independent multiplayer |
+| Fluid transforms | Both built-in Fluix recipes from carried data, source signed timer/threshold/reset, greedy claims, surviving per-entity post-movement/merge/lifetime/environment phase, six level RNG draws and immediate zero-delay fresh entities | Source lightning, explosion recipes/frequency assembly, arbitrary fluid tags and result components, original query/recipe/cache/reload order, command object replacement and complete identity lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
+
+## Fluid item transforms
+
+The server adapter reads ordinary water/lava recipes from native custom recipe
+data, including both original Fluix recipes. It matches all ingredients before
+consumption and refuses unrepresentable component/special results without
+falling through to a different recipe. A missing circumstance means water;
+flowing water and source waterlogged states use the same built-in fluid tag.
+Arbitrary addon fluid tags and complete codecs remain open.
+
+The timer preserves Java signed wrapping, the strict `> 60` condition, failure
+reset, success retention and removed/ineligible refusal. It runs at each live
+entity's end of movement, merging, lifetime and environment processing, before
+the next entity ticks. Fresh outputs are added immediately to the entity list
+and spatial index, with pickup delay zero; the original range bound prevents
+them from ticking during the same pass. They remain visible to later queries,
+merging and pickup. Six draws use the level RNG; native bobbing uses the native
+entity RNG binding.
+
+The pinned mixin API cannot select an interior site in this closure-bearing
+method. The mod therefore carries the pinned `Game::tick_items` body with three
+marked insertions under Horizon's MIT notice. `tools/item_tick_source.py`
+rejects changes outside those regions. All original engine sources/resources
+remain untouched. This bridge still needs joint-mod ordering/coexistence proof.
+
+Transient clocks are scoped by native Game, world and dimension, pruned on
+removal, cleared at world lifecycle and checked against native entity ticks.
+They are not written into stacks or saves. This does not establish all source
+object identity: native command NBT replacement can reset entity tick state;
+full command/reload/unload recovery and exact Java entity-query/cache iteration
+remain open. Source client lightning and explosion transformations, including
+quantum frequency assembly, are separate unfinished features.
 
 ## Components, keys, and inventories
 

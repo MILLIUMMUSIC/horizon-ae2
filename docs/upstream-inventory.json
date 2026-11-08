@@ -77,16 +77,16 @@
       "pending": 89
     },
     "mixins": {
-      "partial": 0,
-      "pending": 17
+      "partial": 1,
+      "pending": 16
     },
     "parts": {
       "partial": 9,
       "pending": 73
     },
     "recipes": {
-      "partial": 1,
-      "pending": 35
+      "partial": 4,
+      "pending": 32
     },
     "server": {
       "partial": 0,
@@ -7175,8 +7175,10 @@
     {
       "family": "mixins",
       "path": "src/main/java/appeng/mixins/ItemEntityMixin.java",
+      "port": "mixins/ae2/transform_throw.rs",
+      "scope": "source server fluid clock with strict >60, signed wrapping, failure reset and ineligible/removed refusal; native per-entity post-movement/merge/lifetime/environment phase and transient scopes; client lightning, explosion injection and full object lifecycle pending",
       "sha256": "074188156fd09b4b3ed7afbccaee85c93899b44f0c0736ef44cd1e6196c53f6f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "mixins",
@@ -7939,20 +7941,26 @@
     {
       "family": "recipes",
       "path": "src/main/java/appeng/recipes/transform/TransformCircumstance.java",
+      "port": "mixins/ae2/transform_throw_world.rs",
+      "scope": "missing circumstance resolves to water, explicit built-in water/lava tag matching includes flowing and waterlogged states; arbitrary/addon fluid tags, full codec/stream API and explosion integration pending",
       "sha256": "c5dc760a3b793843494826991a1112b466957e36b577bd6986f79e2aa28cec14",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "recipes",
       "path": "src/main/java/appeng/recipes/transform/TransformLogic.java",
+      "port": "mixins/ae2/transform_throw_world.rs",
+      "scope": "greedy ordered ingredient claims, atomic all-input match, removal, six level RNG draws and immediate fresh entities; both original fluid recipes; arbitrary fluid tags, original identity/query/cache/order/reload and explosion assembly remain pending",
       "sha256": "20e4e88e5a3efdb19e9659e83844983d7c213295a8fd7bb94b94d5ba04594513",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "recipes",
       "path": "src/main/java/appeng/recipes/transform/TransformRecipe.java",
+      "port": "mixins/ae2/transform_throw_world.rs",
+      "scope": "carried ordinary fluid recipe ingredients/result and source output pickup delay zero; component results, quantum frequency assignment, stream/codec and explosion recipes pending",
       "sha256": "2d8aff4bb0ea122b27e5e94bb2cd36806873988eef8edc71443718629bfad8ae",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "recipes",

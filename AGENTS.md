@@ -225,6 +225,23 @@ is still missing. Smoke tools must never rewrite the tested prepared content.
 Native item-crate payload tests run with tools/horizon.py test --package horizon-items.
 
 Use upstream LGPL-3.0-or-later for derived behaviour; preserve notices and licences.
+Fluid transforms run at each surviving item entity's RETURN phase, after
+movement/merge/lifetime/environment and before the next entity. Keep signed
+wrapping, strict >60, failure-only reset, six level draws and fresh pickup delay
+zero. Fresh outputs enter the live item/spatial list immediately but must not
+tick again in that pass. Both source Fluix recipes come from custom recipe data.
+item_tick.rs carries the pinned Horizon body with exactly three marked mod
+regions; preserve LICENSES/Horizon-MIT and run tools/item_tick_source.py.
+Never edit original engine sources to add the callback. Transient sidecars must
+stay Game/world/dimension scoped, lifecycle-cleared and dead-ID pruned; no stack
+components or saved timer. Full command object identity, source query/cache/
+recipe order/reload, arbitrary fluid tags/results, explosions and lightning
+remain partial. Do not equate the controlled Java oracle with native physics.
+recipe_ingredient.rs translates original item/tag objects before native
+Ingredient parsing for Inscriber and transforms. Preserve flat alternatives;
+refuse unsupported members instead of letting the native parser filter them.
+Do not allocate timer sidecars for unrelated items or prune live IDs quadratically.
+
 Assets come from the pinned jar into ignored target/content only. Do not commit
 jars, Minecraft resources, models, textures, exported sources or binaries.
 Tooling adapted from horizon-create keeps tools/LICENSE-MIT.

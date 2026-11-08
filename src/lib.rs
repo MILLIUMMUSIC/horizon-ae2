@@ -79,3 +79,6 @@ pub mod ae2_inscriber;
 
 #[path = "../mixins/ae2/transform_throw.rs"]
 pub mod ae2_transform_throw;
+
+#[path = "../mixins/ae2/recipe_ingredient.rs"]
+pub mod ae2_recipe_ingredient;

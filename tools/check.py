@@ -21,3 +21,4 @@ if __name__ == "__main__":
     run(sys.executable, "tools/test_tooling.py")
     run(sys.executable, "tools/upstream.py", "audit", "--check")
     run(sys.executable, "tools/item_stack_limits.py", "--check")
+    run(sys.executable, "tools/item_tick_source.py")

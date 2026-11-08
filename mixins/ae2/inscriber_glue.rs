@@ -2,6 +2,7 @@
 // Inscriber native inventories, recipe work and private/grid energy bindings.
 // Source menu/render packets, name-press components and complete managed-node
 // lifecycle are separate work; no replacement recipes or fake output slots.
+use super::ae2_recipe_ingredient::normalize as ingredient;
 use super::{Game, ae2_inscriber as rules};
 use horizon_client::{
     containers::{BlockEntity, ModBlockEntity},
@@ -168,25 +169,7 @@ struct Task {
     result: ItemStack,
     press: bool,
 }
-fn ingredient(value: &Value) -> Option<Value> {
-    match value {
-        Value::String(_) => Some(value.clone()),
-        Value::Object(o) if o.len() == 1 => o
-            .get("item")
-            .and_then(Value::as_str)
-            .map(|s| Value::String(s.into()))
-            .or_else(|| {
-                o.get("tag")
-                    .and_then(Value::as_str)
-                    .map(|s| Value::String(format!("#{s}")))
-            }),
-        Value::Array(a) => {
-            let all: Option<Vec<_>> = a.iter().map(ingredient).collect();
-            all.map(Value::Array)
-        }
-        _ => None,
-    }
-}
+
 fn matches(game: &Game<'_>, value: Option<&Value>, stack: Option<&ItemStack>) -> bool {
     let Some(value) = value else {
         return stack.is_none_or(|s| s.count == 0);

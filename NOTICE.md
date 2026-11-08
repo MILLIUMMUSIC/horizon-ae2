@@ -13,6 +13,11 @@ MIT-licensed API; its copyright and permission notice are preserved there.
 tools/horizon.py and tools/package.py are adapted from horizon-create and the
 Horizon native-mod/Veinminer templates. Their MIT notice is tools/LICENSE-MIT.
 
+`mixins/ae2/item_tick.rs` carries the pinned Horizon `Game::tick_items` body
+with marked AE2 insertion regions. Copyright (c) 2026 Ludovic Marie and the
+Horizon contributors, MIT; see LICENSES/Horizon-MIT. Original engine sources
+remain unchanged. `tools/item_tick_source.py` verifies the carried body.
+
 Upstream textures/models: copyright (c) 2020 Ridanisaurus Rid and
 (c) 2013-2020 AlgorithmX2 et al, CC BY-NC-SA 3.0. Text/translations: CC0.
 Guidebook click sound: EminYILDIRIM, CC BY 4.0. These assets are not bundled in

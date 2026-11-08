@@ -249,6 +249,14 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "mixins/ItemEntityMixin.java": ("mixins/ae2/transform_throw.rs", "source server fluid clock with strict >60, signed wrapping, failure reset and ineligible/removed refusal; native per-entity post-movement/merge/lifetime/environment phase and transient scopes; client lightning, explosion injection and full object lifecycle pending"),
+    "recipes/transform/TransformLogic.java": ("mixins/ae2/transform_throw_world.rs", "greedy ordered ingredient claims, atomic all-input match, removal, six level RNG draws and immediate fresh entities; both original fluid recipes; arbitrary fluid tags, original identity/query/cache/order/reload and explosion assembly remain pending"),
+    "recipes/transform/TransformRecipe.java": ("mixins/ae2/transform_throw_world.rs", "carried ordinary fluid recipe ingredients/result and source output pickup delay zero; component results, quantum frequency assignment, stream/codec and explosion recipes pending"),
+    "recipes/transform/TransformCircumstance.java": ("mixins/ae2/transform_throw_world.rs", "missing circumstance resolves to water, explicit built-in water/lava tag matching includes flowing and waterlogged states; arbitrary/addon fluid tags, full codec/stream API and explosion integration pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

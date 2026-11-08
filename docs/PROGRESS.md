@@ -42,6 +42,14 @@ inputs, result counts and press/inscribe consumption rules. The source machine
 menu, dynamic name presses, complete upgrades/drop callbacks and render packets
 remain required work.
 
+Both original Fluix fluid recipes now use the native custom recipe data. The
+server clock and greedy ingredient claims match the original Java methods in
+5,014 scenarios / 212,490 callbacks. The native bridge runs at each surviving
+item's end-of-tick phase, preserving movement, merging, expiry, environment,
+fresh-entity visibility and ordinary pickup. Source client lightning, explosion
+assembly, arbitrary fluid tags/components and full identity/cache/query order
+remain open.
+
 ## Verified foundations
 
 | Layer | Evidence and current boundary |
@@ -62,10 +70,13 @@ remain required work.
 | Inscriber | Four original slots, 15 carried recipes, source callback state machine, private/grid/crank power, capacities, speed-card saved data, sided automation, auto-export, configured comparator and 48 wet/oriented states; source menu, name-press components and full lifecycle remain open |
 | Keys/storage/services | Component-aware identities, finite/creative/restricted cells, byte/type rules, routing/mounts and caches; full registry recovery, callbacks, consumers and addon APIs remain open |
 | Certus quartz loot | Original carried bud/cluster tables, source missing-entity refusal and matching stage templates; growth/decay and complete explosion actor context remain open |
+| Fluid transforms | Both original Fluix recipes, original timer and greedy claims, per-entity native phase, six level RNG draws and zero-delay fresh outputs; full effects/explosion/codec/cache/lifecycle remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Current validation: 144 standalone Rust tests, 203 native game tests, 19 native
-library tests, 7 native item-crate tests and 15 Python tests. Native check/build and the isolated CableBus
+Latest standalone/native checkpoint: 149 standalone Rust tests, 213 native game
+tests and 16 Python tests. Native check/build, the 18-case Fluix/item world
+scenario and the 23-group Inscriber regression pass. The unchanged native
+library/item payloads previously passed 19 and 7 tests respectively. Earlier isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.

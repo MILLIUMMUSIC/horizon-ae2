@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "engine_file_sha256": "b99ccd23927aa4de5edf44322a0a4706b76d60fc109ace893899d9258cbf2c43",
+  "payload_sha256": "be7b63f1d95b1501d1b53a5a2144f31d96a954bd61965cff2bfb966ac1c1d592",
+  "original_body_sha256": "ffec80152638315159abcba7637754edcc45aa1f7c8d0dba8f0f0c621fb3232f",
+  "regions": [
+    "initial",
+    "entity-return",
+    "outputs"
+  ],
+  "boundary": "Unmodified pinned tick outside marked mod insertions; no source-game equivalence claim",
+  "horizon_revision": "aa27eca326db26e999d4e59d7899576016764b1e"
+}

@@ -3,7 +3,49 @@
 Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current Inscriber dependency checkpoint
+## Current fluid-transform checkpoint
+
+- Formatting, Clippy with warnings denied, 149 standalone Rust tests, 16 Python
+  tests, source inventory (1,429 Java files / 123 partial classes) and stack-limit
+  audit pass. Final native compilation/build and 213 native game tests pass.
+  The previous 19 native library and 7 native item-crate tests concern unchanged
+  payloads; those suites were not rerun for this game-only adapter change.
+- `tools/transform_oracle.py` extracts the verbatim original
+  `ItemEntityMixin.handleEntityTransform` and `TransformLogic.tryTransform`
+  methods. Both match 5,014 controlled scenarios / 212,490 callbacks, including
+  strict `>60`, signed overflow, failure reset, success retention, greedy
+  repeated-ingredient claims, removal and six level RNG draws. Fluid/cache,
+  query/recipe order, ingredient tests, assembly and RNG are controlled bindings;
+  identity-map iteration, native physics and source client effects are excluded.
+  Source/method/driver/input/output hashes are in `docs/transform-oracle.json`.
+- `tools/item_tick_source.py` verifies the carried pinned native tick body after
+  removing exactly three marked AE2 insertion regions. Its regression rejects
+  an unmarked pickup-rule mutation. The bridge is part of the mod under the
+  preserved Horizon MIT notice; original engine checkouts/resources are unchanged.
+- `tools/smoke_fluix_throw.py` compares both recipes semantically with the pinned
+  jar, then uses normally prepared content in a private world. Its 18 checks
+  cover actual player throw/pickup, the 60/61 boundary, the Fluix Dust recipe,
+  zero output pickup delay, three successive successes, last-tick expiry,
+  failure/retry reset, post-movement fluid sampling, dry refusal, and ordinary
+  item merging/despawn/pickup. Fixtures await loaded chunks and authoritative
+  drops; exact boundary cases use frozen-world server steps. No content is rewritten.
+- The same final binary passes `tools/smoke_inscriber.py`: all 15 carried source
+  recipes and the full 23-group machine/automation/comparator regression. The
+  shared ingredient bridge preserves original item/tag objects and flat
+  alternatives, refusing unrepresentable alternatives instead of dropping them.
+- `docs/fluix-world-smoke.json`, `docs/fluid-inscriber-regression.json` and
+  `docs/item-tick-source-audit.json` record this checkpoint. Native source-package
+  validation passes. These are separate rule, native, packaging and world proofs.
+
+Remaining fluid-transform requirements include source client lightning,
+explosion injection/quantum frequency assembly, arbitrary fluid tags and result
+components, original entity-query/recipe/cache iteration and reload, native
+command object replacement and complete identity/unload lifecycle, joint-mod
+hook ordering and independent multiplayer. Timers are transient and scoped by
+Game/world/dimension; unrelated native items do not acquire sidecar entries.
+This is not full TransformLogic, ItemEntityMixin or full-mod parity.
+
+## Inscriber dependency checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 144 standalone Rust tests, 15 Python
   tests, source inventory (1,429 Java files / 119 partial classes) and stack-limit

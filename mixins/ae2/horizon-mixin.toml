@@ -1226,10 +1226,32 @@ name = "ae2_transform_throw_world"
 source = "transform_throw_world.rs"
 
 [[injection]]
-id = "fluix-throw-before-discard"
+id = "fluid-item-return-phase"
 kind = "HEAD"
+cancellable = true
 target = "horizon_client::game::Game<'_>::tick_items"
 helper = "transform_throw_tick.rs"
 bindings = [
   { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
 ]
+
+[[module]]
+id = "fluid-item-tick"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_item_tick"
+source = "item_tick.rs"
+
+[[injection]]
+id = "fluid-world-reset"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_world_lifecycle"
+helper = "transform_throw_reset.rs"
+bindings = [
+ { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+]
+
+[[module]]
+id = "recipe-ingredient"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_recipe_ingredient"
+source = "recipe_ingredient.rs"

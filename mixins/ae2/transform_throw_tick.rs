@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-// Item-entity tick, before ItemEntity lifetime discard.
-fn ae2_fluix_before_item_tick(game: &mut crate::game::Game<'_>) {
-    crate::game::ae2_transform_throw_world::before_item_tick(game);
+fn ae2_fluid_item_phase(game: &mut crate::game::Game<'_>) -> std::ops::ControlFlow<()> {
+    if game.remote.is_some() {
+        return std::ops::ControlFlow::Continue(());
+    }
+    crate::game::ae2_item_tick::tick(game);
+    std::ops::ControlFlow::Break(())
 }
