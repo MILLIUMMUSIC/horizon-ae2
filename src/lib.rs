@@ -76,3 +76,6 @@ pub mod ae2_quartz;
 
 #[path = "../mixins/ae2/inscriber.rs"]
 pub mod ae2_inscriber;
+
+#[path = "../mixins/ae2/transform_throw.rs"]
+pub mod ae2_transform_throw;
