@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "item": "ae2:item_storage_cell_1k",
+  "count": 1,
+  "supplied": [
+    "ae2:certus_quartz_crystal",
+    "ae2:certus_quartz_dust",
+    "ae2:logic_processor",
+    "minecraft:copper_ingot",
+    "minecraft:glass",
+    "minecraft:iron_ingot",
+    "minecraft:redstone"
+  ],
+  "crafts": [
+    {
+      "source": "ae2:decorative/quartz_glass",
+      "carried": "ae2:decorative.quartz_glass",
+      "pattern": [
+        "aba",
+        "bab",
+        "aba"
+      ],
+      "key": {
+        "a": "#ae2:all_quartz_dust",
+        "b": "#c:glass_blocks/cheap"
+      },
+      "result": "ae2:quartz_glass",
+      "count": 4
+    },
+    {
+      "source": "ae2:network/cells/item_storage_components_cell_1k_part",
+      "carried": "ae2:network.cells.item_storage_components_cell_1k_part",
+      "pattern": [
+        "aba",
+        "bcb",
+        "aba"
+      ],
+      "key": {
+        "a": "#c:dusts/redstone",
+        "b": "#ae2:all_certus_quartz",
+        "c": "ae2:logic_processor"
+      },
+      "result": "ae2:cell_component_1k",
+      "count": 1
+    },
+    {
+      "source": "ae2:network/cells/item_storage_cell_1k",
+      "carried": "ae2:network.cells.item_storage_cell_1k",
+      "pattern": [
+        "aba",
+        "bcb",
+        "ded"
+      ],
+      "key": {
+        "a": "ae2:quartz_glass",
+        "b": "#c:dusts/redstone",
+        "c": "ae2:cell_component_1k",
+        "d": "#c:ingots/iron",
+        "e": "#c:ingots/copper"
+      },
+      "result": "ae2:item_storage_cell_1k",
+      "count": 1
+    },
+    {
+      "inventory": "ae2:item_storage_cell_1k",
+      "count": 1
+    }
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/cell-1k-0cscb9h_",
+  "limits": [
+    "three carried crafting-table recipes only",
+    "logic processor, certus quartz crystal and certus quartz dust are given",
+    "no Inscriber and no certus growth"
+  ]
+}

@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -24,6 +25,7 @@ def main():
     parser.add_argument("--ctl", type=Path, required=True)
     parser.add_argument("--resources", type=Path, required=True)
     parser.add_argument("--game", type=Path, default=ROOT / "target/horizon-cargo/fast/horizon-client")
+    parser.add_argument("--content", type=Path, default=ROOT / "target/content/ae2")
     args = parser.parse_args()
     parent = ROOT / "target/smoke"
     parent.mkdir(parents=True, exist_ok=True)
@@ -56,7 +58,7 @@ def main():
             str(args.game.resolve()), "--world", "ChargeCertusSmoke", "--creative", "--seed", "42",
             "--offscreen", "--control-socket", str(socket), "--render-distance", "3",
             "--width", "960", "--height", "640", "--game-dir", str(game_dir),
-            "--resources", str(args.resources.resolve()), "--dev-mod", str(ROOT / "target/content/ae2"),
+            "--resources", str(args.resources.resolve()), "--dev-mod", str(args.content.resolve()),
         ], cwd=game_dir, env=env, stdout=log, stderr=subprocess.STDOUT)
         processes.append(process)
         deadline = time.monotonic() + 30
@@ -81,9 +83,18 @@ def main():
 
     try:
         launch()
+        ctl("tp", 8.5, 82, 4.5)
+        for corner in [(5, 72, 3), (11, 72, 10)]:
+            for _ in range(60):
+                if ctl("block", *corner).get("loaded"):
+                    break
+                ctl("wait", 5)
+            else:
+                raise AssertionError(f"fixture chunk never loaded: {corner}")
         ctl("command", "fill 5 72 3 11 72 9 stone")
         ctl("command", "fill 5 73 3 11 78 9 air")
         ctl("tp", 8.5, 73, 4.5)
+        assert ctl("getblock", 8, 72, 4)["block"] == "minecraft:stone"
         ctl("command", "clear @s")
         ctl("setblock", *charger, "ae2:charger[facing=north]")
         ctl("setblock", *crank, "ae2:crank[facing=up]")
@@ -128,7 +139,8 @@ def main():
             "logs": str(work),
         }
         (work / "result.json").write_text(json.dumps(report, indent=2) + "\n")
-        print(f"PASS: crank-powered charger converted one certus crystal; logs: {work}", flush=True)
+        print(f"PASS: crank-powered charger converted one certus crystal; logs: {work}", file=sys.stderr, flush=True)
+        print(json.dumps(report, indent=2))
     finally:
         for process in processes:
             if process.poll() is None:

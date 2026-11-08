@@ -3,6 +3,19 @@
 Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
+## Crafting and crank charging regressions
+
+- [Crafting-table scenario](docs/cell-1k-world-smoke.json): the actual native
+  3x3 table crafts quartz glass, a 1k component and one 1k item cell. Patterns,
+  tags, counts and ingredients are compared with the pinned jar. Logic processor
+  and raw quartz materials are supplied; Inscriber and growth are not exercised.
+- [Crank-only charging](docs/charge-certus-world-smoke.json): ten turns supply
+  1,600 AE and convert one certus crystal to one charged certus crystal. No
+  creative or finite energy cell supplies the Charger. This verifies the recipe
+  and existing power adapter, not the full crank placement/animation lifecycle.
+- Both scripts load and verify their private fixture chunks before setup, use
+  isolated homes/worlds, and leave the prepared content unchanged.
+
 ## Current orientation and wrench checkpoint
 
 - Formatting, Clippy, 138 standalone Rust tests and 15 Python tooling tests pass.

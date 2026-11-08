@@ -66,6 +66,7 @@ def package():
                  'tools/ctrl_oracle.py', 'examples/ctrl_oracle.rs', 'docs/ctrl-oracle.json', 'tools/smoke_cable_input.py', 'docs/cable-input-world-smoke.json',
                  'tools/smoke_adventure.py', 'docs/adventure-world-smoke.json',
                  'tools/block_orientation.py', 'tools/orientation_oracle.py', 'examples/orientation_oracle.rs', 'docs/orientation-oracle.json',
+                 'tools/smoke_cell_1k.py', 'docs/cell-1k-world-smoke.json', 'tools/smoke_charge_certus.py', 'docs/charge-certus-world-smoke.json',
                  'tools/smoke_charger_orientation.py', 'tools/smoke_wrench_rotation.py', 'tools/smoke_crank_states.py',
                  'docs/charger-orientation-world-smoke.json', 'docs/wrench-rotation-world-smoke.json', 'docs/crank-states-world-smoke.json',
                  'tools/adventure_oracle.py', 'examples/adventure_oracle.rs', 'docs/adventure-oracle.json',

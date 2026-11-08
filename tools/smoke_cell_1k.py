@@ -279,6 +279,14 @@ def main():
 
     try:
         launch()
+        ctl("tp", 8.5, 82, 4.5)
+        for corner in [(5, 72, 3), (11, 72, 10)]:
+            for _ in range(60):
+                if ctl("block", *corner).get("loaded"):
+                    break
+                ctl("wait", 5)
+            else:
+                raise AssertionError(f"fixture chunk never loaded: {corner}")
         ctl("wait", 20)
         ctl("command", "fill 5 72 3 11 72 10 stone")
         ctl("command", "fill 5 73 3 11 78 10 air")
@@ -287,6 +295,7 @@ def main():
         ctl("wait", 10)
         ctl("command", "setblock 8 73 6 minecraft:crafting_table")
         ctl("wait", 5)
+        assert ctl("getblock", 8, 72, 4)["block"] == "minecraft:stone"
         ctl("command", "clear @s")
         block = ctl("block", 8, 73, 6)
         pos = (ctl("state").get("player") or {}).get("position") or [0, 0, 0]
