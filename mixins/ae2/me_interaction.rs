@@ -74,7 +74,7 @@ pub struct DecodeError {
     pub kind: ErrorKind,
     pub consumed: usize,
 }
-fn read_var(input: &[u8], at: &mut usize, width: u32) -> Result<u64, DecodeError> {
+pub(crate) fn read_var(input: &[u8], at: &mut usize, width: u32) -> Result<u64, DecodeError> {
     let max = if width == 64 { 10 } else { 5 };
     let mut value = 0u64;
     for count in 1..=max + 1 {
@@ -108,7 +108,7 @@ fn read_var(input: &[u8], at: &mut usize, width: u32) -> Result<u64, DecodeError
     }
     unreachable!()
 }
-fn write_var(mut value: u64, out: &mut Vec<u8>) {
+pub(crate) fn write_var(mut value: u64, out: &mut Vec<u8>) {
     while value & !127 != 0 {
         out.push((value as u8 & 127) | 128);
         value >>= 7;

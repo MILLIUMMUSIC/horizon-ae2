@@ -7,7 +7,7 @@
   },
   "binding_sha256": "b9f33d5de548595990daae1fd7f8d74a5a089aa24e830ed3420844bb800118a9",
   "rust_sha256": {
-    "mixins/ae2/me_interaction.rs": "0d8efb5fc92e64deb9c96160d50664616355e273ac4ba06e135f08bf4779d9c8",
+    "mixins/ae2/me_interaction.rs": "16b8204c0dd758b2f7e3fc78631b3a6bb1508174926cc038534d275c96886c6a",
     "examples/me_interaction_oracle.rs": "4b56bf65078dc90a7e23940914a3c4bbf726125cfd66ccc382e76f90bd65dafb"
   },
   "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",

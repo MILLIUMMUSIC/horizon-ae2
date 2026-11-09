@@ -14,6 +14,11 @@ container loops. Original Java comparisons pass 12,960 power-helper scenarios,
 controlled callback comparisons. Real native menu/session/UI/capability binding
 remains open for PR #3/#6; neither terminal nor ME Chest is playable yet.
 
+The inventory update builder and serial-indexed client entry rules also match
+1,258 source packet/Repo scenarios, including exact byte/count flush boundaries
+and partial-codec errors. Optional-key registry codecs and search/sort/pinned
+views remain binding work; native transport is not activated by these cores.
+
 The graph and saved-host binding now address each primary part separately from
 its cable center. Internal null-direction edges, occupied-face blocking,
 per-part channel demand and separate `gn` persistence are implemented. A source

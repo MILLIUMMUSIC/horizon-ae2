@@ -108,3 +108,6 @@ pub mod ae2_me_interaction;
 
 #[path = "../mixins/ae2/storage_menu.rs"]
 pub mod ae2_storage_menu;
+
+#[path = "../mixins/ae2/inventory_update.rs"]
+pub mod ae2_inventory_update;

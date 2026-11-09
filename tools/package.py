@@ -84,6 +84,7 @@ def package():
                  'tools/multipart_oracle.py', 'examples/multipart_oracle.rs', 'docs/multipart-oracle.json', 'docs/multipart-cable-regression.json', 'docs/multipart-power-regression.json',
                  'tools/part_geometry_oracle.py', 'examples/part_geometry_oracle.rs', 'docs/part-geometry-oracle.json', 'docs/part-geometry-world-smoke.json', 'docs/part-geometry-placement-world-smoke.json',
                  'tools/reporting_oracle.py', 'examples/reporting_oracle.rs', 'docs/reporting-oracle.json', 'docs/reporting-cable-regression.json',
+                 'tools/inventory_update_oracle.py', 'examples/inventory_update_oracle.rs', 'docs/inventory-update-oracle.json',
                  'tools/storage_helper_oracle.py', 'examples/storage_helper_oracle.rs', 'docs/storage-helper-oracle.json',
                  'tools/incremental_update_oracle.py', 'examples/incremental_update_oracle.rs', 'docs/incremental-update-oracle.json',
                  'tools/me_interaction_oracle.py', 'examples/me_interaction_oracle.rs', 'docs/me-interaction-oracle.json',

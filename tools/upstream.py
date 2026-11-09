@@ -303,6 +303,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "core/network/clientbound/MEInventoryUpdatePacket.java": ("mixins/ae2/inventory_update.rs", "source builder full/delta/key/serial/removal/filter/commit rules, post-write 512KiB and 32767-entry flushing, field codecs with delegated optional-key codec; 1258 whole-original-packet scenarios; real native transport/registry codec and arbitrary Java HashSet order pending"),
+    "menu/me/common/GridInventoryEntry.java": ("mixins/ae2/inventory_update.rs", "serial/nullable key/stored/requestable/craftable fields and meaningful predicate; native registry packet binding and public API remain pending"),
+    "client/gui/me/common/Repo.java": ("mixins/ae2/inventory_update.rs", "serial-indexed update/clear/removal/key-retention/unknown-delta entry rules against original methods; view/search/sort/pins/cache invalidation/UI and full native lifecycle pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

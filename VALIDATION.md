@@ -5,8 +5,8 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
 ## Shared storage-menu core
 
-- Formatting, Clippy with warnings denied, 191 standalone tests and 17 Python
-  tests pass. The inventory records 148 partial classes of 1,429, none complete.
+- Formatting, Clippy with warnings denied, 193 standalone tests and 17 Python
+  tests pass. The inventory records 151 partial classes of 1,429, none complete.
 - `tools/storage_helper_oracle.py`: 12,960 whole-original-class callback traces
   compare power-limited simulate/commit, item/fluid factors, signed boundaries,
   nonfinite power and statistics against the Rust core.
@@ -24,8 +24,15 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   two destination slots and bucket/tank strategies. Reentrant callbacks replace
   cursors/slots or change storage; partial fluid commits and null-key faults
   retain source boundaries. Reports record exact input/source/binding/output hashes.
-- Packaging retains all four drivers, Rust examples, the shared fixture and
-  reports. The actual native-mod reader accepts the 165-entry archive; all 191
+- `tools/inventory_update_oracle.py`: 1,258 whole-original-packet/builder and
+  extracted Repo-method scenarios compare exact bytes, retained helper state
+  and final client entries. This includes 32,767-entry/512-KiB flush boundaries,
+  repeated build, full/change filters, removal/reassignment and partial key-codec
+  errors. Actual MC buffer varints run with controlled optional-key encoding.
+  HashSet iteration is aligned by eight small unique key hashes; arbitrary hash
+  order, actual key registry/components and full Repo views are excluded.
+- Packaging retains all five drivers, Rust examples, the shared fixture and
+  reports. The actual native-mod reader accepts the 166-entry archive; all 193
   tests also pass from its extracted corresponding source.
   These cores are not native-registered; no Horizon runtime payload
   changed and native game suites were not repeated for this standalone change.

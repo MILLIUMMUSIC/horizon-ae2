@@ -302,7 +302,8 @@ class PackageTests(unittest.TestCase):
                              "tools/storage_menu_oracle.py", "examples/storage_menu_oracle.rs",
                              "examples/support/storage_menu_fixture.rs", "docs/storage-menu-oracle.json",
                              "tools/storage_helper_oracle.py", "tools/incremental_update_oracle.py",
-                             "tools/me_interaction_oracle.py"]:
+                             "tools/me_interaction_oracle.py", "tools/inventory_update_oracle.py",
+                             "examples/inventory_update_oracle.rs", "docs/inventory-update-oracle.json"]:
                     self.assertIn(name, source.namelist())
 
     def test_corresponding_source_includes_content_preparation_imports(self):

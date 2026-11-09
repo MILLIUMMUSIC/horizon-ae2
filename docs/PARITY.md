@@ -58,6 +58,25 @@ including reentrant cursor/slot/storage changes. Separate original-class checks
 cover 12,960 StorageHelper scenarios, 30,015 incremental-update operations and
 44,253 packet cases; reports record hashes and excluded scope.
 
+MEInventoryUpdatePacket's builder preserves full/delta/filter behavior, nullable
+keys, zero-removal and commit ordering. It flushes after writing an entry at
+512 KiB or 32,767 entries, keeps full=true only on the first packet, retains
+built packets across calls, and sends no empty packet when nothing was written.
+A partial key-codec failure retains source buffer/serial/pending mutations;
+callers must discard failed transmissions. Field encodings use source VarInt/
+VarLong/boolean semantics while optional-key registry/component codecs remain
+binding callbacks. A full-key union keeps the first equal key object, matching
+source storage/craftable/requestable precedence.
+
+The client entry core indexes by serial, retains keys for keyless deltas,
+refuses unknown keyless serials with a warning, and removes nonmeaningful entries.
+Equal client-visible keys do not merge distinct serials. Full refresh clears
+entries; actual view/cache/pin clearing and updateView callbacks are separate.
+1,258 original packet/builder and Repo-method scenarios compare exact bytes and
+server/client state, including flush boundaries and controlled codec failures.
+Small controlled key hashes align Java iteration with native sorted order;
+arbitrary HashSet order and real AEKey registry codecs are excluded.
+
 These modules are standalone dependencies for the remaining terminal/ME Chest
 PRs. They are not registered as native payloads yet. Actual native menus, client
 updates/view cells/settings, host/window authority, real slot semantics and

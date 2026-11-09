@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "cases": 1258,
+  "source_sha256": {
+    "core/network/clientbound/MEInventoryUpdatePacket.java": "64d13867abbe28fcc37e14574c6892948b3752a871a07a118796ba57218b9c99",
+    "menu/me/common/IncrementalUpdateHelper.java": "897aad8af481efe4c3ac8f4f2722170e39f1718775e5c5ccf1976993ac34b25f",
+    "menu/me/common/GridInventoryEntry.java": "5c595150f2155be04cdb16cbbfe5de4b5484d16b5a76e3c08aa44edfd0f1ce5d",
+    "client/gui/me/common/Repo.java": "e974fb682bf2312fb6334592359f5784e01c6fa4b840efddadf684f494f9177e"
+  },
+  "binding_sha256": "4b11220f3c914b0d76c0f8ca98d86a5a9ae4c470101f2b84ea146e1739931cd5",
+  "rust_sha256": {
+    "mixins/ae2/inventory_update.rs": "f85ae85051f1c8b1f6ca339b513fb30329b8c3359b4f7f67d86d4b01d6714c4a",
+    "mixins/ae2/incremental_update.rs": "abe60e928bffff054d8415443d21b56fe702cad77e955a5769b69310cce62c9b",
+    "mixins/ae2/me_interaction.rs": "16b8204c0dd758b2f7e3fc78631b3a6bb1508174926cc038534d275c96886c6a",
+    "examples/inventory_update_oracle.rs": "e93a66c8fd60677830da6a208f9a3edf98def4f14976b6eb804350e2066329fd"
+  },
+  "input_sha256": "4b775a2bd4c6645e92dace03d30eb30ed06b11c48af5769c5d209251d54e072f",
+  "output_sha256": "3473d3067e0161e872c542d0a22e200062f613c02e4dbba081952c5e360c06ed",
+  "scope": "Original whole packet builder/encode/decode and client dispatch, original GridInventoryEntry/IncrementalUpdateHelper and extracted Repo update/clear methods; exact packet bytes, serial/pending state and resulting client entries",
+  "limits": [
+    "Controlled optional-key registry/component codec and player/menu/Repo view bindings; real MC FriendlyByteBuf/Netty varint encoding",
+    "Eight controlled keys use collision-free small integer hashes matching sorted iteration; arbitrary Java HashSet ordering excluded",
+    "No native session/transport/UI/search/sort/view-cell/permission or actual registry component codec proof",
+    "Partial key-write failures retain source buffered bytes and pending/serial mutations; caller must discard failed transmissions"
+  ]
+}

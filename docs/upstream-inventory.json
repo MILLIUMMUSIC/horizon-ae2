@@ -13,12 +13,12 @@
       "pending": 36
     },
     "client": {
-      "partial": 7,
-      "pending": 210
+      "partial": 8,
+      "pending": 209
     },
     "core": {
-      "partial": 7,
-      "pending": 62
+      "partial": 8,
+      "pending": 61
     },
     "crafting": {
       "partial": 0,
@@ -73,8 +73,8 @@
       "pending": 42
     },
     "menu": {
-      "partial": 5,
-      "pending": 87
+      "partial": 6,
+      "pending": 86
     },
     "mixins": {
       "partial": 1,
@@ -2801,8 +2801,10 @@
     {
       "family": "client",
       "path": "src/main/java/appeng/client/gui/me/common/Repo.java",
+      "port": "mixins/ae2/inventory_update.rs",
+      "scope": "serial-indexed update/clear/removal/key-retention/unknown-delta entry rules against original methods; view/search/sort/pins/cache invalidation/UI and full native lifecycle pending",
       "sha256": "e974fb682bf2312fb6334592359f5784e01c6fa4b840efddadf684f494f9177e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
@@ -4071,8 +4073,10 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/network/clientbound/MEInventoryUpdatePacket.java",
+      "port": "mixins/ae2/inventory_update.rs",
+      "scope": "source builder full/delta/key/serial/removal/filter/commit rules, post-write 512KiB and 32767-entry flushing, field codecs with delegated optional-key codec; 1258 whole-original-packet scenarios; real native transport/registry codec and arbitrary Java HashSet order pending",
       "sha256": "64d13867abbe28fcc37e14574c6892948b3752a871a07a118796ba57218b9c99",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "core",
@@ -6899,8 +6903,10 @@
     {
       "family": "menu",
       "path": "src/main/java/appeng/menu/me/common/GridInventoryEntry.java",
+      "port": "mixins/ae2/inventory_update.rs",
+      "scope": "serial/nullable key/stored/requestable/craftable fields and meaningful predicate; native registry packet binding and public API remain pending",
       "sha256": "5c595150f2155be04cdb16cbbfe5de4b5484d16b5a76e3c08aa44edfd0f1ce5d",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "menu",

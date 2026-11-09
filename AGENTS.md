@@ -341,3 +341,13 @@ returns typed NullFluidKey at the original fault boundary. Keep the inherited
 oracles. Native session/host/window authority, actual inventory/capabilities,
 update transport and UI remain open; never activate a generic empty terminal
 or add a persistent third ME Chest withdrawal slot.
+
+inventory_update.rs ports builder field/control flow and Repo entry mutations,
+not the optional-key registry codec or full client view. Preserve post-write
+512KiB/32767-entry flushes, first-packet-only full flag, no packet for no data,
+partial-codec error mutations and first-equal-object union precedence. Never
+merge different serials because client share keys are equal. Unknown keyless
+deltas warn and stay absent. Native full updates must clear views/pins/caches
+and invoke the source view callbacks as well as clearing the entry core.
+Run tools/inventory_update_oracle.py; its controlled eight key hashes align
+iteration, not arbitrary Java HashSet order or actual registry codec behavior.
