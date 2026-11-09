@@ -3,6 +3,27 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
+## Inventory access dependency
+
+- Formatting, Clippy with warnings denied, 196 existing standalone tests,
+  five new inventory integration tests and 17 Python checks pass. Source audits
+  retain 154 partial classes; no whole inventory class is marked complete.
+- `tools/inventory_access_oracle.py` compares 24,320 cases against the original
+  InternalInventory insertion method, AppEng extraction/setter/notification
+  methods and InternalInventoryItemHandler wrapped-stack gate. Retained/copied
+  object identities, current/caller stack mutations inside callbacks, exact
+  notification order, signed bounds, simulation, client/host guards and the
+  differing invalid-slot boundaries match. Source, method, binding, driver,
+  input and output hashes are in `docs/inventory-access-oracle.json`.
+- The fixture controls stacks, component equality, filters and host/client
+  callbacks. Actual Minecraft component-object mutations, NeoForge capabilities
+  and native Chest endpoint behavior are outside this proof. This core has no
+  native registration yet; the prior host's native suites/world evidence below
+  do not claim that automation or either screen has been activated.
+- The actual native-mod reader accepts the 169-entry archive. Its extracted
+  corresponding source contains the new core, fixture, driver, report and
+  integration tests; all 201 standalone tests also pass from that archive.
+
 ## Retained native ME Chest host
 
 - Formatting, Clippy with warnings denied, 196 standalone tests, 17 Python

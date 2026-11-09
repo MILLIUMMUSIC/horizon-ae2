@@ -112,5 +112,7 @@ pub mod ae2_storage_menu;
 #[path = "../mixins/ae2/inventory_update.rs"]
 pub mod ae2_inventory_update;
 
+#[path = "../mixins/ae2/inventory_access.rs"]
+pub mod ae2_inventory_access;
 #[path = "../mixins/ae2/me_chest.rs"]
 pub mod ae2_me_chest;

@@ -84,6 +84,19 @@ charging of the local buffer. Source CONFIG loading, dynamic power priority,
 color/cell client streams, synchronous external callbacks and complete same-tick
 save/drop/command-load lifecycle still need binding.
 
+`inventory_access.rs` ports InternalInventory insertion, AppEng extraction and
+the wrapped-stack extraction gate for the native item endpoint to consume.
+Full committed AppEng extraction returns the retained old stack and sends the
+setter's notification followed by the source's explicit second notification.
+Partial extraction shrinks the retained inventory stack, not a replacement,
+and returns a copy. Insertion copies before calling the setter and re-reads
+the caller's stack after callbacks when computing its remainder. The 24,320
+original-method comparisons include invalid slots, signed count/limit bounds,
+simulation, client/missing-host guards and callbacks changing both references.
+Stacks, component equality, filters and world/client bindings are controlled;
+actual Minecraft component-object mutation, native automation and the complete
+NeoForge capability/lifecycle contract are outside this proof.
+
 The callback core caches a nonempty cell lookup, including failed lookups, until
 a cell change or priority reset. Empty slots stay uncached. Removing or failing
 to read a cell does not reset its last idle drain. The readable-cell drain is

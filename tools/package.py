@@ -87,6 +87,7 @@ def package():
                  'tools/shared_power_oracle.py', 'examples/shared_power_oracle.rs', 'docs/shared-power-oracle.json', 'docs/shared-power-cable-regression.json',
                  'tools/me_chest_oracle.py', 'examples/me_chest_oracle.rs', 'examples/support/me_chest_fixture.rs', 'docs/me-chest-oracle.json',
                  'tools/smoke_me_chest.py', 'docs/me-chest-native.json', 'docs/me-chest-cable-regression.json',
+                 'tools/inventory_access_oracle.py', 'examples/inventory_access_oracle.rs', 'examples/support/inventory_access_fixture.rs', 'tests/inventory_access.rs', 'docs/inventory-access-oracle.json',
                  'tools/inventory_update_oracle.py', 'examples/inventory_update_oracle.rs', 'docs/inventory-update-oracle.json',
                  'tools/storage_helper_oracle.py', 'examples/storage_helper_oracle.rs', 'docs/storage-helper-oracle.json',
                  'tools/incremental_update_oracle.py', 'examples/incremental_update_oracle.rs', 'docs/incremental-update-oracle.json',

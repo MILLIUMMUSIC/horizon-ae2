@@ -38,6 +38,12 @@ own-cell isolation from a Drive, malformed refusal, replacement and restart.
 Screens, external capabilities, source cell/color rendering and complete
 same-tick save/drop/command-load callbacks remain open.
 
+The inventory-access dependency now compares 24,320 cases of the original
+insertion, AppEng extraction, guarded notifications and wrapped-stack gate.
+It preserves retained/copied stack identities and callback mutations of the
+slot and caller's stack. This core is standalone until the native Chest item
+endpoint consumes it; it does not activate external automation by itself.
+
 The graph and saved-host binding now address each primary part separately from
 its cable center. Internal null-direction edges, occupied-face blocking,
 per-part channel demand and separate `gn` persistence are implemented. A source

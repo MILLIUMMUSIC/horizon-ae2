@@ -322,6 +322,12 @@ PARTIAL.update({
     "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/power.rs", "shared owned power store can outlive managed grid attachment without copying energy; native Chest constructor/load/local-store binding and source wrapper/local extraction callback program; external capabilities, config reload and complete base lifecycle pending"),
 })
 
+PARTIAL.update({
+    "api/inventories/InternalInventory.java": ("mixins/ae2/inventory_access.rs", "source insertItem stack copies, limits, full-before-component order and post-callback remainder through retained handles; existing native signal adapter; 24320 controlled original-method comparisons; general API and native Chest insert binding pending"),
+    "util/inv/AppEngInternalInventory.java": ("mixins/ae2/inventory_access.rs", "source extractItem and guarded setter/change/save notification order, retained full-extract result and in-place partial shrink; existing Drive/Charger adapters; complete filters, native Chest binding and lifecycle pending"),
+    "api/inventories/InternalInventoryItemHandler.java": ("mixins/ae2/inventory_access.rs", "source wrapped-stack extraction gate before inventory validation/filter with controlled component/stack identities; existing Charger native guard; full platform capability API and native Chest endpoint pending"),
+})
+
 
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()

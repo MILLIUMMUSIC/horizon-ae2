@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "cases": 24320,
+  "source_sha256": {
+    "api/inventories/InternalInventory.java": "336e863371ea4c49d7d0794ce35855f1f831243b6c952cd94400333f7336af0b",
+    "util/inv/AppEngInternalInventory.java": "598ffc63a4900654ba1b920e7c0f0b18f32c485a090b3bcb6fe3132930b3b53c",
+    "api/inventories/InternalInventoryItemHandler.java": "51ba1d47e9ff15fdd26bc27fa8fe5c2cd32fa5f9c0f1386f571431f35385c91c"
+  },
+  "methods_sha256": {
+    "0": "bb309c0117c70c8a371a9514ea6dc24c9ea1aa1d252dc021e8085daa370607d6",
+    "1": "020de947f6b6c2ac874577f6d50caaf4d8d01fc4e851e43b19db6b52088083e4",
+    "2": "e1fa22f3c3786e866fba618e5b35064534d09e22a5feb45d6dcd715580d33627",
+    "3": "813c467587ed9e3c6e1ae68d2a3bed6fcf2a3b1735603163f2c26c6d7509a1e1",
+    "4": "87526826ccc6ea4aba65453d0e23f61a0d3c2f5bac145dc173e0eb4547048286",
+    "5": "2a4bd8966cadf708bfcb89739a3ee029933c1b9ef92f97b72fa8d859c680d0bd",
+    "6": "cbf9a53f006c35c1293506697dcf55446aa53d3e8369dbdc35cb117da0890bd3"
+  },
+  "binding_sha256": "7913718ca385f85564c8ceb4c0f724a464577a39cb25f8a3d45f088e42e1abd5",
+  "rust_and_driver_sha256": {
+    "mixins/ae2/inventory_access.rs": "8b2665450084460a058f486c7fddc7daea5cf7bcd0422cd62106a5fbea435720",
+    "examples/inventory_access_oracle.rs": "c4e744fe23b2a38403fb0d77ed5cb79fe27ee3b6ceb1ece69c24d1c8be81a0f2",
+    "examples/support/inventory_access_fixture.rs": "ca2715a28bbb5bd679ac5a6f56aa78c6e2f55527e339534e34cb545296ba5cce",
+    "tools/inventory_access_oracle.py": "addadd933fb2ba371c8478515d4f6e1ac6a4b0d9b2cba0c793422b9dbab86c88"
+  },
+  "input_sha256": "9389baa0780a49fc3cd4c4756a85d9a4a46d551c31d79891019ae379c0925d59",
+  "output_sha256": "109847858bd6f92fb8edbbc81d108219deaf97b8838bdd3b8c3b79a4cea1a093",
+  "scope": "Original insertion/extraction and guarded inventory notification methods; exact retained/copied stack identities, callback traces, wrapped gate and invalid-slot faults",
+  "limits": [
+    "Controlled stacks, components, filters, host and client/level bindings; no real Minecraft ItemStack or NeoForge capability implementation.",
+    "Native Chest automation, menus, ownership and world lifecycle are not activated by this standalone comparison."
+  ]
+}

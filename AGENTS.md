@@ -387,3 +387,14 @@ not persisted; never use root NBT as a fake instance identifier. Run both
 native binary and library tests: the latter load all 48 Chest states and
 verify multipart model selection. tools/smoke_me_chest.py uses only owned
 worlds and asserts unchanged native source/binary hashes throughout its run.
+
+inventory_access.rs is a standalone dependency for Chest item endpoints; do not
+register an unconsumed native module. Stack::clone retains the handle, whereas
+copy_stack copies the source object. Full committed AppEng extraction notifies
+twice (setter plus explicit notify) and returns the retained old object; partial
+extraction shrinks that old object and returns a copy. Default insertion tests
+free space before components, copies before setter callbacks, then re-reads
+the caller's stack to compute the remainder. stored_stack is the AppEng backing-
+list read; stack is the virtual getter used by insertion/wrapper. Preserve their
+different dispatch/fault boundaries. Run tools/inventory_access_oracle.py and
+the five integration tests before binding this program to a real host.

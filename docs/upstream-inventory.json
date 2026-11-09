@@ -841,16 +841,16 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/inventories/InternalInventory.java",
-      "port": "mixins/ae2/inventory_signal.rs",
-      "scope": "getRedstoneSignal for native Drive/Charger via original slot-one ContainerAdapter contract and Minecraft float32 lerpDiscrete arithmetic; remaining inventory API/hosts pending",
+      "port": "mixins/ae2/inventory_access.rs",
+      "scope": "source insertItem stack copies, limits, full-before-component order and post-callback remainder through retained handles; existing native signal adapter; 24320 controlled original-method comparisons; general API and native Chest insert binding pending",
       "sha256": "336e863371ea4c49d7d0794ce35855f1f831243b6c952cd94400333f7336af0b",
       "status": "partial"
     },
     {
       "family": "api",
       "path": "src/main/java/appeng/api/inventories/InternalInventoryItemHandler.java",
-      "port": "mixins/ae2/charger_automation.rs",
-      "scope": "Charger native exposed-handler wrapped-stack extraction guard only; general item handler/capability API pending",
+      "port": "mixins/ae2/inventory_access.rs",
+      "scope": "source wrapped-stack extraction gate before inventory validation/filter with controlled component/stack identities; existing Charger native guard; full platform capability API and native Chest endpoint pending",
       "sha256": "51ba1d47e9ff15fdd26bc27fa8fe5c2cd32fa5f9c0f1386f571431f35385c91c",
       "status": "partial"
     },
@@ -8805,8 +8805,8 @@
     {
       "family": "util",
       "path": "src/main/java/appeng/util/inv/AppEngInternalInventory.java",
-      "port": "mixins/ae2/automation.rs",
-      "scope": "native Drive/Charger one-slot insertion limit, Charger filter-before-extraction and direct-loaded count retention; general inventory API, simulate handler, event/lifecycle and other hosts pending",
+      "port": "mixins/ae2/inventory_access.rs",
+      "scope": "source extractItem and guarded setter/change/save notification order, retained full-extract result and in-place partial shrink; existing Drive/Charger adapters; complete filters, native Chest binding and lifecycle pending",
       "sha256": "598ffc63a4900654ba1b920e7c0f0b18f32c485a090b3bcb6fe3132930b3b53c",
       "status": "partial"
     },
