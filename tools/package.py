@@ -71,6 +71,7 @@ def package():
                  'tools/multipart_oracle.py', 'examples/multipart_oracle.rs', 'docs/multipart-oracle.json', 'docs/multipart-cable-regression.json', 'docs/multipart-power-regression.json',
                  'tools/part_geometry_oracle.py', 'examples/part_geometry_oracle.rs', 'docs/part-geometry-oracle.json', 'docs/part-geometry-world-smoke.json', 'docs/part-geometry-placement-world-smoke.json',
                  'tools/reporting_oracle.py', 'examples/reporting_oracle.rs', 'docs/reporting-oracle.json', 'docs/reporting-cable-regression.json',
+                 'LICENSES/JOML-MIT', 'tools/quad_rotation_oracle.py', 'examples/quad_rotation_oracle.rs', 'docs/quad-rotation-oracle.json',
                  'LICENSES/Horizon-MIT', 'tools/item_tick_source.py', 'tools/transform_oracle.py', 'examples/transform_oracle.rs', 'docs/transform-oracle.json', 'tools/smoke_fluix_throw.py', 'docs/fluix-world-smoke.json', 'docs/fluid-inscriber-regression.json', 'docs/item-tick-source-audit.json',
                  'tools/smoke_cell_1k.py', 'docs/cell-1k-world-smoke.json', 'tools/smoke_charge_certus.py', 'docs/charge-certus-world-smoke.json',
                  'tools/smoke_charger_orientation.py', 'tools/smoke_wrench_rotation.py', 'tools/smoke_crank_states.py',

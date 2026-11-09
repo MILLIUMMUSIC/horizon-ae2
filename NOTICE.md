@@ -42,3 +42,12 @@ Renderer API embedded in AE2's appeng.thirdparty.fabric package. Copyright (c)
 2016, 2017, 2018, 2019 FabricMC, Apache-2.0; see LICENSES/Fabric-Apache-2.0.
 The implementation is modified/re-expressed in Rust; no Fabric runtime is bundled.
 Original attribution: https://github.com/FabricMC/fabric/blob/1.21.1/fabric-renderer-api-v1/src/client/java/net/fabricmc/fabric/api/renderer/v1/mesh/QuadEmitter.java
+
+`quad_rotation.rs` also adapts Fabric's packed normal/color and quad accessor
+rules under the same Apache-2.0 notice. Its scalar quaternion-vector arithmetic
+is a modified Rust expression of JOML 1.10.5, copyright (c) 2015-2022 JOML,
+MIT; see LICENSES/JOML-MIT, preserved from the verified dependency archive.
+The 24 immutable quaternion/direction rows are derived from AE2's original
+BlockOrientation constructor with that dependency. No JOML Java runtime is
+included in the mod. Minecraft winding is checked against the player's
+verified reference artifact; that artifact is not distributed here.

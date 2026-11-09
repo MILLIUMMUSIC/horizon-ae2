@@ -6,6 +6,10 @@ The user explicitly authorized creating and publishing the public GitHub reposit
 MILLIUMMUSIC/horizon-ae2 with gh. Keep game assets/builds/worlds out of Git.
 Work without subagents. Read README.md, docs/PLAN.md, docs/PARITY.md,
 upstream.lock.json and compatibility.json before editing.
+Current user priority: finish the outstanding PR #3/#6/#7 work, including
+required missing-port dependencies and verified fixes/integration, then pause
+the goal at the user's request. Do not continue unrelated porting after that
+condition is met. Keep the full-port objective intact while it is paused.
 
 Keep this repository separate from horizon-create, Horizon and horizon-mixins.
 Never edit their original sources, player resources, saves or launcher settings.
@@ -57,6 +61,12 @@ do not activate native side parts or replace full inherited/host lifecycle.
 When those parts are activated, retain Reporting state by actual part identity;
 Part.reporting constructs fresh state, not an opacity cache to recreate on each
 query. Apply read_spin to retained instances for in-place NBT reads.
+quad_rotation.rs is a standalone core pending the native part-model collector;
+do not register an unconsumed payload module or activate the side-part graph.
+Its tables come from the original BlockOrientation constructor and pinned JOML,
+not rounded integer quarter turns. Identity must preserve all raw words.
+Winding changes positions/UV only; the last coincident vertex wins UVs.
+Keep JOML MIT and Fabric Apache-2.0 notices and verify tools/quad_rotation_oracle.py.
 Hosts.primary_snapshots/observe_primary/persist_node are groundwork for the
 multipart adapter. Keep the active center-only decoder boundary until source
 shape/input/render and real menu support land. Secondary tunnel/fiber nodes,

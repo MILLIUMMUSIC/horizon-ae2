@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "cases": 38689,
+  "panel_quad_cases": 16128,
+  "arbitrary_quad_cases": 12000,
+  "normal_pack_cases": 10561,
+  "source_sha256": {
+    "client/render/cablebus/QuadRotator.java": "c7b581f58da69c1beea965527e1d74e9234d370c4b30367573fbdf1fdbfe7797",
+    "thirdparty/fabric/ColorHelper.java": "855578113dfb319365896f6ab10d45642316047342fbef101ff5db81a49a4cdd",
+    "thirdparty/fabric/EncodingFormat.java": "a8375164cf924b4996c97df9cb0dd310c0826fab54a473e80127f4d0b7ea8e07",
+    "api/orientation/BlockOrientation.java": "d91cada671714ecbe797af72cbc2faa87038a972582d6a19f583f78422220d8a",
+    "thirdparty/fabric/NormalHelper.java": "71274e6ae7a8d5de5aef00975b45cdc8badb9249bc7b5505e413ea15c12c3e0d",
+    "thirdparty/fabric/QuadViewImpl.java": "9716bea7af0d1e5b91c61a0a00e6563c8c1b39289d3c4c59523bffdb302ca386",
+    "thirdparty/fabric/MutableQuadViewImpl.java": "9818de410a363a040362e545471fef8c0240f41177118edcc5fd7fcfeb007fc1"
+  },
+  "method_sha256": {
+    "orientation_constructor": "e4cb8c9d0ae7f4bac88b53734770a75841ed416e10fb0971c421257d255cf821",
+    "orientation_0": "e04eb5d22466358efcbb20de2d837daac7ff15fee11896f8b07b69ab7740567c",
+    "orientation_1": "0452385edaad46f332d490654b3e5d215806f4ac3454c922637bfcdddc7ee9a5",
+    "orientation_2": "b5a1f5e8e0f503fed2f362506cc58d62bc12fe76f87b732cc4358ce1aba178c4",
+    "orientation_3": "94c0cc378325f68afa405e189759283dc29e8d8fa6a368ca10f389da375067b4",
+    "normal_0": "b486ca5ee50c87649e968d969a93c26c0ca3abc4935433cc593f665eef54eaa3",
+    "normal_1": "091a6d68f43d17b97fe9bbd180894aa0c59b23d9473d2a58326d91bcc283cde4",
+    "quad_read_0": "d71a111a12538755d7c7b7215be9e34bb854bd5bf6b1ccc0c6c5cd421d0f7846",
+    "quad_read_1": "833774e76eccae3549441be18c4a2aef32167195400dc6bd3cb0aea24583f3f8",
+    "quad_read_2": "54a06e8a246862f93207e74109c4bc8ff1c88a50ba56745c3e098118a3920a06",
+    "quad_read_3": "09f0990f2e019f00d911e44ad6a04942d29433c5534d5413cb10e7c88b0dbc08",
+    "quad_read_4": "b90cf76c64fa2c538d884e76c61727b834e86b732fdcaf87a15e57b16cf58080",
+    "quad_read_5": "5a5190b31cf3634fab09380921a33d1b14587c13d6451f2d5a9b2a4e6205444f",
+    "quad_read_6": "0e433c212dcc00e8f0f012dd941b1d4deeb7169bd5a2b3308482f5a7a58ac10f",
+    "quad_read_7": "dc6d63247043a12e444a830f955df75e48e2c2ebc6471a7b5de5f3e83275788e",
+    "quad_write_0": "60044e1fdbc80a7589339a7e0d1b3f8c07e289b6585a2a2ec1cac4d20762cf2d",
+    "quad_write_1": "e380e39a6e6ebcaeb2d034d394375449208de29ebe4b4e7679201eb2ed352ed7",
+    "quad_write_2": "027bb934004e1e2abc3da2e1a376e24e36aa539074dc6c0fcc1e52335a24cb2d",
+    "quad_write_3": "c3c10fa73a04377a6fb10e621788c0529323ebc9b669ceb9c854552128c8c179",
+    "quad_write_4": "7231c6ba034d8711135a4c3178a0ae6a74c0e8e72c0a2f169ce25e8a8acb40a1",
+    "quad_write_5": "73b3f572b2b046417cb7943619d87a5da9ff271cb9919b446dd31c42ce53229f"
+  },
+  "binding_sha256": {
+    "appeng/api/orientation/BlockOrientation.java": "e9776da04499b9b31e6028278f7d5007c7ee65f4559e7760e5b7248acb7a14c6",
+    "appeng/thirdparty/fabric/MutableQuadViewImpl.java": "5cc515d2e443df7deead4cc12ab8190a0d1ea56a7393e103231589290405d991",
+    "appeng/thirdparty/fabric/NormalHelper.java": "6f27ca13e65ad5021cc5892b405cbb4bde86fcf460cc8dd15151b8028e713d3a",
+    "appeng/thirdparty/fabric/MutableQuadView.java": "2c0911b9033b931e3438dfd2dd1b54a8261a5b554d1cc6c6f274f834f6b3b522",
+    "appeng/thirdparty/fabric/RenderContext.java": "248aeec5f823f5daffe7589a8434b097029f8cbf9adcd2b75ba4ae0388bc4ecb",
+    "appeng/thirdparty/fabric/QuadView.java": "9bc5d3cf804bf038fbc503dbceb998ded94c4a1e2731be7eed7fcba4f0aa7c24",
+    "appeng/thirdparty/fabric/GeometryHelper.java": "2f370a18b7cf1ef3ba5032ddf312de8f274c792a77c2bdf3f3d82e289d33d561",
+    "appeng/thirdparty/fabric/ModelHelper.java": "07ef38818d1e6c556d76366e1a3828cfe9964055e68b39c599780e4df9e3b387",
+    "net/minecraft/core/Direction.java": "ac8932f43c40c2de77ade28ac419376125c599cded8ad385cb22b07c898a7e5c",
+    "net/minecraft/util/Mth.java": "b9f57ef81bf8e71854513f1984980b7555044c6396f9d8336df2e597dfeb778a",
+    "net/minecraft/client/renderer/block/model/FaceBakery.java": "980da03dadfecb3128c5bfa0a49499d9fd204cfe5f9ded21403bf1ba384a9653",
+    "net/minecraft/client/renderer/block/model/BlockModel.java": "9ac871a1c8f8d61f3a07a550e912dc8a3c196c0b6384dae06af512eccd841f2b",
+    "com/mojang/blaze3d/vertex/VertexFormat.java": "b738f72f3244e04404dd6264b6f3cc3badd65c0c2cb548a6897fdaca54fea1f3",
+    "com/mojang/blaze3d/vertex/DefaultVertexFormat.java": "ad451021d65de1f3c521940cfde8a30529eb8460c156c5153d0bbd6864233c2e",
+    "org/jetbrains/annotations/Nullable.java": "a6463df426473666d43dda2dddc1cac787b101a7ab926685856f329d295c7c99",
+    "oracle/QuadRotationOracle.java": "df67cae36eba60659ab6bbc67d7921343c97844d95b739743bc1e76c77d50e2a"
+  },
+  "table_sha256": "66d05ca722ed765e4d477aa251f8626cf9e4e3a4b84680848ab1c23f22d234a1",
+  "rust_sha256": {
+    "mixins/ae2/quad_rotation.rs": "053cd72bb2f6701b08d4761f498a88253531dcf3db7e7677588c6c3afca4f896",
+    "examples/quad_rotation_oracle.rs": "638c49e3c96068b85290021d394a730c0c4ad5be6da80b3068f3a218bf1e45e0"
+  },
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "minecraft_mappings_sha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+  "joml_sha256": "cac9f22f83a7aa33eebda73c16ff5261e3cb4911b6bafcf4c79ea486099d0c9a",
+  "input_sha256": "ea799e2af4dd26ce11a09ca143eecbcae117f4a6753c870098de3395bcac5d9e",
+  "output_sha256": "10259a3413fd36412e7cc53152938f21491a18d7f2baf8af7287a7b367eac58c",
+  "scope": "Original QuadRotator class, source BlockOrientation constructor/direction methods and extracted Fabric packed accessors; real MC FaceBakery/FaceInfo/Mth and JOML 1.10.5 default scalar arithmetic",
+  "limits": [
+    "Controlled quad storage, direction vector, VertexFormat stride and unused Transformation bindings; nominal faces are non-null and cull indices valid",
+    "NaN position outputs canonicalized after nonidentity rotations; identity is compared as untouched raw words",
+    "No optional JVM JOML modes, full face-normal/AO/mesh caches, model loading, native GPU or side-part world activation proof"
+  ]
+}

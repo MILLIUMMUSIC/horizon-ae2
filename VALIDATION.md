@@ -3,7 +3,38 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current reporting-part state checkpoint
+## Current packed part-rotation core checkpoint
+
+- Formatting, Clippy with warnings denied, 168 standalone Rust tests, 16 Python
+  tests and source/stack-limit/native-tick audits pass. Coverage is 132 partial
+  Java classes out of 1,429; no native side-part feature is claimed.
+- `tools/quad_rotation_oracle.py` executes the original QuadRotator class,
+  original BlockOrientation constructor/direction methods and extracted Fabric
+  accessors with real pinned JOML 1.10.5, Minecraft FaceBakery/FaceInfo/Mth and
+  the original EncodingFormat. All 38,689 cases match: 16,128 panel quads,
+  12,000 arbitrary/degenerate quad cases and 10,561 packed-normal cases.
+- The 24 quaternion/direction rows and face winding indices are independently
+  regenerated/checked before comparisons. Identity is a true raw-word no-op;
+  signed spin keeps the source unchecked linear enum indexing. Winding changes
+  positions/UV only, retains colors/light/normals at their original indices and
+  lets the last coincident vertex supply UV. Tests also cover normal clamp,
+  signed-byte decoding and opaque header preservation.
+- Source/binding/dependency/table/driver/output hashes are in
+  `docs/quad-rotation-oracle.json`. JOML's licence is preserved from the verified
+  dependency archive. Reference-init logs and artifacts remain under `target/`.
+
+This is a standalone rotation core for PR #3's rendering dependency. It is not
+registered as a native payload until the actual model collector consumes it.
+No runtime Horizon payload changed, so native builds/world tests were not
+repeated for this core-only change; the previous 234 game/26 render tests and
+eight center-world groups concern the previous runtime checkpoint. Default
+scalar JOML options, non-null nominal faces and valid cull indices are covered.
+Nonidentity NaN position outputs are compared canonically; identity compares
+raw words. Face-normal/geometry cache, baked-model loading, AO/lighting, GPU
+and side-part world activation remain required. Big-endian conversion is
+implemented but not exercised by a big-endian Java/native platform run.
+
+## Reporting-part state checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 163 standalone Rust tests, 16 Python
   tests and source/stack-limit/native-tick audits pass. Source coverage remains

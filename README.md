@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 125 partially ported classes. That count is not a gameplay completion percentage.
+files, including 132 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported

@@ -31,6 +31,15 @@ The full mod is not yet complete.
 
 ## Primary multipart node foundation
 
+The standalone packed-quad rotation core follows QuadRotator, source Fabric
+accessors and the original BlockOrientation/JOML constructor. Its 24 rows are
+derived as float bits rather than approximated cardinal matrices. Identity
+preserves raw data/cache state; winding rewrites only positions/UVs and keeps
+last-match UV behavior on degenerate faces. All 38,689 source comparisons pass
+with real Minecraft winding and default scalar JOML. This core is not wired
+into native part model collection yet. Face-normal/cache, full model import,
+AO/lighting, native GPU and complete side-part activation remain open.
+
 Reporting state preserves signed spin and source numeric NBT conversion,
 including Float/DoubleTag floor-before-byte narrowing. Vertical placement uses
 the source float32 yaw arithmetic; horizontal sides retain spin. Wrench turns

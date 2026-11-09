@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 28,
-      "pending": 244
+      "partial": 29,
+      "pending": 243
     },
     "block": {
       "partial": 10,
@@ -13,8 +13,8 @@
       "pending": 37
     },
     "client": {
-      "partial": 6,
-      "pending": 211
+      "partial": 7,
+      "pending": 210
     },
     "core": {
       "partial": 6,
@@ -105,8 +105,8 @@
       "pending": 10
     },
     "thirdparty": {
-      "partial": 1,
-      "pending": 24
+      "partial": 6,
+      "pending": 19
     },
     "util": {
       "partial": 4,
@@ -1263,8 +1263,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/orientation/BlockOrientation.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "derived source quaternion/direction tables, identity bypass and unnormalized facing*4+spin lookup; actual JOML constructor comparison; transformation/host/relative-side and public native API remain partial",
       "sha256": "d91cada671714ecbe797af72cbc2faa87038a972582d6a19f583f78422220d8a",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -3473,8 +3475,10 @@
     {
       "family": "client",
       "path": "src/main/java/appeng/client/render/cablebus/QuadRotator.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "source packed-quad transform with all 24 original quaternion/direction rows, default JOML scalar arithmetic, normal packing and real Minecraft winding comparison; standalone core only, native part model collector/cache/GPU integration pending",
       "sha256": "c7b581f58da69c1beea965527e1d74e9234d370c4b30367573fbdf1fdbfe7797",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "client",
@@ -8509,14 +8513,18 @@
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/ColorHelper.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "ARGB/native packed-color conversions and roundtrip in quad transform; current little-endian Java comparison, no big-endian native platform run",
       "sha256": "855578113dfb319365896f6ab10d45642316047342fbef101ff5db81a49a4cdd",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/EncodingFormat.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "three header/eight vertex words, cull and normal flag fields with preservation of other opaque words; full light/geometry/material metadata API and native mesh integration pending",
       "sha256": "a8375164cf924b4996c97df9cb0dd310c0826fab54a473e80127f4d0b7ea8e07",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",
@@ -8563,14 +8571,18 @@
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/MutableQuadViewImpl.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "rotation position/normal writes, cull/nominal state and vanilla import; source accessor comparison, clear/emitter/baked-model and cache lifecycle remain pending",
       "sha256": "9818de410a363a040362e545471fef8c0240f41177118edcc5fd7fcfeb007fc1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/NormalHelper.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "packed normal clamp/truncation and signed-byte unpack, used by source quad rotation; face-normal computation/cache and full renderer integration pending",
       "sha256": "71274e6ae7a8d5de5aef00975b45cdc8badb9249bc7b5505e413ea15c12c3e0d",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",
@@ -8589,8 +8601,10 @@
     {
       "family": "thirdparty",
       "path": "src/main/java/appeng/thirdparty/fabric/QuadViewImpl.java",
+      "port": "mixins/ae2/quad_rotation.rs",
+      "scope": "packed position/normal access and vanilla export used by rotation; retained header/vertex data, no full face-normal/geometry cache or full public quad API",
       "sha256": "9716bea7af0d1e5b91c61a0a00e6563c8c1b39289d3c4c59523bffdb302ca386",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "thirdparty",

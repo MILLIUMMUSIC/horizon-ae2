@@ -266,6 +266,17 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "client/render/cablebus/QuadRotator.java": ("mixins/ae2/quad_rotation.rs", "source packed-quad transform with all 24 original quaternion/direction rows, default JOML scalar arithmetic, normal packing and real Minecraft winding comparison; standalone core only, native part model collector/cache/GPU integration pending"),
+    "api/orientation/BlockOrientation.java": ("mixins/ae2/quad_rotation.rs", "derived source quaternion/direction tables, identity bypass and unnormalized facing*4+spin lookup; actual JOML constructor comparison; transformation/host/relative-side and public native API remain partial"),
+    "thirdparty/fabric/NormalHelper.java": ("mixins/ae2/quad_rotation.rs", "packed normal clamp/truncation and signed-byte unpack, used by source quad rotation; face-normal computation/cache and full renderer integration pending"),
+    "thirdparty/fabric/ColorHelper.java": ("mixins/ae2/quad_rotation.rs", "ARGB/native packed-color conversions and roundtrip in quad transform; current little-endian Java comparison, no big-endian native platform run"),
+    "thirdparty/fabric/EncodingFormat.java": ("mixins/ae2/quad_rotation.rs", "three header/eight vertex words, cull and normal flag fields with preservation of other opaque words; full light/geometry/material metadata API and native mesh integration pending"),
+    "thirdparty/fabric/QuadViewImpl.java": ("mixins/ae2/quad_rotation.rs", "packed position/normal access and vanilla export used by rotation; retained header/vertex data, no full face-normal/geometry cache or full public quad API"),
+    "thirdparty/fabric/MutableQuadViewImpl.java": ("mixins/ae2/quad_rotation.rs", "rotation position/normal writes, cull/nominal state and vanilla import; source accessor comparison, clear/emitter/baked-model and cache lifecycle remain pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 
