@@ -28,14 +28,14 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 2. Keys, cells and persistence | Component-aware item/fluid keys; all 23 built-in basic, portable, creative and tool cell profiles; Drive backends | Complete registry recovery, Cell Workbench, config writers and upgrade lifecycle |
 | 3. ME networks and cables | Topology, channels, energy routing, Controller validation, five cable types and 17 colors, native cable centers, item placement/drop and waterlogging | Complete part interactions, side parts/facades, full source events, collision and lighting paths |
 | 4. Energy and machines | Charger recipes and powered items, finite/creative energy cells, Controller power, source Charger/Drive orientation, Inscriber recipes and automation | Energy Acceptor, Vibration Chamber, complete machine menus/rendering, external capabilities and lifecycle |
-| 5. Storage and terminals | Ten-slot Drive, cell mounting, priorities in the storage core, filtered screen and automation | Terminals, ME Chest, storage buses, priority UI and complete storage interactions |
+| 5. Storage and terminals | Ten-slot Drive, retained two-slot ME Chest host, cell mounting, priorities in the storage core, Drive screen and automation | Terminals, ME Chest screens/capabilities, storage buses, priority UI and complete storage interactions |
 | 6. Autocrafting | Pending | Patterns, providers, assemblers, crafting CPUs, planning and job lifecycle |
 | 7. Other network services | Pending | P2P, quantum links, wireless, security, spatial I/O and buses |
 | 8. Items, world content and integration | Item energy profiles/bars, finite cell item models and placement/drop energy, original resources and common tags | Complete tools, handheld menus, world generation, effects, guidebook and addon APIs |
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 153 partially ported classes. That count is not a gameplay completion percentage.
+files, including 154 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -52,7 +52,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Inscriber | `inscriber.rs`, `inscriber_glue.rs`: four source slots, 15 original recipes, press/inscribe modes, private/grid/crank power, speed-card rules, capacities, separated automation and auto-export; source menu, name presses, upgrade lifecycle and complete packets remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
-| ME Chest rules | `me_chest.rs`: two-inventory contract, own-cell handler/cache, grid/local energy, input and fluid insertion, status/link and menu callbacks; native host, screen and capability binding remain pending |
+| ME Chest | `me_chest.rs`, `me_chest_glue.rs`: retained two-slot native host, own-cell input/persistence, shared local power, grid provider and 48 facing/spin/light states; screens, external capabilities, cell rendering and full lifecycle remain pending |
 | Shared storage-menu rules | `storage_menu.rs`, `storage_helper.rs`, `incremental_update.rs`, `me_interaction.rs`, `inventory_update.rs`: source powered transfers, serial/key identity, inventory update packets and item/container action program; native terminal/ME Chest UI and session binding remain pending |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
@@ -70,6 +70,11 @@ Blocks, items and recipes carried over as data do not count as working features 
 The Inscriber currently operates through automation and its original four inventory slots. Its source
 menu and name-press workflow are still pending. Controller and Inscriber crafting recipes and the
 original sky-stone materials are registered.
+
+ME Chest's native host is available for command-initialized inventory and power checks. It has the
+source input and cell slots, and keeps its own cell separate from network storage. Its two screens,
+external item/fluid/power interfaces and complete client/lifecycle behavior are still pending; it is
+not yet a playable storage terminal.
 
 The network core now addresses a cable center and each side part separately,
 including internal edges, channel demand and per-slot node saves. This is a

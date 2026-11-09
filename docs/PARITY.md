@@ -18,6 +18,7 @@ The full mod is not yet complete.
 | Network storage | Preferred passes, mount priorities, mutation queues, recursion protection and weak links | Full handler filters, all providers/consumers, security and lifecycle |
 | Storage service | Node/global provider identities, refresh/unmount, public/private counts, caches and watchers | Java service oracle, live world watcher consumers, iterator/callback/hash-order fidelity and debug UI |
 | Drive | Ten actual slots, all 23 built-in backend families, power/channel/priority mounting, source inventory, filtered screen and automation | Priority UI, bulk actions, cell models/LEDs, external capabilities, all destruction/chunk/reload paths |
+| ME Chest | Retained native input/cell stacks and own-cell backend, shared local energy, grid provider, original inventory persistence, 48 full-orientation/light states and restart checks | Both screens, external item/fluid/power interfaces, source config/color/cell rendering and complete save/drop/load/readiness lifecycle |
 | Controller | 8,000 public AE, 3 AE/tick idle, source flags and structures, channel supply, 18 state/type models and world conflict/restart checks | Status menu, power funnel, immediate source event/readiness/shape ordering and spatial lifecycle |
 | Energy cells | Network storage, original energy/node NBT, finite fullness states/models and local comparator, deferred notifications | Exact TickManager/base settings, material/lifecycle completeness and every saved-BE/explosion/pick/loot path |
 | Finite cell items | Fixed capacities/rates, source removal threshold, Charger support, float item-model thresholds and placement/first-drop energy | Complete tooltip/settings/capability APIs, charged creative variants and every loot/recovery path |
@@ -45,9 +46,10 @@ The graph has a parameterized Chest construction profile: bounded 500*CONFIG
 capacity, source priority, REQUIRE_CHANNEL, all six exposed grid faces and a
 shared WRITE-only power store. Its initial node idle is 1 AE/tick, inherited
 from ManagedGridNode/GridNode; the distinct local idlePowerUsage starts at zero.
-A readable cell changes the node/local idle through the existing host callback
-program. This graph support is not admitted by Kind.from_block yet: native
-Chest registration, loaded-host binding and menus are not active.
+A readable cell changes the node/local idle through the host callback program.
+Kind.from_block now admits native Chest hosts. The world adapter binds their
+actual retained SharedPower before topology snapshots, including while detached.
+Both menus and external capabilities remain unbound.
 
 256 original-energy-class scenarios / 29,907 operations compare a retained host
 across three grids, local work while detached, simulation/commit, resizing,
@@ -56,7 +58,7 @@ are controlled; finite inputs and a fixed unique priority are covered. Numerical
 tolerance is 1e-11 relative / 1e-8 absolute. Graph regressions check a fresh host's
 separate store, old-handle survival, split/merge and all six faces. Dynamic power-
 priority tree mutation, nonfinite power, native callback reentrancy, complete
-unload/drop/session identity and physical world binding remain required.
+unload/drop/session identity and complete physical lifecycle remain required.
 
 ## ME Chest host rules
 
@@ -67,6 +69,20 @@ Chest's own cell even when a grid is connected; grid mounting is a separate
 online/priority-gated use of that same cell. The top opens BasicCellChestMenu;
 other faces open the separate MEChestMenu. No withdrawal slot is introduced.
 Native face routing, menus and capability admission remain unbound.
+
+`me_chest_glue.rs` retains the two native stack handles and cell backend across
+ticks, shares that same cell with the grid StorageService, and writes current
+contents into the actual cell item. Unchanged source/native echoes cannot reload
+spent power or old contents. A transient per-block identity survives the engine's
+tick take/put-back but is excluded by the actual native save codec; stale hosts
+cannot flush into a replacement. Empty menu padding is retained without becoming
+a third inventory. Nonempty extra slots, malformed source inventory and nonfinite
+power are preserved through refusal, not claimed as source recovery behavior.
+Seven command-initialized world groups and native save/model tests are recorded
+in `me-chest-native.json`. Grid-powered operation does not imply automatic
+charging of the local buffer. Source CONFIG loading, dynamic power priority,
+color/cell client streams, synchronous external callbacks and complete same-tick
+save/drop/command-load lifecycle still need binding.
 
 The callback core caches a nonempty cell lookup, including failed lookups, until
 a cell change or priority reset. Empty slots stay uncached. Removing or failing

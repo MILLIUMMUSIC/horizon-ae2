@@ -10,7 +10,7 @@ pub(super) fn placed(game: &mut Game<'_>, stack: &ItemStack, pos: [i32; 3]) {
     let block = game.native_block(pos);
     if !matches!(
         block.as_str(),
-        "ae2:charger" | "ae2:drive" | "ae2:inscriber"
+        "ae2:charger" | "ae2:drive" | "ae2:inscriber" | "ae2:chest"
     ) {
         return;
     }

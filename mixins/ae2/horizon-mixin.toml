@@ -1361,3 +1361,22 @@ bindings = [
   { name = "dynamic", ty = "&[crate::items::ItemStack]", value = "dynamic" },
   { name = "random", ty = "&mut impl horizon_core::random::RandomSource", value = "random" },
 ]
+
+
+[[module]]
+id = "me-chest-host-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_me_chest"
+source = "me_chest.rs"
+
+[[module]]
+id = "me-powered-storage-helper"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_storage_helper"
+source = "storage_helper.rs"
+
+[[module]]
+id = "me-chest-world-binding"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_me_chest_glue"
+source = "me_chest_glue.rs"

@@ -20,7 +20,7 @@ pub struct Source {
     pub player: Option<u128>,
     pub machine_node: Option<u64>,
 }
-type Service = StorageService<Key, Source>;
+pub(super) type Service = StorageService<Key, Source>;
 struct Host {
     drive: Arc<Mutex<Drive<Key>>>,
     items: Vec<Option<ItemStack>>,
@@ -58,7 +58,7 @@ fn encode_inv(items: &[Option<ItemStack>], previous: Option<&Tag>) -> Tag {
 #[derive(Default)]
 pub(super) struct Drives {
     hosts: BTreeMap<Pos, Host>,
-    services: BTreeMap<u64, Service>,
+    pub(super) services: BTreeMap<u64, Service>,
 }
 impl Drives {
     /// Observe commands/slot changes before topology reconciliation. Unchanged
@@ -213,11 +213,9 @@ impl Drives {
                 }
             }
         }
-        let used: BTreeSet<_> = self
-            .hosts
-            .values()
-            .filter_map(|h| h.registration.map(|r| r.0))
-            .collect();
+        // StorageService belongs to the grid, including grids currently
+        // provided by a Chest without a Drive.
+        let used = network.service_ids();
         self.services.retain(|id, _| used.contains(id));
     }
     pub(super) fn end_tick(&mut self) {

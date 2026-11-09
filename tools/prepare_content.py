@@ -21,7 +21,7 @@ ORIENTED_FACINGS = ["north", "east", "south", "west", "up", "down"]
 CRAFTING = ["network/blocks/crystal_processing_charger.json", "network/blocks/crank.json",
             "network/blocks/energy_energy_cell.json", "network/blocks/energy_dense_energy_cell.json",
             "network/blocks/storage_drive.json", "network/blocks/controller.json",
-            "network/blocks/inscribers.json"]
+            "network/blocks/inscribers.json", "network/blocks/storage_chest.json"]
 
 
 def write_json(path, data):
@@ -196,12 +196,12 @@ def fit(content, jar, platform):
     states = content / "assets/ae2/blockstates"
     # A dispenser supplies six-facing placement and a block entity. Its menu
     # and inventory are intercepted; template redstone remains a parity gap.
-    for name in ["charger", "crank", "drive", "inscriber"]:
+    for name in ["charger", "crank", "drive", "inscriber", "chest"]:
         data = {
             "template": "minecraft:dispenser",
             "properties": {"light": 0, "hardness": 2.2},
         }
-        if name == "inscriber":
+        if name in ["inscriber", "chest"]:
             data["properties"].update({"explosion_resistance": 11, "requires_tool": False,
                                        "map_color": 6, "sounds": "minecraft:iron_block"})
         if name == "crank":
@@ -242,6 +242,24 @@ def fit(content, jar, platform):
             variants = {key + ",waterlogged=" + wet: value
                         for key, value in variants.items() for wet in ["false", "true"]}
         write_json(states / f"{name}.json", {"variants": variants})
+    # Preserve all three original Chest model layers; translate each
+    # facing/spin group's source rotations through the same pinned table.
+    chest = json.loads((states / "chest.json").read_text())
+    multipart = []
+    for extra in [{}, {"lights_on": "false"}, {"lights_on": "true"}]:
+        group = {}
+        for part in chest.get("multipart", []):
+            when = part["when"]
+            if {k:v for k,v in when.items() if k not in ["facing", "spin"]} != extra:
+                continue
+            key = "facing=" + when["facing"] + ",spin=" + when["spin"]
+            if key in group:
+                raise ValueError("duplicate Chest model orientation " + key)
+            group[key] = part["apply"]
+        for key, model in block_orientation.oriented_variants({"variants": group}).items():
+            when = dict(clause.split("=") for clause in key.split(",")) | extra
+            multipart.append({"when": when, "apply": model})
+    write_json(states / "chest.json", {"multipart": multipart})
     # CrankBlockEntityRenderer uses a separate handle model. Static preview only
     # for this milestone; the exact animation needs render/sync work.
 

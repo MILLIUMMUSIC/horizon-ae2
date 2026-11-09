@@ -5,8 +5,8 @@
       "pending": 242
     },
     "block": {
-      "partial": 11,
-      "pending": 43
+      "partial": 12,
+      "pending": 42
     },
     "blockentity": {
       "partial": 16,
@@ -2141,8 +2141,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/storage/MEChestBlock.java",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "native 48 facing/lights_on/spin states, original multipart housing/light models, full placement/wrench orientation and server light-state updates; both activation menus, dynamic cell/color rendering and full inherited lifecycle pending",
       "sha256": "88580b77d3aad60e98c3b855ca0d4b152524fe0e941c9a1eae57f24b8c0844a9",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2414,7 +2416,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/powersink/AEBasePoweredBlockEntity.java",
       "port": "mixins/ae2/power.rs",
-      "scope": "shared owned power store can outlive managed grid attachment without copying energy; source wrapper/local extraction callback program also in me_chest.rs; native Chest root constructor/load/host binding, external capabilities and full base lifecycle pending",
+      "scope": "shared owned power store can outlive managed grid attachment without copying energy; native Chest constructor/load/local-store binding and source wrapper/local extraction callback program; external capabilities, config reload and complete base lifecycle pending",
       "sha256": "2bf6cb48c896c86b4deeda1a998284c444b6dae0e012bab1ef38013e4b331276",
       "status": "partial"
     },
@@ -2472,7 +2474,7 @@
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/storage/MEChestBlockEntity.java",
       "port": "mixins/ae2/me_chest.rs",
-      "scope": "source two-inventory handler/cache, grid-first local power, input/filter and guarded notification contract, monitor/display/link, priority/node/mount/menu callbacks and insertion-only fluid rules; 4005 original-method scenarios; real native registration, host/menu/slot/capability binding, codecs/color and full lifecycle pending",
+      "scope": "source callback core plus retained native own-cell/input host in me_chest_glue.rs, shared local power, grid provider, original two-slot persistence, replacement and restart; 4005 original-method scenarios and seven native world groups; menus, external capabilities, config/color/client cell streams and complete same-tick save/drop/load lifecycle pending",
       "sha256": "d2fa9ed89e593a9544f406b95a3c5af6029f24122abdec36dc511524d723a21a",
       "status": "partial"
     },

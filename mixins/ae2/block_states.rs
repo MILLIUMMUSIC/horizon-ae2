@@ -76,6 +76,7 @@ enum Definition {
     Charger,
     Inscriber,
     Drive,
+    Chest,
     Crank,
 }
 impl Definition {
@@ -90,6 +91,7 @@ impl Definition {
             "ae2:charger" => Some(Self::Charger),
             "ae2:inscriber" => Some(Self::Inscriber),
             "ae2:drive" => Some(Self::Drive),
+            "ae2:chest" => Some(Self::Chest),
             "ae2:crank" => Some(Self::Crank),
             _ => None,
         }
@@ -105,13 +107,16 @@ impl Definition {
             Self::Charger => "ae2:charger",
             Self::Inscriber => "ae2:inscriber",
             Self::Drive => "ae2:drive",
+            Self::Chest => "ae2:chest",
             Self::Crank => "ae2:crank",
         }
     }
     fn template(self) -> &'static str {
         match self {
             Self::CableBus => "minecraft:glass",
-            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank => "minecraft:dispenser",
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Chest | Self::Crank => {
+                "minecraft:dispenser"
+            }
             _ => "minecraft:iron_block",
         }
     }
@@ -120,7 +125,7 @@ impl Definition {
             Self::Controller => ae2_controller::VARIANTS,
             Self::CableBus => 32,
             Self::CreativeEnergyCell | Self::MysteriousCube => 1,
-            Self::Inscriber => 48,
+            Self::Inscriber | Self::Chest => 48,
             Self::Charger | Self::Drive => 24,
             Self::Crank => 6,
             _ => 5,
@@ -129,7 +134,7 @@ impl Definition {
     /// Rows the pinned template initially contributes for this block.
     fn source_rows(self) -> usize {
         match self {
-            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank => 12,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Chest | Self::Crank => 12,
             _ => 1,
         }
     }
@@ -140,7 +145,7 @@ impl Definition {
             // The dispenser template orders (north, east, south, west, up,
             // down) with its untriggered row second. Full orientation streams
             // spin fastest; the Crank has only the facing property.
-            Self::Inscriber => (index / 8) * 2 + 1,
+            Self::Inscriber | Self::Chest => (index / 8) * 2 + 1,
             Self::Charger | Self::Drive => (index / 4) * 2 + 1,
             Self::Crank => index * 2 + 1,
             _ => 0,
@@ -150,7 +155,7 @@ impl Definition {
     /// collapse onto the same spin-zero orientation.
     fn old_to_new(self, old: usize) -> usize {
         match self {
-            Self::Inscriber => old / 2 * 8,
+            Self::Inscriber | Self::Chest => old / 2 * 8,
             Self::Charger | Self::Drive => old / 2 * 4,
             Self::Crank => old / 2,
             _ => 0,
@@ -161,12 +166,15 @@ impl Definition {
     fn oriented(self) -> bool {
         matches!(
             self,
-            Self::Charger | Self::Inscriber | Self::Drive | Self::Crank
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Chest | Self::Crank
         )
     }
     /// Full orientation adds the source spin property.
     fn full(self) -> bool {
-        matches!(self, Self::Charger | Self::Inscriber | Self::Drive)
+        matches!(
+            self,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Chest
+        )
     }
     fn properties(self, index: usize) -> Value {
         match self {
@@ -175,6 +183,11 @@ impl Definition {
                 json!({"light_level":(index/2).to_string(),"waterlogged":(index%2==1).to_string()})
             }
             Self::CreativeEnergyCell | Self::MysteriousCube => json!({}),
+            Self::Chest => json!({
+                "facing": ORIENTED_FACINGS[index / 8],
+                "lights_on": (index / 4 % 2 == 1).to_string(),
+                "spin": (index % 4).to_string(),
+            }),
             Self::Inscriber => json!({
                 "facing": ORIENTED_FACINGS[index / 8],
                 "spin": ((index / 2) % 4).to_string(),
@@ -197,6 +210,11 @@ impl Definition {
             Self::CableBus => {
                 json!({"light_level":{"integer":[0,15]},"waterlogged":{"named":["false","true"]}})
             }
+            Self::Chest => json!({
+                "facing":{"named":ORIENTED_FACINGS},
+                "lights_on":{"named":["false","true"]},
+                "spin":{"integer":[0,3]},
+            }),
             Self::Inscriber => json!({
                 "facing":{"named":ORIENTED_FACINGS},
                 "spin":{"integer":[0,3]},
@@ -223,6 +241,11 @@ impl Definition {
                     (0..16).map(|i| i.to_string()).collect::<Vec<_>>()
                 ],
                 ["waterlogged", ["false", "true"]]
+            ]),
+            Self::Chest => json!([
+                ["facing", ORIENTED_FACINGS],
+                ["lights_on", ["false", "true"]],
+                ["spin", ["0", "1", "2", "3"]],
             ]),
             Self::Inscriber => json!([
                 ["facing", ORIENTED_FACINGS],
@@ -463,6 +486,16 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 .iter()
                 .position(|v| v.as_str() == Some("minecraft:water"))
                 .ok_or("missing water fluid")?;
+            if layout.kind == Definition::Chest {
+                let blocks = doc["blocks"]
+                    .as_array_mut()
+                    .ok_or("missing behaviour blocks")?;
+                let block = blocks
+                    .iter_mut()
+                    .find(|b| b["name"] == layout.kind.block())
+                    .ok_or("missing Chest behaviour")?;
+                block["class"] = json!(["Block"]);
+            }
             if matches!(layout.kind, Definition::CableBus | Definition::Inscriber) {
                 let blocks = doc["blocks"]
                     .as_array_mut()
@@ -1207,6 +1240,132 @@ mod tests {
                     )
                     .unwrap()
                     .is_empty()
+            );
+        }
+    }
+    #[test]
+    fn chest_native_registry_and_models_keep_both_multipart_layers_in_all_48_states() {
+        let scratch = Scratch::new();
+        let base = PathBuf::from(std::env::var_os("HORIZON_RESOURCES").unwrap());
+        let mut parts = Vec::new();
+        for facing in ORIENTED_FACINGS {
+            for spin in 0..4 {
+                parts.push(json!({"when":{"facing":facing,"spin":spin.to_string()},
+                    "apply":{"model":"ae2:block/chest/base"}}));
+                for (on, model) in [("false", "off"), ("true", "on")] {
+                    parts.push(
+                        json!({"when":{"facing":facing,"spin":spin.to_string(),"lights_on":on},
+                        "apply":{"model":format!("ae2:block/chest/{model}")}}),
+                    );
+                }
+            }
+        }
+        let ae2 = content_assets(
+            &scratch.0.join("ae2"),
+            "ae2",
+            &[("chest", json!({"template":"minecraft:dispenser"}))],
+            &[
+                (
+                    "assets/ae2/blockstates/chest.json",
+                    json!({"multipart":parts}),
+                ),
+                (
+                    "assets/ae2/models/block/chest/base.json",
+                    json!({"elements":[]}),
+                ),
+                (
+                    "assets/ae2/models/block/chest/off.json",
+                    json!({"elements":[]}),
+                ),
+                (
+                    "assets/ae2/models/block/chest/on.json",
+                    json!({"elements":[]}),
+                ),
+            ],
+        );
+        let out = scratch.0.join("root");
+        super::super::build(&base, &[ae2], &out).unwrap();
+        let facts = read_json(&out, "facts.json").unwrap();
+        let rows = facts["states"].as_array().unwrap();
+        let first = facts["defaults"]["ae2:chest"].as_u64().unwrap() as usize;
+        assert_eq!(rows.iter().filter(|r| r[0] == "ae2:chest").count(), 48);
+        let behavior = read_json(&out, "block-behaviours.json").unwrap();
+        let block = behavior["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|b| b["name"] == "ae2:chest")
+            .unwrap();
+        assert_eq!(block["class"], json!(["Block"]));
+        assert!(
+            !block["interfaces"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|i| i == "SimpleWaterloggedBlock")
+        );
+        let gameplay = read_json(&out, "gameplay-facts.json").unwrap();
+        let structure = read_json(&out, "worldgen/blocks/structure-blocks.json").unwrap();
+        let assets = crate::assets::Assets::load(&out).unwrap();
+        let mut table = horizon_world::level::StateTable::new(assets.registry).unwrap();
+        let block = table.block_by_name("ae2:chest").unwrap();
+        let default = table.default_state(block);
+        assert_eq!(default.0 as usize, first);
+        let facing = table.key_of("facing").unwrap();
+        let lights = table.key_of("lights_on").unwrap();
+        let spin = table.key_of("spin").unwrap();
+        assert_eq!(table.text(default, facing), "north");
+        assert_eq!(table.text(default, lights), "false");
+        assert_eq!(table.int(default, spin), 0);
+        assert_eq!(
+            table.with_text(default, lights, "true").unwrap().0,
+            default.0 + 4
+        );
+        let mut sprites = horizon_client_render::sprites::Sprites::default();
+        let models = horizon_client_render::models::catalog::StateModels::load(
+            &out,
+            assets.registry,
+            &["ae2:chest"],
+            &mut sprites,
+        )
+        .unwrap();
+        for i in 0..48 {
+            let state = horizon_world::registry::BlockStateId((first + i) as u32);
+            assert_eq!(table.text(state, facing), ORIENTED_FACINGS[i / 8]);
+            assert_eq!(
+                table.text(state, lights),
+                if i / 4 % 2 == 1 { "true" } else { "false" }
+            );
+            assert_eq!(table.int(state, spin), (i % 4) as i32);
+            assert_eq!(rows[first + i][2], false);
+            assert_eq!(behavior["states"][first + i][2], 0);
+            assert_eq!(behavior["states"][first + i][3], 0);
+            assert_eq!(gameplay["states"][first + i]["block_entity"], true);
+            assert_eq!(
+                structure["rotate"][first + i],
+                json!([first + i, first + i, first + i])
+            );
+            assert_eq!(
+                structure["mirror"][first + i],
+                json!([first + i, first + i])
+            );
+            let layers = models
+                .collect(state, horizon_core::position::BlockPos::new(0, 0, 0))
+                .unwrap();
+            let names = layers
+                .iter()
+                .map(|(v, _)| v.model.as_str())
+                .collect::<Vec<_>>();
+            assert_eq!(
+                names,
+                [
+                    "ae2:block/chest/base",
+                    if i / 4 % 2 == 1 {
+                        "ae2:block/chest/on"
+                    } else {
+                        "ae2:block/chest/off"
+                    }
+                ]
             );
         }
     }

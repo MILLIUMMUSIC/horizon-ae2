@@ -24,12 +24,23 @@ pub(super) fn block_entity(block: &str, entity: &mut Option<(String, Compound)>)
 }
 
 pub(super) fn ticks(block: &str, ticks: &mut bool) {
-    if matches!(block, CHARGER | CRANK | "ae2:inscriber") {
+    if matches!(block, CHARGER | CRANK | "ae2:inscriber" | "ae2:chest") {
         *ticks = true;
     }
 }
 
 pub(super) fn container(block: &str, out: &mut Option<ModContainer>) {
+    if block == "ae2:chest" {
+        // Real combined inventory only. Capability routes and the two source
+        // menus are bound separately; no approximate generic screen is opened.
+        *out = Some(ModContainer {
+            slots: 2,
+            faces: std::array::from_fn(|_| Vec::new()),
+            inputs: Vec::new(),
+            outputs: Vec::new(),
+            menu: None,
+        });
+    }
     if block == "ae2:inscriber" {
         *out = Some(ModContainer {
             slots: 4,
@@ -209,6 +220,7 @@ fn charger_work(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity, power: &
 
 pub(super) fn tick(game: &mut Game<'_>, pos: Pos, be: &mut ModBlockEntity) {
     match be.id.as_str() {
+        "ae2:chest" => super::ae2_grid_glue::tick_chest(game, pos, be),
         "ae2:inscriber" => super::ae2_inscriber_glue::tick(game, pos, be),
         CRANK => {
             let mut crank = read_crank(be);

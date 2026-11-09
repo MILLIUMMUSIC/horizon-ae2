@@ -24,13 +24,19 @@ with aliasing handles across node detachment/reattachment and grid transfer.
 A WRITE-only Chest store remains usable locally without becoming grid supply.
 256 original energy scenarios / 29,907 operations match, and graph tests cover
 replacement, split/merge and all six Chest faces. Initial node idle is 1 AE/tick;
-local idle starts at zero. Native Chest admission/host/menu binding remains open.
+local idle starts at zero. The native Chest host now owns this retained store;
+menu and external capability binding remain open.
 
 ME Chest's standalone host program now matches 4,005 original-method scenarios:
 own-cell cache, grid/local power, input and fluid insertion, display/link,
 priority/node/mount callbacks and the two separate menu choices. Its two-slot
-inventory contract replaces the proposed extra withdrawal slot. Real native
-host/node/storage/slot/capability/UI and codec/lifecycle binding remain open.
+inventory contract replaces the proposed extra withdrawal slot. The native
+host now retains those two real stacks, mounts the same own-cell handler into
+the grid storage service and persists current contents and energy. Seven isolated
+world groups cover all 48 physical states, unpowered refusal, local input/drain,
+own-cell isolation from a Drive, malformed refusal, replacement and restart.
+Screens, external capabilities, source cell/color rendering and complete
+same-tick save/drop/command-load callbacks remain open.
 
 The graph and saved-host binding now address each primary part separately from
 its cable center. Internal null-direction edges, occupied-face blocking,

@@ -311,14 +311,15 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "blockentity/storage/MEChestBlockEntity.java": ("mixins/ae2/me_chest.rs", "source two-inventory handler/cache, grid-first local power, input/filter and guarded notification contract, monitor/display/link, priority/node/mount/menu callbacks and insertion-only fluid rules; 4005 original-method scenarios; real native registration, host/menu/slot/capability binding, codecs/color and full lifecycle pending"),
+    "block/storage/MEChestBlock.java": ("mixins/ae2/block_states.rs", "native 48 facing/lights_on/spin states, original multipart housing/light models, full placement/wrench orientation and server light-state updates; both activation menus, dynamic cell/color rendering and full inherited lifecycle pending"),
+    "blockentity/storage/MEChestBlockEntity.java": ("mixins/ae2/me_chest.rs", "source callback core plus retained native own-cell/input host in me_chest_glue.rs, shared local power, grid provider, original two-slot persistence, replacement and restart; 4005 original-method scenarios and seven native world groups; menus, external capabilities, config/color/client cell streams and complete same-tick save/drop/load lifecycle pending"),
     "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/me_chest.rs", "public multiplier wrapper and local stored-extraction callback contract used by ME Chest; original parent methods in Java oracle with actual StoredEnergyAmount/Mth; native external power/public-flow/capabilities, base inventory/NBT and full lifecycle pending"),
 })
 
 
 PARTIAL.update({
     "me/service/EnergyService.java": ("mixins/ae2/power.rs", "existing provider/requester/overlay/storage rules plus a shared powered-host store and explicit owner event path; 29907 original operations with retained WRITE-only host across grids; native owner callback interior ordering, dynamic power priority tree mutation and full world lifecycle pending"),
-    "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/power.rs", "shared owned power store can outlive managed grid attachment without copying energy; source wrapper/local extraction callback program also in me_chest.rs; native Chest root constructor/load/host binding, external capabilities and full base lifecycle pending"),
+    "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/power.rs", "shared owned power store can outlive managed grid attachment without copying energy; native Chest constructor/load/local-store binding and source wrapper/local extraction callback program; external capabilities, config reload and complete base lifecycle pending"),
 })
 
 

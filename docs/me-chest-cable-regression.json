@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "checks": [
+    "all 32 source light/waterlogged states registered",
+    "all 85 source cable center IDs participate and save gn instead of proxy",
+    "source dense 3..13-pixel outline admits edge rays and bare Pick Block; all three normal cores refuse that ray",
+    {
+      "center_outline_pick": {
+        "block": {
+          "block": "ae2:cable_bus",
+          "distance": 2.8772990808002645,
+          "face": "north",
+          "loaded": true,
+          "point": [
+            8.5,
+            74.50500000314209,
+            8.375
+          ],
+          "pos": [
+            8,
+            74,
+            8
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        },
+        "entity": null,
+        "kind": "block"
+      }
+    },
+    "actual ME power crosses five CableBus nodes to a real Charger recipe",
+    "unlike nontransparent cable colors split the live power network",
+    "transparent cable reconnects the colored network",
+    "source center identity, node NBT and downstream inventory survive restart"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/cable-world-vhp7wikc",
+  "binary_sha256": "06595be957acd973f3cef936e2e0e0ce3b118cdd3a9c335825ae067b1ed0d9bb",
+  "network_sha256": "fc92187d9e942f4ac0b5bc36f7cc62f9081ef50b1694fab6ca8bfd0562dd7706",
+  "geometry_sha256": {
+    "part_geometry.rs": "eb1b30d368c3a10622a64e063c92cf03c2f89b933588efcd2943e8977b466860",
+    "cable_view.rs": "1637eef6200950e4396d08b54a2c05953fb48703b5e7844a33f9078b4e9c2c48",
+    "cable_pick.rs": "d9857bca4520ab1f02d2f2091b2562f5147b84adcbf46cdc41a5dd2db84a13a8"
+  },
+  "limits": [
+    "parts created by source-format commands, survival placement/drop not exercised here",
+    "smooth AO/full lighting and all direct collision callers require further coverage",
+    "facades/side parts/full source lifecycle and external multiplayer remain open",
+    "GPU screenshot requires visual review; no Java/NeoForge world oracle"
+  ]
+}

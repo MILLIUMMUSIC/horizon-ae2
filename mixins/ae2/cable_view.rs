@@ -112,7 +112,7 @@ fn external(registry: &BlockRegistry, world: &World, q: [i32; 3]) -> CableType {
         .map(|s| s.name.as_str())
     {
         Some("ae2:controller") => CableType::DenseSmart,
-        Some("ae2:drive") => CableType::Smart,
+        Some("ae2:drive" | "ae2:chest") => CableType::Smart,
         Some(
             "ae2:charger"
             | "ae2:inscriber"

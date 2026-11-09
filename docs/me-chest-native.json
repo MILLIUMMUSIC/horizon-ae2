@@ -1,0 +1,332 @@
+{
+  "schema": 1,
+  "result": "passed",
+  "checks": [
+    {
+      "name": "all 48 source physical states are registered without a waterlogged property",
+      "state": null
+    },
+    {
+      "name": "an unpowered own cell does not accept the waiting input",
+      "state": {
+        "tick": 35,
+        "energy": 0.0,
+        "nbt": "8, 73, 7 has the following block data: {inv: {item0: {count: 64, id: \"minecraft:iron_ingot\"}, item1: {id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{count: 64, Slot: 0b, id: \"minecraft:iron_ingot\"}, {count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 0.0d}",
+        "slots": [
+          {
+            "count": 64,
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "count": 1,
+            "item": "ae2:item_storage_cell_1k"
+          }
+        ],
+        "block": "ae2:chest[facing=north,lights_on=false,spin=0]"
+      }
+    },
+    {
+      "name": "source input uses the retained own cell and local energy drains at 1.5 AE/tick without stale refill",
+      "state": [
+        {
+          "tick": 52,
+          "energy": 412.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}, item1: {components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 64L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 64L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 412.0d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        },
+        {
+          "tick": 78,
+          "energy": 373.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}, item1: {components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 64L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 64L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 373.0d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        }
+      ]
+    },
+    {
+      "name": "grid-connected Chest input targets its own fluid cell and cannot leak into an adjacent Drive item cell",
+      "state": {
+        "chest": {
+          "tick": 151,
+          "energy": 0.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {count: 64, id: \"minecraft:iron_ingot\"}, item1: {id: \"ae2:fluid_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{count: 64, Slot: 0b, id: \"minecraft:iron_ingot\"}, {count: 1, Slot: 1b, id: \"ae2:fluid_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 0.0d}",
+          "slots": [
+            {
+              "count": 64,
+              "item": "minecraft:iron_ingot"
+            },
+            {
+              "count": 1,
+              "item": "ae2:fluid_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        },
+        "drive": "8, 73, 8 has the following block data: {inv: {item0: {id: \"ae2:item_storage_cell_1k\"}, item2: {}, item1: {}, item8: {}, item7: {}, item9: {}, item4: {}, item3: {}, item6: {}, item5: {}}, proxy: {p: -1}, x: 8, y: 73, Items: [{count: 1, Slot: 0b, id: \"ae2:item_storage_cell_1k\"}], z: 8, id: \"ae2:drive\"}"
+      }
+    },
+    {
+      "name": "malformed original inventory is retained and prevents ticking or energy mutation",
+      "state": [
+        {
+          "tick": 183,
+          "energy": 170.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {count: 0, id: \"minecraft:diamond\"}, item1: {id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 9L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 170.0d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        },
+        {
+          "tick": 199,
+          "energy": 170.0,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {count: 0, id: \"minecraft:diamond\"}, item1: {id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 9L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 170.0d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        }
+      ]
+    },
+    {
+      "name": "a fresh physical Chest at the same position cannot inherit the previous cell or energy",
+      "state": {
+        "tick": 213,
+        "energy": 0.0,
+        "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}, item1: {id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 0.0d}",
+        "slots": [
+          null,
+          {
+            "count": 1,
+            "item": "ae2:item_storage_cell_1k"
+          }
+        ],
+        "block": "ae2:chest[facing=north,lights_on=false,spin=0]"
+      }
+    },
+    {
+      "name": "native save/restart keeps both real slots, current cell contents, local power and unknown source NBT",
+      "state": [
+        {
+          "tick": 227,
+          "energy": 457.5,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}, item1: {components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 23L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 23L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 457.5d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        },
+        {
+          "tick": 246,
+          "energy": 430.5,
+          "nbt": "8, 73, 7 has the following block data: {inv: {item0: {}, item1: {components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 23L, id: \"minecraft:iron_ingot\"}]}, id: \"ae2:item_storage_cell_1k\"}}, proxy: {p: -1}, \"test:unknown\": 123456789L, x: 8, y: 73, Items: [{components: {\"ae2:storage_cell_inv\": [{\"#t\": \"ae2:i\", \"#\": 23L, id: \"minecraft:iron_ingot\"}]}, count: 1, Slot: 1b, id: \"ae2:item_storage_cell_1k\"}], z: 7, id: \"ae2:chest\", internalCurrentPower: 430.5d}",
+          "slots": [
+            null,
+            {
+              "count": 1,
+              "item": "ae2:item_storage_cell_1k"
+            }
+          ],
+          "block": "ae2:chest[facing=north,lights_on=true,spin=0]"
+        }
+      ]
+    }
+  ],
+  "binary_sha256": "06595be957acd973f3cef936e2e0e0ce3b118cdd3a9c335825ae067b1ed0d9bb",
+  "source_sha256": {
+    "mixins/ae2/adventure.rs": "27fc0d398d23372721041a8dd06f432df662b3ba2c43357ca7b92448056ac2ba",
+    "mixins/ae2/adventure_native.rs": "ada25b63d076fc4b9d96cc5e325f931dbd7cd28bc6923271f26dd2c7feb821e6",
+    "mixins/ae2/adventure_snbt.rs": "6f882893be17885896cff4bd3da095c40a99a3318e789b78425f60b7f0c775e3",
+    "mixins/ae2/automation.rs": "0774aed5d8d5257eaed83413cc3bc0faa9130412dc2ef6c6c25ad095e2f2662c",
+    "mixins/ae2/automation_changed.rs": "c4995e86c85b8aece3ac61a7b714bbcfb3f36e2414ca97e976494ab27aa273c8",
+    "mixins/ae2/automation_flush.rs": "ac87344b4f5513afaba9ca04af360a509fbff3ad1f55f8ae3d7623d47669fcf5",
+    "mixins/ae2/automation_insert.rs": "65f4c1d4b97d6d9b2dd2c0516ff795e62930e51811c2067a173b038ed2604124",
+    "mixins/ae2/automation_place.rs": "d4411802a8f2f9b9a25ffe102a571e718e70bbde5fc4252e9c2404478cbb326d",
+    "mixins/ae2/automation_take.rs": "c67005a6f693561e3525d2a2fc25fba112566a824298f0a6b95931662767be29",
+    "mixins/ae2/backend.rs": "fda0c5f8fd30fce67a3890eea2f4922a77ffbff2ea8e17222de69fae0a04a7e4",
+    "mixins/ae2/before_packet.rs": "9d61a17b26f664ef4a8fd0fe2cfc63cd0d0c86d0b30f4932c5a833b8ee7a8c8e",
+    "mixins/ae2/block_entity.rs": "c090f357d7d50d7b3c112d4b05392b633d644152b1ef44c4ffc734068b199989",
+    "mixins/ae2/block_entity_container.rs": "505836ee2e8c8951c159033765802535f1bdc82572aae4a6dc45872f2e91b931",
+    "mixins/ae2/block_entity_tick.rs": "2557dbef61f2109f324d57be6f53c234e3d19ac914319aaa15c8ac2639277eea",
+    "mixins/ae2/block_entity_ticks.rs": "509d830cfbb824424eceae968c12876c744d6cc7c23d52ef1e05d19d228f5067",
+    "mixins/ae2/block_states.rs": "1519265e2c7e31b7a6c261e6d91f93b96b080b5b178d4145b841d69d61f65e29",
+    "mixins/ae2/block_states_hook.rs": "0a55d35add80ea1b421737da0aa6428de70327e1fa40eb06376cd1a6feb1a887",
+    "mixins/ae2/cable.rs": "3290cf4eb759e68914000b8cca0d742980a9b51135badbacf63c83607ee2b5c7",
+    "mixins/ae2/cable_actions.rs": "d4ef1d543ac20fb6c4944c1320e28d9efc0969a7e03c4aebb4fa481147237270",
+    "mixins/ae2/cable_atlas_hook.rs": "dfce2620a4fe63b91c29665c9533af50264d276d59dd2c881e2c4aa1186820df",
+    "mixins/ae2/cable_bus.rs": "5254fb4ff412ded2d7a7372ddb7106c7c5ab500b325206297dcc6576c2eae5a6",
+    "mixins/ae2/cable_collision_hook.rs": "170e8af7f3379d43424d3e2f6bad5e2459cca757461e5af94968eaaef45e2d73",
+    "mixins/ae2/cable_decode_hook.rs": "a4578d56efdd506cd72e084dcbe2c23b0be2eb009eca1d9e5adddafd8175e711",
+    "mixins/ae2/cable_drop_level.rs": "c73a4727442bf9b5e34a5dbc3a3c27fb76b49e63da159952b2b0ce688b5bedc6",
+    "mixins/ae2/cable_drop_record.rs": "73b3e0eb9ad5d333e1e38929fe03446d1c3b1e0806ef066f1b412f8a55f026db",
+    "mixins/ae2/cable_entity_tag_hook.rs": "406b9c22f0331cefbc3cfb2990f7d70920c3f2b1b65fbca0d7aa06dacb88b814",
+    "mixins/ae2/cable_entity_type_hook.rs": "148b4975ec8434d4d2b08b6b08a0fba5256b253d1cda6ad9be4e04a4fed70fdc",
+    "mixins/ae2/cable_for_block_hook.rs": "e6ee83d17d7e90c4efad3f18195bc6cb36c1b9c38615e3678a1205936fa773f2",
+    "mixins/ae2/cable_geometry_hook.rs": "8c2f724e358d847335540083efd0eea4fe3b28667fb855d13e725f36fdcc6128",
+    "mixins/ae2/cable_guest_packet.rs": "aff5d33c7c72f1dd588f74366b09f722e567c234d599adb24c4b1300af2ec69e",
+    "mixins/ae2/cable_hand.rs": "8bc3ec1a6a21699970f549daaa8fe03d3ea4fa2e7265f83911833f7caf36a623",
+    "mixins/ae2/cable_input.rs": "cb3b3d11107729bbbfac98d34dcae5fc8b67152b0af3bb229e9c6848bd58bb4c",
+    "mixins/ae2/cable_items.rs": "3683f1253048afc8648b0085b04c6a7f97428d6c0ecb9343c967ee649ff1c621",
+    "mixins/ae2/cable_loot.rs": "b87749fdba0651be1c41fd5cf08dc736a365b4f2322e49376fd55f405503a94a",
+    "mixins/ae2/cable_outline_hook.rs": "11aba478766ac6a52da56b87e12a88bb2457818097928b12d3064df9cfe39b3f",
+    "mixins/ae2/cable_pick.rs": "d9857bca4520ab1f02d2f2091b2562f5147b84adcbf46cdc41a5dd2db84a13a8",
+    "mixins/ae2/cable_piston_shape_hook.rs": "013645768bd6b437d08505146f499560fe1df34326d933398868b71b400421c7",
+    "mixins/ae2/cable_predict_hook.rs": "8890191938d3ddc6ec9c2272b9515d61f898ef2046cfe069b4e3c575eb24f7a4",
+    "mixins/ae2/cable_prediction.rs": "fc6c252aa7dabadace6a872429b46e7f798853e221a44dc3cd1f0abe3cf22c2e",
+    "mixins/ae2/cable_prediction_ack.rs": "d6300fc671b9e655fb79b7cdab060653aec1c880c6c747764dc093aa5e1141f8",
+    "mixins/ae2/cable_prediction_break.rs": "f5a54d5d8499d70e326e0d72ef40c02d075338e2c302a55f3fb0d8038aa766f7",
+    "mixins/ae2/cable_prediction_reset.rs": "9e98d58940c499aac07c49201cef46678b36a0013c4f60246bc92122af65a880",
+    "mixins/ae2/cable_remote_hand.rs": "888cf83d2282b58014aef6141c372b19983cc0d6e6c6267cc2a13b25a7ac3d86",
+    "mixins/ae2/cable_render.rs": "9c04c4c871a731520ddf12866694fae5951dac13bcf464d51799f6a5e7e5c5ae",
+    "mixins/ae2/cable_swing.rs": "b4b4a32e292f65a8c9597e5574493ef0303b37e48a073b3ed7f80eb38725510a",
+    "mixins/ae2/cable_sync.rs": "ec88788fda69e0a6594fb1ddea34f298de556505cc036dfb8a6c107a4123e141",
+    "mixins/ae2/cable_use_on.rs": "4e731f4495c2600e0fa5772281084f42734df6ca7ed782092e7bcab54ff2b4aa",
+    "mixins/ae2/cable_view.rs": "1637eef6200950e4396d08b54a2c05953fb48703b5e7844a33f9078b4e9c2c48",
+    "mixins/ae2/cells.rs": "c502c964aac7d5fa4b5ee4422e7c89689a930f21b38f448c513c814b8a6bff81",
+    "mixins/ae2/charger.rs": "758887e612d93f7e54b9236c4b0cdffede6f880f2f47362ee073d94cad4c70e3",
+    "mixins/ae2/charger_automation.rs": "7784084dd6549750ae1615dc6c1acddc32088ecff6d5aa9b991a9c3a67397cac",
+    "mixins/ae2/charger_automation_rules.rs": "b68dbea98d8ad5834bc534dc164b73c8cbf0a33383bb53f9fc84aca7682a377c",
+    "mixins/ae2/charger_inventory.rs": "5d9f5685d71f49cb50be55c40e4ed3b30f131d442c4630bbe3b52010a8d07ae3",
+    "mixins/ae2/charger_orientation.rs": "7cff7072df2c64da7635eca44f165cc6fc87cff35c06367b887cf1d7fdc81e6a",
+    "mixins/ae2/charger_orientation_hook.rs": "f80b2246387854f71b19606c9d97ea6a2e81088805917f7de42de6007f19bb59",
+    "mixins/ae2/component_decode.rs": "029d93a0e0ac1c4d213b2c502284277d1fe1a559e1d5142b829576374af57c37",
+    "mixins/ae2/component_receive.rs": "b6bec401adc837d49fc22a19e6df615d4737ba53d4f60d2a2ac5e5d567c70aa7",
+    "mixins/ae2/component_registry.rs": "85eb6f64ada12e96332227f3abc88bb0bc15cdc107ced2a54abd1d25ade09b70",
+    "mixins/ae2/component_send.rs": "136750e31eec91c7bbaa9d6f004aa6969dd71380df3cc6f6f0720777e77d6c9d",
+    "mixins/ae2/component_sync.rs": "c5d4960b25a1b128d5902ca65e3134844a955c390610bb48bae5da36a2166e2f",
+    "mixins/ae2/controller.rs": "e360e7f559c9ee0944eaea4283f44c56e734a4dd000780ba1ca5985a29951626",
+    "mixins/ae2/ctrl.rs": "881b001432e5a1e2b30363dc5dac233cb80d4cc3ac834cb4273e29d1a293e302",
+    "mixins/ae2/ctrl_frame.rs": "f7161b73dbd6a4ce109b9bb99979fec3c93dad3f97688393d57a2cd90171da49",
+    "mixins/ae2/ctrl_key.rs": "8bd843491c0f89daed97bcf420c8dfe7d89fbda0df06e90c82fe865b58caa07c",
+    "mixins/ae2/ctrl_mods.rs": "cd7821f025c39cb10ffc7aa94fb4a43143e8472c974023d740b6b9e0af66f3af",
+    "mixins/ae2/ctrl_player_died.rs": "57551498acfb93cebf084e3a7e6ad86b90b6447f036b8a785bb4677b69f67ccc",
+    "mixins/ae2/ctrl_receive.rs": "20a4413c63168f768dd1304d8a8b2c6ad54712c56dbfed029165270798f07336",
+    "mixins/ae2/ctrl_world.rs": "702b0945e9d074f3f93202ad19d05d7b30f506a80d2fdc3d21d507b5f9dc55d3",
+    "mixins/ae2/cube_builder.rs": "52e70a1defc30534567c7b319882c86d9a34cb0ba08d32f92804434f8197232f",
+    "mixins/ae2/cube_loot.rs": "375ce2f0d776559aefa0dc4fdf71a975459c5ae8891b05889e0bf6fa9612bbfa",
+    "mixins/ae2/cube_loot_hook.rs": "8d1e9d8f6665c0c7be02719c05db46d1c64afca970a12456207f47448c4b6e5f",
+    "mixins/ae2/cube_loot_level_hook.rs": "b8614a2b0ee60004f25e277e04b81f876ec6b16b1df88165dfee309ee25ecbb2",
+    "mixins/ae2/destroy_block.rs": "023558170199cda1123c7be140c23ce605f4e76f0f63b3570f097dcf39f4eb50",
+    "mixins/ae2/drive.rs": "755593dffc9151ffca3a16414a002a3befb4ad653e8bb3d458ea0ade51a640cf",
+    "mixins/ae2/drive_glue.rs": "d7f7399ae8c686478adae8caf3965d25874e5442eceaaf418fb0448b3c9cc6d2",
+    "mixins/ae2/energy.rs": "d9d7990c28f901801dae9e4b20d5dfe4d767732566465624c8ec15032d44a6e1",
+    "mixins/ae2/energy_cell_drop_level.rs": "84d943e5e2aacd5e1a10af1769c40118cb528dda80478235c76ecb4d2de2de74",
+    "mixins/ae2/energy_cell_drop_record.rs": "b5aab73cc2093502d7e4e3736d8e17e610574313d8265d8f8120f1dc3f88e798",
+    "mixins/ae2/energy_cell_glue.rs": "857287e10ed9f031c05d2e4a733c85335a0bf3d2d319f4f84cf874f955d34169",
+    "mixins/ae2/energy_cell_item.rs": "5b75b86e03d470cc054ed2d943dd0d70ec5ef4063cfe7cc5fbe6cd699fc83b50",
+    "mixins/ae2/energy_cell_model.rs": "bdd378d4f0393092d8c57cbd0e7eb6ce1d112f38a3c264442d6832f89db450e8",
+    "mixins/ae2/energy_cell_model_hook.rs": "022b3e084bf0ae3f4f83668d9903ef77c4d84fc2175c69ce45de2a5ca846d50c",
+    "mixins/ae2/energy_cell_placed.rs": "5a21aef8be2fb01e2d5e516e3cf178d68cc52822992d8d17ebcea5dc0121cba3",
+    "mixins/ae2/energy_cell_render_bridge.rs": "5d7b1b9950180dff1fc7409048bd00e00d88a7a57fb9d04f0819366ed450023f",
+    "mixins/ae2/energy_cell_render_hook.rs": "025f89a8dbc1be1ff55d3a688c24396b0259bb1386d5d87ff19ccab3d5675cb8",
+    "mixins/ae2/energy_cell_signal_hook.rs": "137360c70faf9078dfa8d46b73f9c1fd7d422465809ba9bb8599bff2e8ff94cd",
+    "mixins/ae2/glue.rs": "f793d9136a618727f2b7f3b0c8bc50e186cf6e252c7b4c837afbfbb0e8e72160",
+    "mixins/ae2/grid.rs": "ab207c3ac46a65b6671e661ab5f74a5b13adc4aece4c517a32307b280195a530",
+    "mixins/ae2/grid_glue.rs": "5db7e59837248a3e7266982932277a3b778b4a688ed688dd88a9bca259494e1b",
+    "mixins/ae2/guest_begin.rs": "bbb218ebac0be02a18a28d6402bdc6ed21b927ba32fa1b459ea8fe1089cabb98",
+    "mixins/ae2/guest_max.rs": "edfb35c058553994ad9395e65af2eb839e44b377f912a3a7c968afb034f2f83b",
+    "mixins/ae2/guest_place.rs": "d4bdaf211bb8d8193cb11732eab9a750e06f6a25281f2ecaedf4d73782425551",
+    "mixins/ae2/guest_quick.rs": "d58825dde09870faa6e1a5f6560f23057613b08ff324f652bfa9ef86bea2f642",
+    "mixins/ae2/guest_slots.rs": "a5811410292b9346a607cffac6065814dac7e51c92d5f8b92f9f939bfb411436",
+    "mixins/ae2/gui.rs": "b0d4fa0b76f5b0ffc6d3d25f8da2ec801f2ed6b8283cb11f6caa7f3a6d211bde",
+    "mixins/ae2/horizon-mixin.toml": "635901c7bad80c187f4f19443953e4dab6d2bcf68a36cf9529ce9ed0f84f55b9",
+    "mixins/ae2/incremental_update.rs": "abe60e928bffff054d8415443d21b56fe702cad77e955a5769b69310cce62c9b",
+    "mixins/ae2/inscriber.rs": "2ca675e4580eaa2079a5927757ed610f647e8d0b33d6cb6740a78b1a1b0a8cf2",
+    "mixins/ae2/inscriber_glue.rs": "26e85027c34f8f6e0ea2389818716b1aec3c3d09645b6a23d749276b5b6113bd",
+    "mixins/ae2/inscriber_hand.rs": "731fa967f9b9ee97cc6ff456b4bdd457c9b8a0bfdaa0d72f20d7989cbf08d478",
+    "mixins/ae2/inscriber_placement.rs": "692a0189a005dc7763d3ea5cbbc89638901e9041fd450827ad5d9b98dc9b42f8",
+    "mixins/ae2/inscriber_view.rs": "ef7b89f086f554976eb4aeec403fa85943f107809f4abf5c64ffe4e6085aaa37",
+    "mixins/ae2/inventory_codec.rs": "48a8e691432dfbfca27ed2981c435835ca7ec642e8b5ca6b819b1b3ead5919de",
+    "mixins/ae2/inventory_signal.rs": "b52e8e0701f3c7ed1e187c10e2f4f041a03487196725a670699c2db9ed213016",
+    "mixins/ae2/inventory_signal_glue.rs": "8f413f71622b5191c2adf9376065ce211d433fd656d63fed14d2d8268d376781",
+    "mixins/ae2/inventory_signal_hook.rs": "81bc7552307f5a67c34b6756dadc86259d84449d3265751694b5d39baf012e24",
+    "mixins/ae2/inventory_update.rs": "f85ae85051f1c8b1f6ca339b513fb30329b8c3359b4f7f67d86d4b01d6714c4a",
+    "mixins/ae2/item_decorations.rs": "429333d5f1bf2609a90996338dcc9b1adc4326153916bd80249916302208552d",
+    "mixins/ae2/item_energy.rs": "b8bfadcbd881adc9ad55c75293d8f862c57133708a9eb3b15a1a720a10ef734f",
+    "mixins/ae2/item_energy_glue.rs": "f4e43c2c58e852f1789541b93273e42c1c6615c06b483bc7b85e7da7e69c9338",
+    "mixins/ae2/item_energy_view.rs": "5ad43600577ba9532dd2a1a1150c3b9989e1fd0e31492980aa2ad07198c7320d",
+    "mixins/ae2/item_tick.rs": "be7b63f1d95b1501d1b53a5a2144f31d96a954bd61965cff2bfb966ac1c1d592",
+    "mixins/ae2/keys.rs": "0237eee73ab16098625bbb0208b65031a3ec4da5773441a869974605863e963b",
+    "mixins/ae2/level_post.rs": "2fbcec9c8fe6639757fd73e12b6202b635f37e22b2931817c2b768ace77722ed",
+    "mixins/ae2/level_pre.rs": "0f872c4d5a46a20b9fa75866626d806bde73ebaac584148ed8da308803ba3882",
+    "mixins/ae2/local_slot_rule.rs": "55afbed8ffc734b530156833e3f88916b662abffbb656894def33b0b13f380c8",
+    "mixins/ae2/me_chest.rs": "26a47e35bb1ceff1994f02b44c1d44fed7560c724ad0c37ffcd4ea5178f95a4c",
+    "mixins/ae2/me_chest_glue.rs": "29fb7ad8c1b4af7dc3faba2badb636e25784fd43e5379248088348738c05de20",
+    "mixins/ae2/me_interaction.rs": "16b8204c0dd758b2f7e3fc78631b3a6bb1508174926cc038534d275c96886c6a",
+    "mixins/ae2/menu_max.rs": "2ac0e06f3ad615d19374d3535403c046e200d5d18e233952b4de095f7978dd90",
+    "mixins/ae2/menu_place.rs": "ab0caeb3dfd085dafaa2ba34875b4729635e42f2bff80f572be9a205f971c288",
+    "mixins/ae2/menu_quick.rs": "23a79ff664dc4b05ad0393d4b729a864fff3efbbc7036074479259470281c425",
+    "mixins/ae2/meteorite_command.rs": "8093755d4ea4f09d5f30a0fa26280e9a41236f99e0933e75d99ccd3b5805e524",
+    "mixins/ae2/meteorite_fallout.rs": "1531f4033106e91d79f00d2c27eecb52ce0e4218ff2a2aa741f235f4588a2e89",
+    "mixins/ae2/meteorite_glue.rs": "442b4c0bfdc0264df6f707605e777f33fb67099a7e03f9106cbbab2e5bb340b3",
+    "mixins/ae2/meteorite_placer.rs": "ce0a1af8fc32ed55d2c78f13ecc83f58ff976c22a6c5e31f6e2cfbfe2cf9dc3a",
+    "mixins/ae2/meteorite_register.rs": "cba5e2d942a6585d824f6c499a3d55a1f59e469dc26679ed12f15c68a11ada21",
+    "mixins/ae2/mounts.rs": "229a2c1eb94db8cb07a5737b58781442d838366cac92b9be79911c4ab46db88c",
+    "mixins/ae2/network.rs": "fc92187d9e942f4ac0b5bc36f7cc62f9081ef50b1694fab6ca8bfd0562dd7706",
+    "mixins/ae2/node_data.rs": "83cbaa1189770d707b97a800fb3669ec2a06cbf47416e102f9d864ed172b1a65",
+    "mixins/ae2/orientation.rs": "a8acca66d8be0c8fba96acacccf077fd25eb5c6ed4ff7979e89dfd9d5fd77707",
+    "mixins/ae2/part_geometry.rs": "eb1b30d368c3a10622a64e063c92cf03c2f89b933588efcd2943e8977b466860",
+    "mixins/ae2/part_placement.rs": "992da2c37ca4fd740855f424f9dc3bec7160f580e1e9208be2b5537d8ec5fe3c",
+    "mixins/ae2/part_storage.rs": "d0502b1295afb6b8222da41ed050e9a268f38d261ea618de94d6e1fae267fab7",
+    "mixins/ae2/part_use.rs": "be26c6f09ebf5bfe4e43fe96da84bd33acac21c0f5046fb538f5485e9e67bec6",
+    "mixins/ae2/player_registry.rs": "d0a5c892351865619a36b39ad2c7ba98dd65d3047381cae68870cb2abebd9e92",
+    "mixins/ae2/power.rs": "2e7d5221f78a343b1de5b89d9d3079a25d8175ea6decaec15223e5bf35261d16",
+    "mixins/ae2/quad_rotation.rs": "053cd72bb2f6701b08d4761f498a88253531dcf3db7e7677588c6c3afca4f896",
+    "mixins/ae2/quartz.rs": "b5f47622453bbc69755045b84d4a64804e2d771bb7c8a1955a154014465d0cea",
+    "mixins/ae2/quartz_loot_tests.rs": "25a8d1c5ac093e8db419f9b0f908a4df0e431e5bb2283acd19767fe27db933b6",
+    "mixins/ae2/recipe_ingredient.rs": "6d6c33634dcae861ff29cd37016502683cac0a5c8c0985dad7830e8c21a1fef3",
+    "mixins/ae2/reporting.rs": "ad179cf966bdd76a1b54777b2d6f417811bf7db3ec715bb228b56beb2527d7d7",
+    "mixins/ae2/right_click.rs": "678c0f89b2792142d6242995bb8e6179b9c1c5d7251ca53c7f7061e78d817e03",
+    "mixins/ae2/screen.rs": "0e57aa069c0f8665c21731ca76724b5068d5a27e0adb9966a3252d1e3a27cbee",
+    "mixins/ae2/screen_close.rs": "91e2f9a6491298bcec0099ca4ca14c266579cd9855191d74f37348866d815d04",
+    "mixins/ae2/screen_draw.rs": "129ddcacdbbe1336e4c26c61ec62fd30ff096d1e81935f5a5c2992a6c87ab340",
+    "mixins/ae2/screen_open.rs": "fafd455ddd305e214551ee2e6b0c625a8d5e0d9ebf999320eb031b242ec981b6",
+    "mixins/ae2/service.rs": "12a08cc9b86d0a05d2f9a4e6229e97f108152d8d3bf2fde5d2524cf069f7fead",
+    "mixins/ae2/slot_rules.rs": "e63da89c3f275ba9b22374cc0c79a7e1997c7b42f6e29e1159f69594e29f5a16",
+    "mixins/ae2/storage.rs": "56caefbe5c1955daf574d3527659e41dc87e7445d9999a33646529b336a36098",
+    "mixins/ae2/storage_helper.rs": "5a0df0b0c8d86a78423ddf217b428a0e14d966c45895365c439cf689bec68666",
+    "mixins/ae2/storage_menu.rs": "d4e36a593336956f023dc21325500a37b43c8c329a2d1e752af6afb488ceb615",
+    "mixins/ae2/survival_command.rs": "29505d07485f269d0c583b2ce08a62249532ccb8324d94fcd7877880b7dda54d",
+    "mixins/ae2/survival_loot.rs": "338189214235ddc79651fc0eb638228fd6d816543a64fcdd17c3cacecfa23767",
+    "mixins/ae2/tool_filters.rs": "957171a6b38f5bbc34c89908987c2844fd928d26030af62ee85589153d934c88",
+    "mixins/ae2/tool_glue.rs": "59ed7e09e39bf0b9d4e62c832dc6f31e54cbdd251b6779808bead37cb8dd9b01",
+    "mixins/ae2/tooltip.rs": "e68b0b2cdb259952c2322a0d7e0f0bb5a1eda5c232f7c76a7f2f147492953c9f",
+    "mixins/ae2/transform_throw.rs": "954c324bccc12855c3a0c8476c6754e4300ddd9caa4d8310922b2a3e6cc8006e",
+    "mixins/ae2/transform_throw_reset.rs": "df69c1b80b93c048e606806434d9b47f12b305d02ee0e76c6ce9bf541de22959",
+    "mixins/ae2/transform_throw_tick.rs": "08328a8dd65d9227d07ecd07dd15d36af430d1746e135eb9112485b7f88f55a4",
+    "mixins/ae2/transform_throw_world.rs": "ea837182d92f6e2cb24ba41c964362c32aea966acf85aa4fc775c5f6d15ad5f0",
+    "mixins/ae2/upgrade_rules.rs": "a1e0f92f24a399f379020b2575102d57998c239dce03a61de0a59704168f0021",
+    "mixins/ae2/world_phase.rs": "00414eee31f7413a76be9bcbdd750871c9ef784f41530229063003ddd62331ae",
+    "mixins/ae2/wrench.rs": "f9d6be72f464e78f6fc808d47b794dbda42be7ce1abca7c7846bd99cb8ee41ec"
+  },
+  "work": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/me-chest-yvo6ypaf",
+  "limitations": [
+    "Command-initialized native host; menus and external capabilities are not exercised.",
+    "Survival removal, source client cell rendering and external multiplayer remain open."
+  ]
+}

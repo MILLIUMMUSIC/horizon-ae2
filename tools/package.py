@@ -86,6 +86,7 @@ def package():
                  'tools/reporting_oracle.py', 'examples/reporting_oracle.rs', 'docs/reporting-oracle.json', 'docs/reporting-cable-regression.json',
                  'tools/shared_power_oracle.py', 'examples/shared_power_oracle.rs', 'docs/shared-power-oracle.json', 'docs/shared-power-cable-regression.json',
                  'tools/me_chest_oracle.py', 'examples/me_chest_oracle.rs', 'examples/support/me_chest_fixture.rs', 'docs/me-chest-oracle.json',
+                 'tools/smoke_me_chest.py', 'docs/me-chest-native.json', 'docs/me-chest-cable-regression.json',
                  'tools/inventory_update_oracle.py', 'examples/inventory_update_oracle.rs', 'docs/inventory-update-oracle.json',
                  'tools/storage_helper_oracle.py', 'examples/storage_helper_oracle.rs', 'docs/storage-helper-oracle.json',
                  'tools/incremental_update_oracle.py', 'examples/incremental_update_oracle.rs', 'docs/incremental-update-oracle.json',

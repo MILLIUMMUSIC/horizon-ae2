@@ -79,6 +79,15 @@ class ContentTests(unittest.TestCase):
         content.write_json(carried / "assets/ae2/blockstates/charger.json", orientation_states("ae2:block/charger"))
         content.write_json(carried / "assets/ae2/blockstates/drive.json", orientation_states("ae2:block/drive"))
         content.write_json(carried / "assets/ae2/blockstates/inscriber.json", orientation_states("ae2:block/inscriber"))
+        chest = []
+        for lights in [None, "false", "true"]:
+            model = "ae2:block/chest/" + ("base" if lights is None else "lights_" + ("on" if lights == "true" else "off"))
+            for key, apply in orientation_states(model)["variants"].items():
+                when = dict(clause.split("=") for clause in key.split(","))
+                if lights is not None:
+                    when["lights_on"] = lights
+                chest.append({"when": when, "apply": apply})
+        content.write_json(carried / "assets/ae2/blockstates/chest.json", {"multipart": chest})
         for name in ("energy_cell", "dense_energy_cell"):
             content.write_json(carried / f"assets/ae2/blockstates/{name}.json", {
                 "variants": {f"fullness={level}": {"model": f"ae2:block/{name}_{level}"} for level in range(5)}
@@ -145,6 +154,17 @@ class ContentTests(unittest.TestCase):
         for name in ["charger", "crank", "drive"]:
             block = json.loads((carried / f"data/ae2/horizon/block/{name}.json").read_text())
             self.assertEqual(block["template"], "minecraft:dispenser")
+        chest = json.loads((carried / "data/ae2/horizon/block/chest.json").read_text())
+        self.assertEqual(chest["properties"]["explosion_resistance"], 11)
+        parts = json.loads((carried / "assets/ae2/blockstates/chest.json").read_text())["multipart"]
+        self.assertEqual(len(parts), 72)
+        for face in block_orientation.FACING_ORDER:
+            for spin in range(4):
+                for lights in ["false", "true"]:
+                    props = {"facing": face, "spin": str(spin), "lights_on": lights}
+                    matches = [p["apply"] for p in parts if all(props[k] == v for k,v in p["when"].items())]
+                    self.assertEqual({p["model"] for p in matches}, {"ae2:block/chest/base", "ae2:block/chest/lights_" + ("on" if lights == "true" else "off")})
+                    self.assertTrue(all("ae2:z" not in p for p in matches))
         inscriber = json.loads((carried / "data/ae2/horizon/block/inscriber.json").read_text())
         self.assertEqual(inscriber["properties"]["explosion_resistance"], 11)
         self.assertFalse(inscriber["properties"]["requires_tool"])

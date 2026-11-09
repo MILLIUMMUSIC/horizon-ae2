@@ -3,7 +3,38 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Shared powered-host network store
+## Retained native ME Chest host
+
+- Formatting, Clippy with warnings denied, 196 standalone tests, 17 Python
+  tests and source audits pass. The inventory records 154 partial classes out
+  of 1,429; no whole class is marked complete.
+- Native compilation/build, 259 game tests and 20 library tests pass. New tests
+  use the actual save codec to check transient identity, retained cell contents,
+  power, empty native padding, malformed refusal and stale-host protection. The
+  actual state table/model catalog loads all 48 facing/lights_on/spin rows and
+  selects both multipart layers without waterlogging or dispenser behavior.
+- `tools/smoke_me_chest.py` passes seven isolated world groups: all 48 states,
+  unpowered input refusal, own-cell insertion and 1.5 AE/tick local idle drain,
+  own-cell isolation from a connected Drive, malformed inventory refusal,
+  replacement and native save/restart. `docs/me-chest-native.json` records the
+  exact native source/binary hashes and samples; the driver checks that neither
+  changes during the run. The original multipart housing is visible in the
+  captured game image; dynamic cell/color rendering is still pending.
+- Eight center CableBus regression groups pass on the same completed binary,
+  including power/color topology and restart. Evidence and scope are in
+  `docs/me-chest-cable-regression.json`.
+- The actual native-mod reader accepts the 168-entry package. Its extracted
+  corresponding source independently passes all 196 standalone tests and
+  contains the host, world driver and both native regression reports.
+- This command-initialized host checkpoint does not establish either Chest
+  screen, external item/fluid/power interfaces, live CONFIG, source client
+  streams, full native event ordering or complete same-tick save/drop/command-
+  load lifecycle. Source malformed/nonfinite recovery is not claimed.
+- The native build retains unused-code warnings for pending bindings and the
+  known nonfatal rust-objcopy/libLLVM warning. Original Horizon resources and
+  source checkouts remain untouched; generated roots and worlds are in target.
+
+## Shared powered-host network store (previous)
 
 - Formatting, Clippy with warnings denied, 196 standalone tests, 17 Python
   tests and source audits pass. Source coverage remains 153 partial classes.
@@ -31,7 +62,7 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   scenarios / 40,482 operations and 200 overlay scenarios / 52,083 operations.
   Detailed regression reports remain under ignored target/review-2026-11-08/.
 
-## ME Chest host callback core
+## ME Chest host callback core (previous)
 
 - Formatting, Clippy with warnings denied, 193 standalone tests and 17 Python
   tests pass. Inventory coverage is 153 partial classes of 1,429, none complete.
@@ -56,8 +87,8 @@ Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
   complete Chest core, oracle, shared fixture and evidence; the extracted source
   independently passes all 193 standalone tests. The source/reference checkouts
   for Horizon, horizon-mixins and horizon-create remain unmodified.
-- The standalone module is not native-registered. No registered native module
-  or injection changed; native suites/world checks were not repeated for this core.
+- That standalone comparison did not change any registered native module or
+  injection; native suites/world checks were not repeated at that checkpoint.
 
 ## Shared storage-menu core (previous)
 

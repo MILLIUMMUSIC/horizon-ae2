@@ -16,6 +16,7 @@ use std::sync::Mutex;
 struct Dimension {
     network: Network,
     drives: super::ae2_drive_glue::Drives,
+    chests: super::ae2_me_chest_glue::Chests,
     chargers: super::ae2_charger_inventory::Inventories,
     inscribers: super::ae2_inscriber_glue::Inventories,
     cells: super::ae2_energy_cell_glue::Displays,
@@ -60,11 +61,17 @@ fn snapshots(game: &Game<'_>, state: &mut Dimension) -> Vec<Snapshot> {
             }
             continue;
         }
-        let Some(kind) = Kind::from_block(&be.id) else {
+        let Some(mut kind) = Kind::from_block(&be.id) else {
             continue;
         };
         if !game.world.loaded(x, z) || game.native_block([x, y, z]) != kind.block() {
             continue;
+        }
+        if be.id == super::ae2_me_chest::BLOCK {
+            let Some(profile) = state.chests.kind([x, y, z]) else {
+                continue;
+            };
+            kind = profile;
         }
         let saved_buffer = match be.nbt.get(&JavaString::from("proxy")) {
             Some(Tag::Compound(node)) => get_double(node, "e"),
@@ -89,9 +96,15 @@ pub(super) fn pre_tick(game: &mut Game<'_>, dimension: &str) {
     state.chargers.sync(game);
     state.inscribers.sync(game);
     state.drives.read(game);
+    state
+        .chests
+        .read(game, &mut state.network, &mut state.drives.services);
     let nodes = snapshots(game, state);
     state.network.sync(nodes);
     state.drives.reconcile(&mut state.network);
+    state
+        .chests
+        .reconcile(game, &mut state.network, &mut state.drives.services);
     state.network.begin_tick();
 }
 // Placement must test the just-added cable's actual connected shape without
@@ -138,9 +151,15 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         state.chargers.sync(game);
         state.inscribers.sync(game);
         state.drives.read(game);
+        state
+            .chests
+            .read(game, &mut state.network, &mut state.drives.services);
         let nodes = snapshots(game, state);
         state.network.sync(nodes);
         state.drives.reconcile(&mut state.network);
+        state
+            .chests
+            .reconcile(game, &mut state.network, &mut state.drives.services);
         let states = state.network.end_tick();
         for persisted in &states {
             if persisted.side.is_some() {
@@ -190,11 +209,17 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
             }
         }
         state.drives.reconcile(&mut state.network);
+        state
+            .chests
+            .reconcile(game, &mut state.network, &mut state.drives.services);
         state.drives.end_tick();
         state.drives.persist(game);
+        state.chests.flush(game);
         // Energy writes are now saved; comparator reads must see those values.
-        states
+        (states, state.chests.updates())
     };
+    let (states, chest_updates) = states;
+    super::ae2_me_chest_glue::apply(game, chest_updates);
     let controllers: Vec<_> = states
         .iter()
         .filter_map(|state| state.controller_model.map(|model| (state.pos, model)))
@@ -213,6 +238,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         let before = be.nbt.clone();
         if let Some(energy) = state.stored
             && state.kind != Kind::CreativeEnergyCell
+            && !matches!(state.kind, Kind::Chest(_))
         {
             be.nbt.insert(
                 JavaString::from("internalCurrentPower"),
@@ -293,6 +319,9 @@ pub(super) fn node_placed(dimension: &str, pos: [i32; 3]) {
         .unwrap_or_else(|e| e.into_inner())
         .get_mut(dimension)
     {
+        state
+            .chests
+            .forget(pos, &mut state.network, &mut state.drives.services);
         state.network.forget_host(pos);
         state.inscribers.forget(pos);
     }
@@ -333,8 +362,15 @@ pub(super) fn flush_drives(game: &mut Game<'_>) {
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     if let Some(state) = networks.get_mut(game.dim.id()) {
         state.drives.read(game);
+        state
+            .chests
+            .read(game, &mut state.network, &mut state.drives.services);
         state.drives.reconcile(&mut state.network);
+        state
+            .chests
+            .reconcile(game, &mut state.network, &mut state.drives.services);
         state.drives.persist(game);
+        state.chests.flush(game);
     }
 }
 
@@ -345,4 +381,14 @@ pub(super) fn sync_chargers(game: &mut Game<'_>) {
     let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
     let state = networks.entry(game.dim.id().to_owned()).or_default();
     state.chargers.sync(game);
+}
+
+pub(super) fn tick_chest(
+    game: &mut Game<'_>,
+    pos: [i32; 3],
+    be: &mut horizon_client::containers::ModBlockEntity,
+) {
+    let mut networks = NETWORKS.lock().unwrap_or_else(|e| e.into_inner());
+    let state = networks.entry(game.dim.id().to_owned()).or_default();
+    state.chests.tick(game, &mut state.network, pos, be);
 }

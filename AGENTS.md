@@ -352,13 +352,14 @@ and invoke the source view callbacks as well as clearing the entry core.
 Run tools/inventory_update_oracle.py; its controlled eight key hashes align
 iteration, not arbitrary Java HashSet order or actual registry codec behavior.
 
-me_chest.rs is the source host callback core, not a registered native Chest yet.
+me_chest.rs is the source host callback core; me_chest_glue.rs now registers
+and retains native Chest hosts, their own cell and shared powered store.
 Keep exactly two combined slots (input 0, cell 1); never add a withdrawal stack.
 The top terminal reads the Chest's own cell, including when grid-connected.
 Other faces open the separate cell-slot menu. Native item capability front is
 cell inventory, all other faces input; grid nodes expose every face and use SMART
 cable, REQUIRE_CHANNEL, public WRITE-only local 500*CONFIG energy. Native binding
-of those properties is pending. Preserve unreadable nonempty cache hits, empty
+of external capabilities and the two menus is pending. Preserve unreadable nonempty cache hits, empty
 uncached retries, retained idle on removal, grid-first local-remainder power and
 multiply/divide factor rereads. Guard actual inventory notifications as source
 AppEngInternalInventory does; do not reset handler state each tick or recreate
@@ -377,7 +378,12 @@ Do not initialize a duplicate local buffer from a saved value each tick. Raw
 StoredEnergyAmount construction starts provider/requester eligibility true;
 follow the source root constructor/load setters before interpreting events.
 Network ChestPower profiles describe construction capacity/priority only;
-Kind.from_block deliberately does not admit Chest until the host adapter lands.
+Kind.from_block admits Chest through the retained native host adapter.
 The initial managed node idle is 1.0, independently of Chest's local idle=0.0.
-All six grid faces are exposed. Runtime priority tree reordering, real world
-callbacks/menu/host identity and nonfinite recovery remain separate work.
+All six grid faces are exposed. Runtime priority tree reordering, synchronous
+external callbacks, menus, complete same-tick save/drop/command-load lifecycle
+and nonfinite recovery remain separate work. The transient BE data token is
+not persisted; never use root NBT as a fake instance identifier. Run both
+native binary and library tests: the latter load all 48 Chest states and
+verify multipart model selection. tools/smoke_me_chest.py uses only owned
+worlds and asserts unchanged native source/binary hashes throughout its run.

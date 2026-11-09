@@ -111,6 +111,7 @@ impl Kind {
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
             "ae2:drive" => Some(Self::Drive),
+            "ae2:chest" => Some(Self::Chest(ChestPower::new(1.0, 0).unwrap())),
             _ => None,
         }
     }
