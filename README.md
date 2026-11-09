@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 151 partially ported classes. That count is not a gameplay completion percentage.
+files, including 153 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -52,6 +52,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Inscriber | `inscriber.rs`, `inscriber_glue.rs`: four source slots, 15 original recipes, press/inscribe modes, private/grid/crank power, speed-card rules, capacities, separated automation and auto-export; source menu, name presses, upgrade lifecycle and complete packets remain open |
 | Energy cells and Controller | `controller.rs`, `energy_cell_glue.rs`, `block_states.rs`: network power, Controller structures/states, finite-cell fullness and comparator output |
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
+| ME Chest rules | `me_chest.rs`: two-inventory contract, own-cell handler/cache, grid/local energy, input and fluid insertion, status/link and menu callbacks; native host, screen and capability binding remain pending |
 | Shared storage-menu rules | `storage_menu.rs`, `storage_helper.rs`, `incremental_update.rs`, `me_interaction.rs`, `inventory_update.rs`: source powered transfers, serial/key identity, inventory update packets and item/container action program; native terminal/ME Chest UI and session binding remain pending |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |

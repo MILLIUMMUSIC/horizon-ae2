@@ -303,7 +303,9 @@ class PackageTests(unittest.TestCase):
                              "examples/support/storage_menu_fixture.rs", "docs/storage-menu-oracle.json",
                              "tools/storage_helper_oracle.py", "tools/incremental_update_oracle.py",
                              "tools/me_interaction_oracle.py", "tools/inventory_update_oracle.py",
-                             "examples/inventory_update_oracle.rs", "docs/inventory-update-oracle.json"]:
+                             "examples/inventory_update_oracle.rs", "docs/inventory-update-oracle.json",
+                             "tools/me_chest_oracle.py", "examples/me_chest_oracle.rs",
+                             "examples/support/me_chest_fixture.rs", "docs/me-chest-oracle.json"]:
                     self.assertIn(name, source.namelist())
 
     def test_corresponding_source_includes_content_preparation_imports(self):

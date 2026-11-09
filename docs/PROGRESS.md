@@ -19,6 +19,12 @@ The inventory update builder and serial-indexed client entry rules also match
 and partial-codec errors. Optional-key registry codecs and search/sort/pinned
 views remain binding work; native transport is not activated by these cores.
 
+ME Chest's standalone host program now matches 4,005 original-method scenarios:
+own-cell cache, grid/local power, input and fluid insertion, display/link,
+priority/node/mount callbacks and the two separate menu choices. Its two-slot
+inventory contract replaces the proposed extra withdrawal slot. Real native
+host/node/storage/slot/capability/UI and codec/lifecycle binding remain open.
+
 The graph and saved-host binding now address each primary part separately from
 its cable center. Internal null-direction edges, occupied-face blocking,
 per-part channel demand and separate `gn` persistence are implemented. A source

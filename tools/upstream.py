@@ -310,6 +310,12 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "blockentity/storage/MEChestBlockEntity.java": ("mixins/ae2/me_chest.rs", "source two-inventory handler/cache, grid-first local power, input/filter and guarded notification contract, monitor/display/link, priority/node/mount/menu callbacks and insertion-only fluid rules; 4005 original-method scenarios; real native registration, host/menu/slot/capability binding, codecs/color and full lifecycle pending"),
+    "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/me_chest.rs", "public multiplier wrapper and local stored-extraction callback contract used by ME Chest; original parent methods in Java oracle with actual StoredEnergyAmount/Mth; native external power/public-flow/capabilities, base inventory/NBT and full lifecycle pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

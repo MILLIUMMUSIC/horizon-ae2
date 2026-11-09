@@ -351,3 +351,19 @@ deltas warn and stay absent. Native full updates must clear views/pins/caches
 and invoke the source view callbacks as well as clearing the entry core.
 Run tools/inventory_update_oracle.py; its controlled eight key hashes align
 iteration, not arbitrary Java HashSet order or actual registry codec behavior.
+
+me_chest.rs is the source host callback core, not a registered native Chest yet.
+Keep exactly two combined slots (input 0, cell 1); never add a withdrawal stack.
+The top terminal reads the Chest's own cell, including when grid-connected.
+Other faces open the separate cell-slot menu. Native item capability front is
+cell inventory, all other faces input; grid nodes expose every face and use SMART
+cable, REQUIRE_CHANNEL, public WRITE-only local 500*CONFIG energy. Native binding
+of those properties is pending. Preserve unreadable nonempty cache hits, empty
+uncached retries, retained idle on removal, grid-first local-remainder power and
+multiply/divide factor rereads. Guard actual inventory notifications as source
+AppEngInternalInventory does; do not reset handler state each tick or recreate
+stacks where the source retains their identity. The fluid endpoint is an insert-
+only sink: indexed tank-0 capacity/validity differs from unindexed queries.
+Run tools/me_chest_oracle.py. Its original methods/classes use controlled
+world/grid/cell bindings, positive finite CONFIG and attached-level transfers;
+source nonfinite energy and pre-level faults remain outside this proof.

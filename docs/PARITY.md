@@ -29,6 +29,51 @@ The full mod is not yet complete.
 | Fluid transforms | Both built-in Fluix recipes from carried data, source signed timer/threshold/reset, greedy claims, surviving per-entity post-movement/merge/lifetime/environment phase, six level RNG draws and immediate zero-delay fresh entities | Source lightning, explosion recipes/frequency assembly, arbitrary fluid tags and result components, original query/recipe/cache/reload order, command object replacement and complete identity lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
+## ME Chest host rules
+
+`me_chest.rs` keeps the source's two inventories: input at combined slot 0 and
+cell at slot 1. The front exposes the cell inventory to item capabilities; other
+faces expose the input. Input extraction is denied. The terminal reads the
+Chest's own cell even when a grid is connected; grid mounting is a separate
+online/priority-gated use of that same cell. The top opens BasicCellChestMenu;
+other faces open the separate MEChestMenu. No withdrawal slot is introduced.
+Native face routing, menus and capability admission remain unbound.
+
+The callback core caches a nonempty cell lookup, including failed lookups, until
+a cell change or priority reset. Empty slots stay uncached. Removing or failing
+to read a cell does not reset its last idle drain. The readable-cell drain is
+1 + cell drain. Cell changes invalidate handler/cache, request storage refresh
+and, with a level attached, invalidate capabilities and mark the block. Priority
+changes request refresh even when the new value equals the old one. Node online
+transitions request storage refresh and recalculate display.
+
+Chest power extraction uses grid energy first, then the local remainder, inside
+the inherited multiplier wrapper. CONFIG is read for multiplication and again
+for division, preserving a change during callbacks. A locally powered Chest
+requires strictly more than 1 AE, while a powered node satisfies the power
+check independently. Idle drain runs when the grid is absent or unpowered;
+input processing follows it. Input transfers use the actual own-cell handler
+and MachineSource, preserve stack identity and delegate guarded onChange/save
+notifications to the inventory binding. Successful cell commits persist through
+the current handler, mark the block changed, and recalculate the displayed state.
+
+The insertion-only fluid sink exposes no stored fluid or drain result. Its
+unindexed capacity/validity queries depend on a current handler, whereas indexed
+tank 0 remains 1,000 mB/valid independently. Filling refreshes the handler and
+uses StorageHelper's powered insertion with the machine source; it does not
+invent a separate isPowered gate or persistent tank inventory.
+
+4,005 original-method scenarios compare ordered callbacks and final state,
+including reentrant input/cell replacement, mutable power multipliers, guarded
+inventory notifications, unreadable-cell caching, stale fluid-handle predicates
+and menu dispatch. Original StorageHelper, StoredEnergyAmount and Minecraft Mth
+execute in Java; cells/grid/registry/world/stacks and menus are controlled.
+Requests/factors/storage are finite, CONFIG is positive and transfers have an
+attached level. Faulting pre-level content mutations and nonfinite energy edges
+are excluded. Complete native host/node/power/slot/capability/UI binding, config/
+NBT/stream/color/model behavior, full fluid interfaces and lifecycle remain open.
+This standalone core does not resolve PR #6 by itself.
+
 ## Shared storage-menu interaction core
 
 The standalone menu core retains full server keys behind per-menu serials.

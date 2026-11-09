@@ -3,7 +3,35 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Shared storage-menu core
+## ME Chest host callback core
+
+- Formatting, Clippy with warnings denied, 193 standalone tests and 17 Python
+  tests pass. Inventory coverage is 153 partial classes of 1,429, none complete.
+- `tools/me_chest_oracle.py` compares 4,005 scenarios of original MEChestBlockEntity
+  methods, monitor and fluid-handler code. The original parent multiplier/local
+  extraction methods, complete StorageHelper/StoredEnergyAmount and four AppEng
+  inventory notification methods execute with actual Minecraft Mth.clamp.
+- Ordered traces and final cache/handler/idle/status/priority, inventories, two
+  controlled cells and local/grid energy match. This covers grid/local fallback,
+  retained idle, cached failed lookups, own-cell transfers, menu choices, guarded
+  reentrant inventory callbacks, cell/input replacement during commits, multiplier
+  changes, fluid fill and the differing capacity/validity predicates. Source,
+  binding, reference-dependency, driver, input and output hashes are recorded in
+  `docs/me-chest-oracle.json`; only the enclosing class name is adapted where
+  the original fluid handler uses a qualified `this`.
+- Cells, stacks, registry, grid and world/menu callbacks are controlled. Finite
+  positive CONFIG and finite requests/storage are covered; transfers require an
+  attached level. Source nonfinite energy and pre-level content faults, native
+  capabilities/registration/menu rendering/transport and complete lifecycle are
+  not established by this comparison.
+- The actual native-mod reader accepts the 167-entry package. It includes the
+  complete Chest core, oracle, shared fixture and evidence; the extracted source
+  independently passes all 193 standalone tests. The source/reference checkouts
+  for Horizon, horizon-mixins and horizon-create remain unmodified.
+- The standalone module is not native-registered. No registered native module
+  or injection changed; native suites/world checks were not repeated for this core.
+
+## Shared storage-menu core (previous)
 
 - Formatting, Clippy with warnings denied, 193 standalone tests and 17 Python
   tests pass. The inventory records 151 partial classes of 1,429, none complete.
