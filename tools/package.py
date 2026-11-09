@@ -7,6 +7,7 @@ modes, so the same sources always give the same bytes and the same SHA-256. Hori
 Horizon revision. Based on levzzz5154's packager for Veinminer.
 """
 import hashlib
+import io
 import json
 from pathlib import Path
 import tomllib
@@ -14,6 +15,17 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 GAME = '26.3'
+
+
+def zip_bytes(files):
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, content in sorted(files.items()):
+            info = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o100644 << 16
+            archive.writestr(info, content)
+    return buffer.getvalue()
 
 
 def package():
@@ -33,10 +45,11 @@ def package():
     manifest = dict(schema=1, id=mod['id'], version=mod['version'], game=GAME,
                     horizon=compat['horizon_revision'], mixins=compat['horizon_mixins_revision'])
     files = {'horizon-native.json': (json.dumps(manifest, indent=2, sort_keys=True) + '\n').encode()}
+    source_files = {}
     for path in sorted(bundle.iterdir()):
         if path.is_file() and path.suffix in ('.rs', '.toml'):
             files[path.relative_to(ROOT).as_posix()] = path.read_bytes()
-            files[f'mixins/{mod["id"]}/data/source/{path.relative_to(ROOT).as_posix()}'] = path.read_bytes()
+            source_files[path.relative_to(ROOT).as_posix()] = path.read_bytes()
     # Preserve the licence and the complete corresponding port source/tooling.
     for name in ['LICENSE', 'NOTICE.md', 'README.md', 'Cargo.toml', 'Cargo.lock',
                  'rust-toolchain.toml', 'compatibility.json', 'upstream.lock.json',
@@ -71,6 +84,8 @@ def package():
                  'tools/multipart_oracle.py', 'examples/multipart_oracle.rs', 'docs/multipart-oracle.json', 'docs/multipart-cable-regression.json', 'docs/multipart-power-regression.json',
                  'tools/part_geometry_oracle.py', 'examples/part_geometry_oracle.rs', 'docs/part-geometry-oracle.json', 'docs/part-geometry-world-smoke.json', 'docs/part-geometry-placement-world-smoke.json',
                  'tools/reporting_oracle.py', 'examples/reporting_oracle.rs', 'docs/reporting-oracle.json', 'docs/reporting-cable-regression.json',
+                 'tools/meteorite_oracle.py', 'examples/meteorite_oracle.rs', 'docs/meteorite-oracle.json',
+                 'tools/tag_entry_reference.py', 'docs/tag-entry-reference.json', 'tools/smoke_meteorite_fallout.py', 'docs/meteorite-native.json',
                  'LICENSES/JOML-MIT', 'tools/quad_rotation_oracle.py', 'examples/quad_rotation_oracle.rs', 'docs/quad-rotation-oracle.json',
                  'LICENSES/Horizon-MIT', 'tools/item_tick_source.py', 'tools/transform_oracle.py', 'examples/transform_oracle.rs', 'docs/transform-oracle.json', 'tools/smoke_fluix_throw.py', 'docs/fluix-world-smoke.json', 'docs/fluid-inscriber-regression.json', 'docs/item-tick-source-audit.json',
                  'tools/smoke_cell_1k.py', 'docs/cell-1k-world-smoke.json', 'tools/smoke_charge_certus.py', 'docs/charge-certus-world-smoke.json',
@@ -86,16 +101,17 @@ def package():
                  'docs/baseline-port-pack.json', 'docs/pathing-oracle.json',
                  'docs/energy-oracle.json', 'docs/energy-overlay-oracle.json',
                  'docs/mounts-oracle.json', 'docs/drive-world-smoke.json', 'docs/drive-gui-smoke.json', 'docs/drive-automation-smoke.json', 'docs/PROGRESS.md', 'VALIDATION.md']:
-        # Horizon only accepts extra non-Rust files below the bundle's data/.
-        files[f'mixins/{mod["id"]}/data/source/{name}'] = (ROOT / name).read_bytes()
+        source_files[name] = (ROOT / name).read_bytes()
+    # The loader accepts at most 512 entries. Keep all corresponding source,
+    # tools and evidence in one deterministic archive under the allowed data/.
+    files[f'mixins/{mod["id"]}/data/source.zip'] = zip_bytes(source_files)
+    for name in ['LICENSE', 'NOTICE.md']:
+        files[f'mixins/{mod["id"]}/data/{name}'] = (ROOT / name).read_bytes()
+    if len(files) > 512:
+        raise SystemExit("native payload exceeds Horizon's 512-entry limit")
     out = ROOT / 'target' / f"{mod['id']}-{mod['version']}.hnmod"
     out.parent.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(out, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
-        for name, content in sorted(files.items()):
-            info = zipfile.ZipInfo(name, (2026, 1, 1, 0, 0, 0))
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 0o100644 << 16
-            archive.writestr(info, content)
+    out.write_bytes(zip_bytes(files))
     print(json.dumps(dict(file=str(out), size=out.stat().st_size,
                           sha256=hashlib.sha256(out.read_bytes()).hexdigest()), indent=2))
 

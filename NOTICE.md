@@ -51,3 +51,9 @@ The 24 immutable quaternion/direction rows are derived from AE2's original
 BlockOrientation constructor with that dependency. No JOML Java runtime is
 included in the mod. Minecraft winding is checked against the player's
 verified reference artifact; that artifact is not distributed here.
+
+`mixins/ae2/cube_loot.rs` adapts the native block-loot evaluator's pool/condition/
+modifier dispatch for the original mysterious-cube TagEntry. The native dispatch
+retains `LICENSES/Horizon-MIT`; the tag behavior is derived from the original
+Minecraft/AE2 contract. The actual table, ordered tag members, tool and caller's
+named random sequence remain in use. Original engine sources are unchanged.

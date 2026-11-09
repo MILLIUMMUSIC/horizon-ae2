@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 132 partially ported classes. That count is not a gameplay completion percentage.
+files, including 143 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -61,6 +61,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Adventure stack use | `adventure.rs`, `adventure_snbt.rs`, `adventure_native.rs`: actual-hand PASS gate, original saved predicates, typed property ranges and NBT comparison; component cache and complete BE codecs remain open |
 | Cable builders and world rendering | `cube_builder.rs`, `cable_render.rs`, `cable_view.rs`: original cable quads/textures, graph-derived connections/channels, outline and contextual shapes |
 | Certus buds and cluster drops | `quartz.rs`, `survival_loot.rs`: original loot tables and native tool/random-sequence handling, missing-entity refusal, matching stage states/shapes; natural growth and full source block lifecycle remain open |
+| Meteorite placement | `meteorite_placer.rs`, `meteorite_fallout.rs`: source crater, sky-stone/quartz core, decay, lake and ordered random calls; explicit server operator probe and mysterious-cube loot; natural structure generation and compass remain pending |
 | Fluid transforms | `transform_throw.rs`, `transform_throw_world.rs`: source server timer, recipe ingredient claims and both built-in Fluix recipes at the surviving per-entity tick phase; client effects, explosions, arbitrary fluid tags/components and full lifecycle remain open |
 | Client state and stack components | `cable_sync.rs`, `component_sync.rs`: native visual transport and typed item components, preserving authoritative saved data |
 
@@ -181,7 +182,10 @@ python3.12 tools/horizon.py test --library
 
 For packaging, `python3.12 tools/package.py` writes `target/ae2-0.1.0.hnmod`. Build the separate content
 archive with `cargo-horizon-mod build` from `target/content/ae2`. The native archive contains sources;
-the content archive contains the prepared data/assets. Both use mod ID `ae2`. Launcher installation
+the content archive contains the prepared data/assets. The native archive keeps its complete
+corresponding Rust sources, tools, documentation and licence notices in
+`mixins/ae2/data/source.zip`; extract that nested archive to reproduce the standalone checks.
+Both use mod ID `ae2`. Launcher installation
 and rebuild remain separate from the built-client checks documented in [VALIDATION.md](VALIDATION.md).
 
 ## Licences

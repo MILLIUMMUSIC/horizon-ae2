@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "cases": 329,
+  "events": 202360,
+  "writes": 162875,
+  "placement_random_calls": 33350,
+  "level_random_calls": 301,
+  "water_ticks": 5053,
+  "source_sha256": {
+    "MeteoritePlacer.java": "78c5ce7e2188c23b3f2c004322471be85065e690cdd4a3907f0ea80df409afe2",
+    "MeteoriteBlockPutter.java": "d97d4694ecd25073888155b1e3348200e68748bd3ef11f429e81621d8bcada5e",
+    "CraterType.java": "722f61c2baca557f014662e2f89a9c353aae1fb650b14f37cb623c6327821103",
+    "PlacedMeteoriteSettings.java": "eb0c4d4db80f8aa4f8de8d3c4960002cb2a04db3ce9d73d3cac0881ee4b63dd5",
+    "Constants.java": "661cc53eb3a21763cdb6513b72af6e701bd398a8d8aaf5f9239416fe2d0f1daa",
+    "fallout/Fallout.java": "6dd6298b1ced42b134e4cfeb0e4291caa1e15cd933ef2e923b40089d781249fb",
+    "fallout/FalloutCopy.java": "8ff24e66e5fb1761d8447818056b42b61651761e8f08c7591571a591cd3267a4",
+    "fallout/FalloutSand.java": "9d621859d99c19af51bf164aa52945af4eadfdd92e06e469205e11f43c1ee6db",
+    "fallout/FalloutSnow.java": "635a025c2971a01e98ea82fa89fdf69cd3cd2c3869fcf1e7321756a2b5680694",
+    "fallout/FalloutMode.java": "fc173f984036eb58221a64382ec01eaa7890c1b4cef3b20121eb93cf8dab9910"
+  },
+  "binding_sha256": "7c39c3f49d668c928c71b7e42e0dd7097228e431a22b48b1fb0f89572f46c607",
+  "rust_sha256": {
+    "mixins/ae2/meteorite_placer.rs": "ce0a1af8fc32ed55d2c78f13ecc83f58ff976c22a6c5e31f6e2cfbfe2cf9dc3a",
+    "mixins/ae2/meteorite_fallout.rs": "1531f4033106e91d79f00d2c27eecb52ce0e4218ff2a2aa741f235f4588a2e89",
+    "examples/meteorite_oracle.rs": "a36405c1640dd3ae00c95daa7e8ec8ddd1eece4f4095bd1f1892e977f8c6142f"
+  },
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "input_sha256": "36be2cdaae28a3be41c09467eb3608c138338a484866c551ba465b053aad9c65",
+  "output_sha256": "009a81e93f92d34e6adfa2e2e93abe642867b75056ae4849a53b58ab91321b29",
+  "scope": "Full original placer/putter/fallout/settings constructor/getter program, ordered full-state writes, both RNG streams (separate/aliased), entity discard callbacks and water scheduling; actual MC bounding-box center",
+  "limits": [
+    "Controlled terrain, canonical state/property/biome/chunk bindings; java.util.Random supplies controlled legacy draws; no native physics/light/neighbor lifecycle or natural worldgen admission",
+    "Entity query returns one controlled object; bounding-box construction/discard order is checked, not source/native entity collision queries",
+    "Settings saved-NBT codecs are compiled but deliberately unsupported/not executed; source read-query count is not compared"
+  ]
+}

@@ -245,7 +245,7 @@ PARTIAL.update({
     "blockentity/misc/InscriberBlockEntity.java": ("mixins/ae2/inscriber_glue.rs", "four original inventory slots, press/inscribe processing, strict >200 threshold, 16-callback smash, private/grid/crank power, four speed-card slots, input capacity, separate-side automation, auto-export and comparator; source callback Java oracle; full menu/upgrades/drop callbacks, packets and managed-node lifecycle pending"),
     "blockentity/misc/InscriberRecipes.java": ("mixins/ae2/inscriber_glue.rs", "original custom-recipe ingredients, optional/reversible plates and source base-filter admission; dynamic name-press Component recipes, recipe-cache identity and live reload/order remain pending"),
     "recipes/handlers/InscriberRecipe.java": ("mixins/ae2/inscriber_glue.rs", "native execution of carried middle/top/bottom/result/mode data; press consumes one of each input and inscribe retains plates; arbitrary component results, complete original codec/stream API and addon recovery remain pending"),
-    "core/definitions/AEBlocks.java": ("tools/prepare_content.py", "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; full registration/settings and optional Athena connected textures pending"),
+    "core/definitions/AEBlocks.java": ("tools/prepare_content.py", "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; source meteorite quartz 3/5 and mysterious metal cube 10/1000 properties; full registration/settings, budding tick lifecycle and optional Athena connected textures pending"),
 })
 
 
@@ -274,6 +274,21 @@ PARTIAL.update({
     "thirdparty/fabric/EncodingFormat.java": ("mixins/ae2/quad_rotation.rs", "three header/eight vertex words, cull and normal flag fields with preservation of other opaque words; full light/geometry/material metadata API and native mesh integration pending"),
     "thirdparty/fabric/QuadViewImpl.java": ("mixins/ae2/quad_rotation.rs", "packed position/normal access and vanilla export used by rotation; retained header/vertex data, no full face-normal/geometry cache or full public quad API"),
     "thirdparty/fabric/MutableQuadViewImpl.java": ("mixins/ae2/quad_rotation.rs", "rotation position/normal writes, cull/nominal state and vanilla import; source accessor comparison, clear/emitter/baked-model and cache lifecycle remain pending"),
+})
+
+
+PARTIAL.update({
+    "worldgen/meteorite/MeteoritePlacer.java": ("mixins/ae2/meteorite_placer.rs", "ordered source crater/skystone/decay/lake program, clipped bounds, full-state writes, lazy separate/aliased RNG, entity discard and zero-delay water scheduling; whole-program Java trace comparison and explicit native operator probe; natural structure worldgen/caller admission, config/reload and full source world physics remain pending"),
+    "worldgen/meteorite/MeteoriteBlockPutter.java": ("mixins/ae2/meteorite_placer.rs", "source bedrock and equal-state refusal, UPDATE_ALL writes and source return contract; native callback binding, full source physics/lifecycle comparison pending"),
+    "worldgen/meteorite/PlacedMeteoriteSettings.java": ("mixins/ae2/meteorite_placer.rs", "float radius, position, crater/fallout and pure/lake getters consumed by original placer comparison; source saved-NBT codec and natural structure persistence remain pending"),
+    "worldgen/meteorite/CraterType.java": ("mixins/ae2/meteorite_fallout.rs", "seven ordinal values, NONE null filler and other default-state fillers; full saved-enum codec/native public API pending"),
+    "worldgen/meteorite/fallout/Fallout.java": ("mixins/ae2/meteorite_fallout.rs", "source fall/inset selection and crater adjustment, lazy program calls and RNG thresholds; source whole-program trace comparison; full natural worldgen lifecycle pending"),
+    "worldgen/meteorite/fallout/FalloutCopy.java": ("mixins/ae2/meteorite_fallout.rs", "source biome tag precedence at slice bounding-box center, thresholds and no-op outcomes; native zoomed biome/tag binding for explicit probe; dynamic tag reload and natural generation pending"),
+    "worldgen/meteorite/fallout/FalloutSand.java": ("mixins/ae2/meteorite_fallout.rs", "source glass/sand fall/inset choices and +2 crater adjustment, whole-program Java comparison; natural worldgen lifecycle pending"),
+    "worldgen/meteorite/fallout/FalloutSnow.java": ("mixins/ae2/meteorite_fallout.rs", "source layered snow/ice fall/inset choices and +2 crater adjustment, whole-program Java comparison; natural worldgen lifecycle pending"),
+    "worldgen/meteorite/fallout/FalloutMode.java": ("mixins/ae2/meteorite_fallout.rs", "source ordinals, biome precedence and fallout dispatch; explicit native probe input, natural generation's mode selection/persistence pending"),
+    "block/misc/MysteriousCubeBlock.java": ("mixins/ae2/block_states.rs", "source metal cube 10/1000 properties, non-conductor predicate and actual native mod BE, original converted loot tables and player/Level TagEntry adapter with ordered tag members; explosion/entity loot routes, compass notifications, tooltip and full inherited lifecycle pending"),
+    "blockentity/misc/MysteriousCubeBlockEntity.java": ("mixins/ae2/glue.rs", "native empty tracking BE creation for the source cube; inherited save/name/component codecs and compass service lifecycle remain pending"),
 })
 
 

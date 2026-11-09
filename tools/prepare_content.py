@@ -41,6 +41,23 @@ def ingredient(value):
     return value
 
 
+def loot_tag_entries(value):
+    """1.21.1 TagEntry.name -> native HolderSet, preserving dynamic tags/rolls."""
+    if isinstance(value, list):
+        return [loot_tag_entries(v) for v in value]
+    if not isinstance(value, dict):
+        return value
+    result = {key: loot_tag_entries(v) for key, v in value.items()}
+    if result.get("type") == "minecraft:tag" and "name" in result:
+        name = result.pop("name")
+        if "items" in result or not isinstance(name, str) or not name or name.startswith("#"):
+            raise ValueError("ambiguous or invalid legacy loot tag entry")
+        # Keep a tag reference. Expanding it here would lose pack/tag reload
+        # semantics and change expand=false's single choice/all-member output.
+        result["items"] = "#" + (name if ":" in name else "minecraft:" + name)
+    return result
+
+
 def flatten_recipes(content):
     remap = {}
     for folder in sorted((content / "data").glob("*/recipe")):
@@ -132,6 +149,21 @@ def fit(content, jar, platform):
             "properties": {"hardness": hardness, "explosion_resistance": 150,
                            "requires_tool": True, "map_color": color,
                            "sounds": "minecraft:stone"},
+        })
+    # MysteriousCubeBlock.PROPERTIES and AEBlocks.QUARTZ_PROPERTIES. Their
+    # original models, tags and loot stay in the carried resource namespace.
+    write_json(blocks / "mysterious_cube.json", {
+        "template": "minecraft:iron_block",
+        "properties": {"hardness": 10, "explosion_resistance": 1000,
+                       "requires_tool": False, "map_color": 6,
+                       "sounds": "minecraft:iron_block"},
+    })
+    for name in ["quartz_block", "damaged_budding_quartz", "chipped_budding_quartz",
+                 "flawed_budding_quartz", "flawless_budding_quartz"]:
+        write_json(blocks / f"{name}.json", {
+            "template": "minecraft:stone",
+            "properties": {"hardness": 3, "explosion_resistance": 5,
+                           "requires_tool": True, "map_color": 23},
         })
     # AE2 uses the same (height, inset), facing/waterlogged schema, default,
     # support and placement rules as the matching vanilla amethyst stage.
@@ -225,6 +257,8 @@ def fit(content, jar, platform):
             data["key"] = {k: ingredient(v) for k, v in data["key"].items()}
             write_json(content / path, data)
 
+    for path in sorted((content / "data/ae2/loot_table").rglob("*.json")):
+        write_json(path, loot_tag_entries(json.loads(path.read_text())))
     remap = flatten_recipes(content)
     write_json(content / "ae2-recipe-map.json", remap)
     write_json(content / MARKER, {"schema": 2, "upstream": LOCK["revision"], "jar_sha512": LOCK["jar"]["sha512"],

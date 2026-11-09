@@ -3,7 +3,57 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current packed part-rotation core checkpoint
+## Current meteorite placement checkpoint
+
+- Formatting, Clippy with warnings denied, 184 standalone Rust tests, 17 Python
+  tests and source/stack-limit/native-tick audits pass. Source inventory covers
+  143 partial classes out of 1,429; none is claimed complete.
+- `tools/meteorite_oracle.py` compares the whole original placer/putter/fallout
+  program in 329 controlled-world cases: 202,360 ordered events, 162,875 writes,
+  33,350 placement-RNG calls, 301 separate level-RNG calls and 5,053 water ticks.
+  It checks float radii/config flags, all crater/fallout modes, clipped/disjoint
+  slices, separate/aliased streams, complete state copying, bedrock/equal-state
+  refusal, discard callbacks, source bounding-box center and final written maps.
+  Source/dependency/binding/driver/input/output hashes are in
+  `docs/meteorite-oracle.json`. Terrain/properties/tags/entity queries are
+  controlled; this is not a natural worldgen or native physics comparison.
+- Native check/build pass; 250 game tests, 19 native library tests, 26 render
+  tests and 9 native item-crate tests pass. Cube state tests retain vanilla IDs,
+  full collision/opacity, correct empty schema/BE flag and non-conductor bits.
+  Item tests retain the original quartz actor/RNG guard and check ordered tag
+  output, a singleton's unchanged RNG and empty-tag alternatives behavior.
+- `tools/tag_entry_reference.py` executes actual Minecraft 1.21.1 TagEntry in
+  20 reference cases, using controlled vanilla-item tag members. Expanded and
+  unexpanded choices, ordering and successful empty tags match the contract used
+  by the native tests. This is a reference check, not a whole-pool differential
+  comparison; predicates, luck/weighted pools and world contexts are excluded.
+- `docs/meteorite-native.json` records twenty private-world groups on the built
+  binary: full crater height, source shell/core, all seven fillers and five
+  fallout/lake modes, bedrock/slice protection, full waterlogged stair copying,
+  actual intersecting-item discard, both config toggles, invalid/unloaded refusal,
+  four presses plus guide, Silk Touch, tool-free Level destruction and restart.
+  Runtime/content/payload hashes remain unchanged throughout the final smoke.
+  The same binary/prepared content passes thirteen quartz-loot regression groups.
+- The native package passes Horizon's actual `native-mod` reader with 161
+  entries, below its 512-entry limit. Complete corresponding sources remain in
+  deterministic `data/source.zip`; that extracted Cargo tree independently
+  passes all 184 standalone tests. Packaging tests check both archive levels,
+  licence notices, path rules, required tools/evidence and repeated byte identity.
+- The placement command is an explicit operator-two development probe through
+  authenticated player chat. The automation console's vanilla dispatcher does
+  not route registered native server commands. A separate preview at (-8,70,40)
+  produced a real rendered meteor/crater; this was explicit placement, not a
+  naturally selected structure. Preview images stay under ignored `target/`.
+
+Natural structure registration/admission/biome selection, original placer-item
+interaction, settings NBT/config reload, compass notifications/discovery, cube
+tooltip and full inherited/client BE lifecycle remain open. The cube TagEntry
+adapter covers player and generic Level resource drops; explosion/entity loot,
+full luck/weighted context and world-pack loot/tag reload need further integration.
+Native builds retain existing dead-code warnings and the host's nonfatal
+rust-objcopy/libLLVM debug-stripping warning; they are not warning-free builds.
+
+## Packed part-rotation core checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 168 standalone Rust tests, 16 Python
   tests and source/stack-limit/native-tick audits pass. Coverage is 132 partial

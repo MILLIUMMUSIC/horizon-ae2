@@ -965,13 +965,13 @@ bindings = [
 
 [[module]]
 id="ctrl-rules"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_ctrl"
 source="ctrl.rs"
 
 [[module]]
 id="cable-input"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_cable_input"
 source="cable_input.rs"
 
@@ -1050,13 +1050,13 @@ bindings=[
 
 [[module]]
 id="part-use"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_part_use"
 source="part_use.rs"
 
 [[module]]
 id="cable-actions"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_cable_actions"
 source="cable_actions.rs"
 
@@ -1157,19 +1157,19 @@ bindings=[
 
 [[module]]
 id="adventure"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_adventure"
 source="adventure.rs"
 
 [[module]]
 id="adventure-snbt"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_adventure_snbt"
 source="adventure_snbt.rs"
 
 [[module]]
 id="adventure-native"
-file="crates/horizon-client/src/game.rs"
+file = "crates/horizon-client/src/game.rs"
 name="ae2_adventure_native"
 source="adventure_native.rs"
 
@@ -1279,3 +1279,85 @@ id = "recipe-ingredient"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_recipe_ingredient"
 source = "recipe_ingredient.rs"
+
+[[module]]
+id = "meteorite-fallout"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_meteorite_fallout"
+source = "meteorite_fallout.rs"
+
+[[module]]
+id = "meteorite-placer"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_meteorite_placer"
+source = "meteorite_placer.rs"
+
+[[module]]
+id = "meteorite-command-rules"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_meteorite_command"
+source = "meteorite_command.rs"
+
+[[module]]
+id = "meteorite-adapter"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_meteorite_glue"
+source = "meteorite_glue.rs"
+
+[[injection]]
+id = "meteorite-command-register"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_register_commands"
+helper = "meteorite_register.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "&*self" },
+  { name = "commands", ty = "&mut Vec<crate::game::native_server::NativeCommand>", value = "&mut *commands" },
+]
+
+[[injection]]
+id = "meteorite-command"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_perform_command"
+helper = "survival_command.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "player", ty = "&crate::game::native_server::NativeServerPlayer", value = "player" },
+  { name = "command", ty = "&str", value = "command" },
+  { name = "ran", ty = "&mut bool", value = "&mut *ran" },
+]
+
+[[module]]
+id = "cube-tag-loot"
+file = "crates/horizon-items/src/items.rs"
+name = "ae2_cube_loot"
+source = "cube_loot.rs"
+
+[[injection]]
+id = "cube-player-tag-loot"
+kind = "HEAD"
+cancellable = true
+target = "horizon_items::items::Items::block_drops_by_player"
+helper = "cube_loot_hook.rs"
+bindings = [
+  { name = "items", ty = "&crate::items::Items", value = "&*self" },
+  { name = "registry", ty = "&horizon_world::registry::BlockRegistry", value = "registry" },
+  { name = "state", ty = "horizon_world::registry::BlockStateId", value = "state" },
+  { name = "held", ty = "Option<&crate::items::ItemStack>", value = "held" },
+  { name = "dynamic", ty = "&[crate::items::ItemStack]", value = "dynamic" },
+  { name = "random", ty = "&mut impl horizon_core::random::RandomSource", value = "random" },
+]
+
+[[injection]]
+id = "cube-level-tag-loot"
+kind = "HEAD"
+cancellable = true
+target = "horizon_items::items::Items::block_drops_with"
+helper = "cube_loot_level_hook.rs"
+bindings = [
+  { name = "items", ty = "&crate::items::Items", value = "&*self" },
+  { name = "registry", ty = "&horizon_world::registry::BlockRegistry", value = "registry" },
+  { name = "state", ty = "horizon_world::registry::BlockStateId", value = "state" },
+  { name = "held", ty = "Option<&crate::items::ItemStack>", value = "held" },
+  { name = "dynamic", ty = "&[crate::items::ItemStack]", value = "dynamic" },
+  { name = "random", ty = "&mut impl horizon_core::random::RandomSource", value = "random" },
+]

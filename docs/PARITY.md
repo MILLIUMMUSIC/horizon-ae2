@@ -514,3 +514,60 @@ but complete shared TickManager queue/readiness, recipe-cache identity/reload,
 replacement/unload/fake-player lifecycle, client prediction, source notification
 and packet timing, and animated rendering remain unfinished. The world scenarios
 supply ingredients and do not establish complete survival progression.
+
+
+## Meteorite placement
+
+The original `MeteoritePlacer` program runs through a world adapter, retaining
+its float radius, crater/fallout modes and pure/lake/config flags. It applies
+crater clearing through the inclusive maximum build height, bounding-slice
+clamps, sky-stone/quartz ordering, bedrock and identical-state refusal,
+full-state downward copies, source decay budget and lazy random draws. The
+crater discards intersecting dropped items. Lake placement replaces only the
+canonical air block, uses separate placement/level random calls and schedules
+water at delay zero. The native development caller aliases both random streams
+to the actual level RNG, as the original placer item does.
+
+Copy fallout reads tags from the native zoomed biome at the bounding box's
+center. It does not substitute the meteor position or an assumed default biome.
+The original mysterious cube has metal properties (hardness 10, resistance
+1,000), a non-conductor predicate and a server tracking block entity. Its converted original
+loot table/tag remain authoritative: normal mining returns the four Inscriber
+presses and a guide; Silk Touch returns the cube. The cube adapter supplies
+TagEntry to the native player/Level block-loot paths: unexpanded tags are one
+weighted choice emitting every ordered member. The input table retains its
+dynamic tag reference; preparation translates legacy `name` to native
+`items: "#tag"`. Other blocks retain the native evaluator. Explosion/entity
+loot routes, custom weighted/luck contexts and complete world-pack loot/tag
+reload still require integration. Meteorite quartz blocks use
+source hardness 3 and resistance 5. Budding growth/decay remains unported.
+
+The server registers an operator-level-two development command:
+
+```text
+/ae2meteorite x y z radius crater fallout pure lake flawless presses minX minY minZ maxX maxY maxZ seaLevel
+```
+
+Crater names are `none`, `normal`, `lava`, `obsidian`, `water`, `snow`, `ice`;
+fallout names are `none`, `default`, `sand`, `terracotta`, `ice_snow`. The four
+flags are `true`/`false`. The diagnostic radius range is 2..8; slices must be
+ordered, at most 256 blocks wide on either horizontal axis, and loaded before
+the command starts. The center must leave nine blocks below and thirty above
+within the level's build range. The explicit sea level is an input to this
+probe, rather than an inferred value for every generator. Registry/state and
+loaded-chunk preflight refuses incomplete inputs before mutation or RNG use.
+For example, on a loaded slice in a normal Overworld:
+
+```text
+/ae2meteorite 8 73 8 4 lava default true false false true 0 -64 0 15 319 15 63
+```
+
+This command invokes the source placement program on explicit inputs. It is
+not natural structure generation, `MeteoriteSpawner` terrain admission, automatic
+biome/crater selection, the original placer item's interaction, structure-piece
+NBT persistence or configuration loading/reloading. Those callers, worldgen
+registries, biome-tag reload, compass discovery/change notifications, cube tooltip,
+full inherited block-entity/component/packet lifecycle and source world-physics
+comparisons remain required. Java traces use controlled terrain/entity/biome
+bindings; native game tests are separate evidence. External multiplayer remains
+to be validated.

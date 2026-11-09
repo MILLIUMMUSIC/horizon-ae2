@@ -19,6 +19,33 @@ import prepare_content as content
 
 
 class ContentTests(unittest.TestCase):
+    def test_legacy_loot_tags_keep_dynamic_members_and_entry_semantics(self):
+        carried, jar = self.fixture()
+        table = {"random_sequence": "ae2:blocks/test", "pools": [{"rolls": 1,
+            "entries": [{"type": "minecraft:alternatives", "children": [
+                {"type": "minecraft:item", "name": "ae2:mysterious_cube", "weight": 3},
+                {"type": "minecraft:tag", "name": "ae2:inscriber_presses", "expand": False,
+                 "condition": {"type": "minecraft:survives_explosion"}, "weight": 7,
+                 "modifier": {"type": "minecraft:set_count", "count": 2}},
+                {"type": "minecraft:tag", "name": "logs", "expand": True},
+            ]}]}]}
+        path = carried / "data/ae2/loot_table/blocks/test.json"
+        content.write_json(path, table)
+        content.fit(carried, jar, self.platform)
+        normalized = json.loads(path.read_text())
+        children = normalized["pools"][0]["entries"][0]["children"]
+        original = table["pools"][0]["entries"][0]["children"]
+        self.assertEqual(children[0], original[0])
+        expected = dict(original[1])
+        del expected["name"]
+        self.assertEqual(children[1], {**expected, "items": "#ae2:inscriber_presses"})
+        self.assertEqual(children[2], {"type": "minecraft:tag", "items": "#minecraft:logs", "expand": True})
+        self.assertEqual(normalized["random_sequence"], table["random_sequence"])
+        self.assertEqual(content.loot_tag_entries(normalized), normalized)
+        self.assertIn("name", original[1], "normalization must not mutate its caller")
+        with self.assertRaises(ValueError):
+            content.loot_tag_entries({"type": "minecraft:tag", "name": "ae2:old", "items": "#ae2:new"})
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -260,20 +287,28 @@ class PackageTests(unittest.TestCase):
                 self.assertTrue(name.endswith((".rs", ".toml")) or name.startswith(prefix + "data/"))
                 self.assertNotIn("..", name.split("/"))
                 self.assertFalse(name.endswith((".png", ".jar", ".class")))
-            self.assertIn(b"LESSER GENERAL PUBLIC LICENSE", z.read(prefix + "data/source/LICENSE"))
-            self.assertIn(b"MIT License", z.read(prefix + "data/source/tools/LICENSE-MIT"))
-            self.assertIn(prefix + "data/source/src/lib.rs", z.namelist())
-            # Corresponding source must be runnable as its own Cargo tree.
-            self.assertEqual(z.read(prefix + "data/source/mixins/ae2/charger.rs"),
-                             z.read(prefix + "charger.rs"))
+            self.assertLessEqual(len(z.namelist()), 512)
+            self.assertIn(b"LESSER GENERAL PUBLIC LICENSE", z.read(prefix + "data/LICENSE"))
+            with zipfile.ZipFile(io.BytesIO(z.read(prefix + "data/source.zip"))) as source:
+                self.assertIn(b"MIT License", source.read("tools/LICENSE-MIT"))
+                self.assertIn("src/lib.rs", source.namelist())
+                for name in source.namelist():
+                    self.assertNotIn("..", name.split("/"))
+                    self.assertFalse(name.endswith((".png", ".jar", ".class")))
+                self.assertEqual(source.read("mixins/ae2/charger.rs"), z.read(prefix + "charger.rs"))
+                for name in ["tools/meteorite_oracle.py", "examples/meteorite_oracle.rs",
+                             "tools/tag_entry_reference.py", "docs/meteorite-oracle.json",
+                             "docs/meteorite-native.json", "docs/tag-entry-reference.json"]:
+                    self.assertIn(name, source.namelist())
 
     def test_corresponding_source_includes_content_preparation_imports(self):
         with contextlib.redirect_stdout(io.StringIO()):
             package.package()
         with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary) / "source"
             with zipfile.ZipFile(package.ROOT / "target/ae2-0.1.0.hnmod") as archive:
-                archive.extractall(temporary)
-            source = Path(temporary) / "mixins/ae2/data/source"
+                with zipfile.ZipFile(io.BytesIO(archive.read("mixins/ae2/data/source.zip"))) as nested:
+                    nested.extractall(source)
             run = subprocess.run([sys.executable, "-I", "-c",
                 "import sys; sys.path.insert(0, sys.argv[1]); import prepare_content; import block_orientation; assert len(block_orientation.ANGLES)==24",
                 str(source / "tools")], cwd=source, text=True, capture_output=True)

@@ -305,3 +305,22 @@ authorization; the public horizon-ae2 creation/push is authorized above.
 The user removed the quota-based automatic pause rule. Continue the full-port
 goal without pausing at a remaining-usage percentage. Never reset or purchase
 quota on the user's behalf.
+
+MeteoritePlacer now has an ordered World-trait program and a server operator-two
+probe with explicit source settings, slice bounds and sea level. Do not invent
+normal generation/admission/config values: natural structures, source placer-item
+interaction, saved settings and compass are still unported. Preserve full state
+copies, lazy placement/level RNG calls, bedrock/equal-state guard, inclusive level
+top, source slice-center biome, item discard and water delay zero. The explicit
+probe aliases both streams to the level RNG. Missing states/chunks must refuse
+before draws/writes. `tools/meteorite_oracle.py` compares whole Java traces.
+Mysterious Cube uses iron-block sound reference (the content API expects a block
+ID, not a SoundType ID), source 10/1000 metal properties, a server tracking BE
+and non-conductor flags. The source loot needs TagEntry support missing from the
+native block evaluator: cube_loot.rs handles only player/Level cube paths with
+the actual table, ordered item_tag_order members, passed tool and caller's RNG.
+Never flatten the press tag to a fixed list or make expand=false randomize one
+press. Keep the existing quartz missing-actor guard at block_drops_raw. Explosion,
+entity/full loot context, world-pack tag reload and cube inherited/client/compass
+lifecycle remain separate work. `tools/tag_entry_reference.py` runs actual MC
+TagEntry reference cases; it is not a whole-pool Java/native comparison.

@@ -5,12 +5,12 @@
       "pending": 243
     },
     "block": {
-      "partial": 10,
-      "pending": 44
+      "partial": 11,
+      "pending": 43
     },
     "blockentity": {
-      "partial": 13,
-      "pending": 37
+      "partial": 14,
+      "pending": 36
     },
     "client": {
       "partial": 7,
@@ -113,8 +113,8 @@
       "pending": 35
     },
     "worldgen": {
-      "partial": 0,
-      "pending": 13
+      "partial": 9,
+      "pending": 4
     }
   },
   "files": [
@@ -1945,8 +1945,10 @@
     {
       "family": "block",
       "path": "src/main/java/appeng/block/misc/MysteriousCubeBlock.java",
+      "port": "mixins/ae2/block_states.rs",
+      "scope": "source metal cube 10/1000 properties, non-conductor predicate and actual native mod BE, original converted loot tables and player/Level TagEntry adapter with ordered tag members; explosion/entity loot routes, compass notifications, tooltip and full inherited lifecycle pending",
       "sha256": "d36ee6f38121e7cccf5d87ea9ddcbc004f5da9996129279659605d506ea99fcd",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "block",
@@ -2335,8 +2337,10 @@
     {
       "family": "blockentity",
       "path": "src/main/java/appeng/blockentity/misc/MysteriousCubeBlockEntity.java",
+      "port": "mixins/ae2/glue.rs",
+      "scope": "native empty tracking BE creation for the source cube; inherited save/name/component codecs and compass service lifecycle remain pending",
       "sha256": "64f0526bbda4593fa2e13bc58474bef81e5f3077e10dd66fadec66c42b2e1bd1",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "blockentity",
@@ -3862,7 +3866,7 @@
       "family": "core",
       "path": "src/main/java/appeng/core/definitions/AEBlocks.java",
       "port": "tools/prepare_content.py",
-      "scope": "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; full registration/settings and optional Athena connected textures pending",
+      "scope": "finite energy-cell item power profiles, owned Controller/cell/CableBus and oriented machine registrations; Inscriber metal/water states and source Sky Stone 50/150 versus smooth 5/150 properties; source meteorite quartz 3/5 and mysterious metal cube 10/1000 properties; full registration/settings, budding tick lifecycle and optional Athena connected textures pending",
       "sha256": "350ecdb536e2a57f3380aae04639ab761d64467f573f134b069e0a0c898a5d58",
       "status": "partial"
     },
@@ -8887,20 +8891,26 @@
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/CraterType.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "seven ordinal values, NONE null filler and other default-state fillers; full saved-enum codec/native public API pending",
       "sha256": "722f61c2baca557f014662e2f89a9c353aae1fb650b14f37cb623c6327821103",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/MeteoriteBlockPutter.java",
+      "port": "mixins/ae2/meteorite_placer.rs",
+      "scope": "source bedrock and equal-state refusal, UPDATE_ALL writes and source return contract; native callback binding, full source physics/lifecycle comparison pending",
       "sha256": "d97d4694ecd25073888155b1e3348200e68748bd3ef11f429e81621d8bcada5e",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/MeteoritePlacer.java",
+      "port": "mixins/ae2/meteorite_placer.rs",
+      "scope": "ordered source crater/skystone/decay/lake program, clipped bounds, full-state writes, lazy separate/aliased RNG, entity discard and zero-delay water scheduling; whole-program Java trace comparison and explicit native operator probe; natural structure worldgen/caller admission, config/reload and full source world physics remain pending",
       "sha256": "78c5ce7e2188c23b3f2c004322471be85065e690cdd4a3907f0ea80df409afe2",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
@@ -8917,8 +8927,10 @@
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/PlacedMeteoriteSettings.java",
+      "port": "mixins/ae2/meteorite_placer.rs",
+      "scope": "float radius, position, crater/fallout and pure/lake getters consumed by original placer comparison; source saved-NBT codec and natural structure persistence remain pending",
       "sha256": "eb0c4d4db80f8aa4f8de8d3c4960002cb2a04db3ce9d73d3cac0881ee4b63dd5",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
@@ -8929,32 +8941,42 @@
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/fallout/Fallout.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "source fall/inset selection and crater adjustment, lazy program calls and RNG thresholds; source whole-program trace comparison; full natural worldgen lifecycle pending",
       "sha256": "6dd6298b1ced42b134e4cfeb0e4291caa1e15cd933ef2e923b40089d781249fb",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/fallout/FalloutCopy.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "source biome tag precedence at slice bounding-box center, thresholds and no-op outcomes; native zoomed biome/tag binding for explicit probe; dynamic tag reload and natural generation pending",
       "sha256": "8ff24e66e5fb1761d8447818056b42b61651761e8f08c7591571a591cd3267a4",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/fallout/FalloutMode.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "source ordinals, biome precedence and fallout dispatch; explicit native probe input, natural generation's mode selection/persistence pending",
       "sha256": "fc173f984036eb58221a64382ec01eaa7890c1b4cef3b20121eb93cf8dab9910",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/fallout/FalloutSand.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "source glass/sand fall/inset choices and +2 crater adjustment, whole-program Java comparison; natural worldgen lifecycle pending",
       "sha256": "9d621859d99c19af51bf164aa52945af4eadfdd92e06e469205e11f43c1ee6db",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "worldgen",
       "path": "src/main/java/appeng/worldgen/meteorite/fallout/FalloutSnow.java",
+      "port": "mixins/ae2/meteorite_fallout.rs",
+      "scope": "source layered snow/ice fall/inset choices and +2 crater adjustment, whole-program Java comparison; natural worldgen lifecycle pending",
       "sha256": "635a025c2971a01e98ea82fa89fdf69cd3cd2c3869fcf1e7321756a2b5680694",
-      "status": "pending"
+      "status": "partial"
     }
   ],
   "java_files": 1429,

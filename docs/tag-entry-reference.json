@@ -1,0 +1,496 @@
+{
+  "passed": true,
+  "reference_cases": 20,
+  "scope": "Actual Minecraft 1.21.1 TagEntry expansion/create, including ordered tags and empty members, expanded/unexpanded modes; default weight 1 and quality 0",
+  "limits": [
+    "Controlled vanilla-item tag members in the isolated Java registry; empty conditions/functions and null unused context",
+    "Native adapter integration is tested separately by horizon-items tests and private-world cube mining; this is not a whole-pool differential comparison"
+  ],
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "mappings_sha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+  "binding_sha256": "da69536d291d3958a58d3121edddd33d33ef2707293cc6e181969f472c863d67",
+  "native_adapter_sha256": "375ce2f0d776559aefa0dc4fdf71a975459c5ae8891b05889e0bf6fa9612bbfa",
+  "reference_output_sha256": "453692ae3e084d838eebcbbd74893c326096e2e671f8a0a96737ec7068ca08e5",
+  "cases": [
+    {
+      "members": [],
+      "choices": [
+        []
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [],
+      "choices": [],
+      "accepted": true,
+      "weights": [],
+      "expanded": true
+    },
+    {
+      "members": [],
+      "choices": [
+        []
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [],
+      "choices": [],
+      "accepted": true,
+      "weights": [],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          },
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          },
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald",
+        "minecraft:iron_ingot"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          },
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          },
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald",
+        "minecraft:iron_ingot"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1,
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:iron_ingot",
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          },
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          },
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:iron_ingot",
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1,
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald",
+        "minecraft:iron_ingot",
+        "minecraft:gold_ingot"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          },
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          },
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          },
+          {
+            "item": "minecraft:gold_ingot",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:diamond",
+        "minecraft:emerald",
+        "minecraft:iron_ingot",
+        "minecraft:gold_ingot"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:gold_ingot",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "expanded": true
+    },
+    {
+      "members": [
+        "minecraft:gold_ingot",
+        "minecraft:iron_ingot",
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:gold_ingot",
+            "count": 1
+          },
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          },
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          },
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1
+      ],
+      "expanded": false
+    },
+    {
+      "members": [
+        "minecraft:gold_ingot",
+        "minecraft:iron_ingot",
+        "minecraft:emerald",
+        "minecraft:diamond"
+      ],
+      "choices": [
+        [
+          {
+            "item": "minecraft:gold_ingot",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:iron_ingot",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:emerald",
+            "count": 1
+          }
+        ],
+        [
+          {
+            "item": "minecraft:diamond",
+            "count": 1
+          }
+        ]
+      ],
+      "accepted": true,
+      "weights": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "expanded": true
+    }
+  ]
+}

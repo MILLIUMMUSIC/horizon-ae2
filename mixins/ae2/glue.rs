@@ -15,7 +15,10 @@ const CRANK: &str = "ae2:crank";
 type Pos = [i32; 3];
 
 pub(super) fn block_entity(block: &str, entity: &mut Option<(String, Compound)>) {
-    if entity.is_none() && (matches!(block, CHARGER | CRANK) || super::ae2_grid_glue::owns(block)) {
+    if entity.is_none()
+        && (matches!(block, CHARGER | CRANK | "ae2:mysterious_cube")
+            || super::ae2_grid_glue::owns(block))
+    {
         *entity = Some((block.to_owned(), Compound::new()));
     }
 }

@@ -72,6 +72,7 @@ enum Definition {
     EnergyCell,
     DenseEnergyCell,
     CreativeEnergyCell,
+    MysteriousCube,
     Charger,
     Inscriber,
     Drive,
@@ -85,6 +86,7 @@ impl Definition {
             "ae2:energy_cell" => Some(Self::EnergyCell),
             "ae2:dense_energy_cell" => Some(Self::DenseEnergyCell),
             "ae2:creative_energy_cell" => Some(Self::CreativeEnergyCell),
+            "ae2:mysterious_cube" => Some(Self::MysteriousCube),
             "ae2:charger" => Some(Self::Charger),
             "ae2:inscriber" => Some(Self::Inscriber),
             "ae2:drive" => Some(Self::Drive),
@@ -99,6 +101,7 @@ impl Definition {
             Self::EnergyCell => "ae2:energy_cell",
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
+            Self::MysteriousCube => "ae2:mysterious_cube",
             Self::Charger => "ae2:charger",
             Self::Inscriber => "ae2:inscriber",
             Self::Drive => "ae2:drive",
@@ -116,7 +119,7 @@ impl Definition {
         match self {
             Self::Controller => ae2_controller::VARIANTS,
             Self::CableBus => 32,
-            Self::CreativeEnergyCell => 1,
+            Self::CreativeEnergyCell | Self::MysteriousCube => 1,
             Self::Inscriber => 48,
             Self::Charger | Self::Drive => 24,
             Self::Crank => 6,
@@ -171,7 +174,7 @@ impl Definition {
             Self::CableBus => {
                 json!({"light_level":(index/2).to_string(),"waterlogged":(index%2==1).to_string()})
             }
-            Self::CreativeEnergyCell => json!({}),
+            Self::CreativeEnergyCell | Self::MysteriousCube => json!({}),
             Self::Inscriber => json!({
                 "facing": ORIENTED_FACINGS[index / 8],
                 "spin": ((index / 2) % 4).to_string(),
@@ -190,7 +193,7 @@ impl Definition {
             Self::Controller => {
                 json!({"state":{"named":ae2_controller::STATES}, "type":{"named":ae2_controller::TYPES}})
             }
-            Self::CreativeEnergyCell => json!({}),
+            Self::CreativeEnergyCell | Self::MysteriousCube => json!({}),
             Self::CableBus => {
                 json!({"light_level":{"integer":[0,15]},"waterlogged":{"named":["false","true"]}})
             }
@@ -213,7 +216,7 @@ impl Definition {
                 ["state", ae2_controller::STATES],
                 ["type", ae2_controller::TYPES]
             ]),
-            Self::CreativeEnergyCell => json!([]),
+            Self::CreativeEnergyCell | Self::MysteriousCube => json!([]),
             Self::CableBus => json!([
                 [
                     "light_level",
@@ -487,7 +490,10 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
             }
             for i in 0..layout.kind.variants() {
                 let row = &mut doc["states"][layout.first + i];
-                let flags = row[1].as_u64().ok_or("no behaviour flags")?;
+                let mut flags = row[1].as_u64().ok_or("no behaviour flags")?;
+                if layout.kind == Definition::MysteriousCube {
+                    flags &= !u64::from(horizon_world::level::data::state_flags::CONDUCTOR);
+                }
                 if matches!(layout.kind, Definition::CableBus | Definition::Inscriber) {
                     row[2] = json!(if i % 2 == 1 { water } else { 0 });
                     row[3] = json!(if i % 2 == 1 { 8 } else { 0 });
@@ -497,7 +503,9 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                     flags
                         | if !matches!(
                             layout.kind,
-                            Definition::CreativeEnergyCell | Definition::CableBus
+                            Definition::CreativeEnergyCell
+                                | Definition::CableBus
+                                | Definition::MysteriousCube
                         ) {
                             u64::from(horizon_world::level::data::state_flags::ANALOG_OUTPUT)
                         } else {
@@ -506,7 +514,14 @@ fn rewrite_json(layout: Layout, name: &str, doc: &mut Value) -> Result<()> {
                 );
             }
         }
-        "mob-data.json" => layout.rows(&mut doc["states"])?,
+        "mob-data.json" => {
+            layout.rows(&mut doc["states"])?;
+            if layout.kind == Definition::MysteriousCube {
+                let row = &mut doc["states"][layout.first];
+                let flags = row[1].as_u64().ok_or("no mob state flags")?;
+                row[1] = json!(flags & !u64::from(crate::mobs::data::REDSTONE_CONDUCTOR));
+            }
+        }
         "worldgen/block_flags.json" => layout.rows(doc)?,
         "model-states.json" => {
             doc[layout.kind.block()]["schema"] = layout.kind.schema();
@@ -708,6 +723,10 @@ mod tests {
                     json!({"template":"minecraft:iron_block"}),
                 ),
                 ("energy_cell", json!({"template":"minecraft:iron_block"})),
+                (
+                    "mysterious_cube",
+                    json!({"template":"minecraft:iron_block", "properties":{"hardness":10,"explosion_resistance":1000,"requires_tool":false}}),
+                ),
                 ("zzz_door", json!({"template":"minecraft:oak_door"})),
             ],
         );
@@ -803,6 +822,29 @@ mod tests {
             ])
         );
         let gameplay = read_json(&out, "gameplay-facts.json").unwrap();
+        let cube = facts["defaults"]["ae2:mysterious_cube"].as_u64().unwrap() as usize;
+        assert_eq!(rows[cube][4]["properties"], json!({}));
+        assert_eq!(model["ae2:mysterious_cube"]["schema"], json!({}));
+        assert_eq!(command["blocks"]["ae2:mysterious_cube"], json!([]));
+        assert_eq!(gameplay["states"][cube]["block_entity"], true);
+        let conductor = u64::from(horizon_world::level::data::state_flags::CONDUCTOR);
+        assert_eq!(
+            behaviours["states"][cube][1].as_u64().unwrap() & conductor,
+            0
+        );
+        let mobs = read_json(&out, "mob-data.json").unwrap();
+        assert_eq!(
+            mobs["states"][cube][1].as_u64().unwrap()
+                & u64::from(crate::mobs::data::REDSTONE_CONDUCTOR),
+            0
+        );
+        // Source disables conductor while retaining full collision and light.
+        assert!(
+            gameplay["states"][cube]["full_collision"]
+                .as_bool()
+                .unwrap()
+        );
+        assert!(gameplay["states"][cube]["solid_render"].as_bool().unwrap());
         for (id, _) in &controller {
             assert_eq!(gameplay["states"][*id]["block_entity"], true);
         }
@@ -873,6 +915,7 @@ mod tests {
                 "ae2:energy_cell",
                 "ae2:dense_energy_cell",
                 "ae2:creative_energy_cell",
+                "ae2:mysterious_cube",
                 "ae2:zzz_door",
                 "zztest:shaped",
             ],

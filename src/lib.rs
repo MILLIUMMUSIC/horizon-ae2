@@ -88,3 +88,11 @@ pub mod ae2_transform_throw;
 
 #[path = "../mixins/ae2/recipe_ingredient.rs"]
 pub mod ae2_recipe_ingredient;
+
+#[path = "../mixins/ae2/meteorite_fallout.rs"]
+pub mod ae2_meteorite_fallout;
+#[path = "../mixins/ae2/meteorite_placer.rs"]
+pub mod ae2_meteorite_placer;
+
+#[path = "../mixins/ae2/meteorite_command.rs"]
+pub mod ae2_meteorite_command;

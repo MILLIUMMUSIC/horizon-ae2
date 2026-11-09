@@ -29,6 +29,16 @@ float arithmetic, raw identity, header data, UV matching and packed normals.
 This remains a standalone dependency for the part-model collector; it does not
 activate native attachments or add a working terminal screen.
 
+Meteorite placement now has the ordered source crater/core/decay/lake program,
+with 329 whole-program Java trace comparisons. An authenticated operator probe
+supplies explicit settings, bounds and sea level. Twenty private-world groups
+cover placement, preservation, config flags, item discard, cube loot and restart.
+The mysterious cube retains its original table and ordered press tag through a
+native player/Level TagEntry adapter. Natural structure admission/registration,
+source placer-item behavior, compass, config/settings persistence, explosion/
+entity loot and complete lifecycle remain open. This does not yet add naturally
+occurring meteorites to new chunks.
+
 The native center-only CableBus checkpoint integrates all 32 source physical
 states, five cable types and 17 colors, graph-derived visuals, original atlas
 sources, dynamic outline/raycast, contextual movement/piston shapes, and a
