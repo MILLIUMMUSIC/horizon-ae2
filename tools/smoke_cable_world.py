@@ -99,6 +99,26 @@ def main():
                 assert f'ae2:{color}_{kind}' in text and 'gn:' in text, text
                 assert 'proxy:' not in text, text
         checks.append('all 85 source cable center IDs participate and save gn instead of proxy')
+        # This ray crosses x=3.2/16: inside the source dense outline (3..13)
+        # but outside its physical box (4.9..11.1) and all normal cable cores.
+        for kind in kinds:
+            block(test, 'air');cable(test, 'fluix_'+kind)
+            ctl('tp', 6.2, 73, 5.5);ctl('wait',4)
+            ctl('look-at', 6.2, 74.5, 8.5);ctl('wait',4)
+            ray = ctl('looking-at')
+            hit = ray.get('block') or {}
+            selected = hit.get('pos') == list(test)
+            assert selected == ('dense' in kind), (kind,ray)
+            if selected:
+                assert abs(hit['point'][2] - (test[2]+3/16)) < 1e-6, ray
+                ctl('command','clear @s');ctl('wait',3)
+                ctl('mouse','middle','down');ctl('mouse','middle','up');ctl('wait',6)
+                inv = ctl('inventory')
+                stacks = [s for s in inv['hotbar']+inv['main'] if s.get('item')]
+                assert len(stacks)==1 and stacks[0]['item']=='ae2:fluix_'+kind, stacks
+                assert not stacks[0].get('components'), stacks
+        block(test,'air')
+        checks.append('source dense 3..13-pixel outline admits edge rays and bare Pick Block; all three normal cores refuse that ray')
         ctl('tp', 8.5, 73, 5.5); ctl('wait', 10); ctl('look-at', 8.5, 74.5, 8.5); ctl('wait', 3)
         picked = ctl('looking-at')
         assert 'ae2:cable_bus' in json.dumps(picked), picked
@@ -142,7 +162,7 @@ def main():
         assert ctl('container', *charger)['slots'] == [{'count': 1, 'item': 'ae2:charged_certus_quartz_crystal'}]
         checks.append('source center identity, node NBT and downstream inventory survive restart')
         ctl('quit')
-        report = {'passed': True, 'checks': checks, 'logs': str(work), 'binary_sha256':hashlib.sha256(args.game.read_bytes()).hexdigest(), 'network_sha256':hashlib.sha256((ROOT/'mixins/ae2/network.rs').read_bytes()).hexdigest(), 'limits': ['parts created by source-format commands, survival placement/drop not exercised here', 'smooth AO/full lighting and all direct collision callers require further coverage', 'facades/side parts/full source lifecycle and external multiplayer remain open', 'GPU screenshot requires visual review; no Java/NeoForge world oracle']}
+        report = {'passed': True, 'checks': checks, 'logs': str(work), 'binary_sha256':hashlib.sha256(args.game.read_bytes()).hexdigest(), 'network_sha256':hashlib.sha256((ROOT/'mixins/ae2/network.rs').read_bytes()).hexdigest(), 'geometry_sha256':{name:hashlib.sha256((ROOT/'mixins/ae2'/name).read_bytes()).hexdigest() for name in ['part_geometry.rs','cable_view.rs','cable_pick.rs']}, 'limits': ['parts created by source-format commands, survival placement/drop not exercised here', 'smooth AO/full lighting and all direct collision callers require further coverage', 'facades/side parts/full source lifecycle and external multiplayer remain open', 'GPU screenshot requires visual review; no Java/NeoForge world oracle']}
         (work/'result.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(report, indent=2))
     finally:

@@ -8,14 +8,12 @@ fn ae2_cable_pick(
     }
     let picked = (|| {
         let hit = game.pick().filter(|hit| hit.pos == pos)?;
-        let outline = horizon_client_render::ae2_cable_view::outline(
+        if !horizon_client_render::ae2_cable_view::selects_center(
             &game.world,
             &game.pack.assets.registry,
             pos,
-        )?;
-        if !outline.iter().any(|b| {
-            (0..3).all(|i| hit.point[i] >= b[i] - 0.002 && hit.point[i] < b[i + 3] + 0.002)
-        }) {
+            hit.point,
+        ) {
             return None;
         }
         let BlockEntity::Mod(be) = game.world.block_entities.get(&(pos[0], pos[1], pos[2]))? else {

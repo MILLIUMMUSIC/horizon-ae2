@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // Native world view of center-only CableBus parts. Full attachments/facades,
 // source client packet and smooth block-model lighting are separate port work.
-use super::ae2_cable::{self, Cable, CableType};
+use super::ae2_cable::{Cable, CableType};
 use super::ae2_cable_render::{self as cable_render, Core, RenderState};
 use super::ae2_cube_builder::Texture;
 use super::ae2_grid::Direction;
+use super::ae2_part_geometry::{reporting_host_boxes, select_primary};
 use crate::{containers::BlockEntity, hud::Rect, mesher::Vertex, world::World};
 use horizon_core::geometry::{Aabb, ShapeOp, Vec3, VoxelShape};
 use horizon_world::{
@@ -68,17 +69,10 @@ pub fn outline(world: &World, registry: &BlockRegistry, p: [i32; 3]) -> Option<V
     }
     Some(
         view(world, registry, p).map_or_else(Vec::new, |(c, mask, _)| {
-            ae2_cable::boxes(
-                c.kind,
-                mask,
-                dense(world, registry, p),
-                true,
-                127,
-                [None; 6],
-            )
-            .into_iter()
-            .map(|b| std::array::from_fn(|i| b.0[i] / 16.0 + f64::from(p[i % 3])))
-            .collect()
+            reporting_host_boxes(c.kind, 0, mask, dense(world, registry, p), true)
+                .into_iter()
+                .map(|(_, local)| std::array::from_fn(|i| local.0[i] + f64::from(p[i % 3])))
+                .collect()
         }),
     )
 }
@@ -90,15 +84,8 @@ pub fn collision(world: &World, registry: &BlockRegistry, p: [i32; 3]) -> Option
         return Some(VoxelShape::empty());
     };
     let mut result = VoxelShape::empty();
-    for b in ae2_cable::boxes(
-        c.kind,
-        mask,
-        dense(world, registry, p),
-        false,
-        127,
-        [None; 6],
-    ) {
-        let v = b.0.map(|x| x / 16.0);
+    for (_, bounds) in reporting_host_boxes(c.kind, 0, mask, dense(world, registry, p), false) {
+        let v = bounds.0;
         let shape = VoxelShape::from_box(Aabb::new(
             Vec3::new(v[0], v[1], v[2]),
             Vec3::new(v[3], v[4], v[5]),
@@ -107,6 +94,14 @@ pub fn collision(world: &World, registry: &BlockRegistry, p: [i32; 3]) -> Option
         result = result.join(&shape, ShapeOp::OR).ok()?;
     }
     Some(result)
+}
+pub fn selects_center(world: &World, registry: &BlockRegistry, p: [i32; 3], hit: [f64; 3]) -> bool {
+    let Some((c, mask, _)) = view(world, registry, p) else {
+        return false;
+    };
+    let boxes = reporting_host_boxes(c.kind, 0, mask, dense(world, registry, p), true);
+    let local = std::array::from_fn(|i| hit[i] - f64::from(p[i]));
+    select_primary(&boxes, local) == Some(None)
 }
 fn external(registry: &BlockRegistry, world: &World, q: [i32; 3]) -> CableType {
     if let Some(c) = profile(world, registry, q) {
@@ -202,6 +197,92 @@ pub fn geometry(
                     normal: crate::mesher::CULL_BACK,
                     glint_uv: [0.; 2],
                 });
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use horizon_world::registry::BlockStateId;
+    use serde_json::json;
+
+    #[test]
+    fn actual_world_view_keeps_dense_outline_collision_and_local_selection_distinct() {
+        let registry = BlockRegistry::from_facts_json(
+            json!({"states":[
+                ["",true,false,"","minecraft:air"],
+                ["",false,false,"","ae2:cable_bus"]
+            ],"defaults":{"minecraft:air":0,"ae2:cable_bus":1}})
+            .to_string()
+            .as_bytes(),
+        )
+        .unwrap();
+        for p in [[0, 74, 0], [30_000_000, 74, -30_000_000]] {
+            let mut world = World::new(BlockStateId(0), 42);
+            world.chunks.insert(
+                (p[0] >> 4, p[2] >> 4),
+                std::sync::Arc::new(crate::chunk::Chunk::empty(p[0] >> 4, p[2] >> 4)),
+            );
+            world.set(p[0], p[1], p[2], BlockStateId(1)).unwrap();
+            for kind in CableType::VALID {
+                let cable = Cable {
+                    kind,
+                    color: super::super::ae2_cable::Color::Transparent,
+                };
+                world.block_entities.insert(
+                    (p[0], p[1], p[2]),
+                    BlockEntity::Mod(Box::new(crate::containers::ModBlockEntity {
+                        id: BLOCK.into(),
+                        nbt: [(
+                            "cable".into(),
+                            Tag::compound([(
+                                "id",
+                                Tag::String(cable.item().unwrap().as_str().into()),
+                            )]),
+                        )]
+                        .into(),
+                        ..Default::default()
+                    })),
+                );
+                let (low, high) = if kind.is_dense() {
+                    (3., 13.)
+                } else if kind == CableType::Glass {
+                    (6., 10.)
+                } else {
+                    (5., 11.)
+                };
+                assert_eq!(
+                    outline(&world, &registry, p).unwrap(),
+                    vec![std::array::from_fn(
+                        |i| f64::from(p[i % 3]) + if i < 3 { low / 16. } else { high / 16. }
+                    )]
+                );
+                let (low, high) = if kind.is_dense() {
+                    (4.9, 11.1)
+                } else {
+                    (low, high)
+                };
+                assert_eq!(
+                    collision(&world, &registry, p).unwrap().bounds(),
+                    Some(Aabb::new(
+                        Vec3::new(low / 16., low / 16., low / 16.),
+                        Vec3::new(high / 16., high / 16., high / 16.)
+                    ))
+                );
+                let edge = [
+                    f64::from(p[0]) + 0.2,
+                    f64::from(p[1]) + 0.5,
+                    f64::from(p[2]) + 0.5,
+                ];
+                assert_eq!(selects_center(&world, &registry, p, edge), kind.is_dense());
+                assert!(selects_center(
+                    &world,
+                    &registry,
+                    p,
+                    p.map(|v| f64::from(v) + 0.5)
+                ));
             }
         }
     }

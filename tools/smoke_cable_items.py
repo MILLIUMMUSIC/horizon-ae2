@@ -5,6 +5,7 @@ Uses real held-item clicks for all 85 cable centers. Side parts, facades,
 Color Applicator, source security and external multiplayer remain separate.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -72,8 +73,14 @@ def main():
     def count(item):return sum(s['count'] for s in inventory() if s['item']==item)
     placed=(6,73,7)
     try:
-        first=launch(1);ctl('tp',8.5,82,4.5);ctl('wait',60)
+        first=launch(1);ctl('tp',8.5,82,4.5)
+        for corner in [(3,71,2),(16,82,13)]:
+            for _ in range(80):
+                if ctl('block',*corner).get('loaded'):break
+                ctl('wait',5)
+            else:raise AssertionError(f'fixture chunk did not load: {corner}')
         ctl('command','fill 3 71 2 16 72 13 stone');ctl('command','fill 3 73 2 16 82 13 air')
+        assert ctl('getblock',6,72,7)['block']=='minecraft:stone'
         ctl('tp',8.5,73,4.5);ctl('wait',8)
         colors=['white','light_gray','gray','black','lime','yellow','orange','brown','red','pink','magenta','purple','blue','light_blue','cyan','green','fluix']
         kinds=['glass_cable','covered_cable','smart_cable','covered_dense_cable','smart_dense_cable']
@@ -126,6 +133,17 @@ def main():
         assert ctl('getblock',*placed)['block']=='minecraft:air',failed
         assert count('ae2:fluix_smart_cable')==2,inventory()
         checks.append('player obstruction rolls back the new host and preserves held count')
+        for kind in ['covered_dense_cable','smart_dense_cable']:
+            item='ae2:fluix_'+kind
+            for x, allowed in [(5.99,True),(6.02,False)]:
+                ctl('command','clear @s');block(placed,'air')
+                ctl('command',f'tp @s {x} 73 7.5');ctl('wait',8)
+                give(item,2);result=ctl('place',*placed,allow_fail=True);ctl('wait',5)
+                actual=ctl('getblock',*placed)['block']
+                assert ('ae2:cable_bus' in actual)==allowed,(kind,x,result,actual)
+                assert count(item)==(1 if allowed else 2),inventory()
+            block(placed,'air')
+        checks.append('both dense types admit a player just outside the 4.9-pixel physical boundary and refuse one just inside; only successful survival placement consumes')
         # Unsupported facade data must survive rejected admission and rollback.
         ctl('command','clear @s');ctl('tp',8.5,73,4.5)
         block(placed,'ae2:cable_bus');merge(placed,'{facadeNorth:{opaque_marker:123}}')
@@ -177,7 +195,7 @@ def main():
         other=nbt((9,73,7));m=re.search(r'\bp:\s*(-?\d+)\b',other);assert m and int(m[1])==owner_id,other
         checks.append('source part/custom name and world-wide owner mapping survive restart and another placement')
         ctl('quit')
-        report={'passed':True,'checks':checks,'logs':str(work),'limits':[
+        report={'passed':True,'checks':checks,'logs':str(work),'binary_sha256':hashlib.sha256(args.game.read_bytes()).hexdigest(),'geometry_sha256':{name:hashlib.sha256((ROOT/'mixins/ae2'/name).read_bytes()).hexdigest() for name in ['part_geometry.rs','cable_view.rs','cable_items.rs']},'limits':[
             'Center-only placement/drop; unsupported side parts/facades and compatibility are not implemented',
             'Offhand Color Applicator, complete settings/security, source readiness events and external CTRL synchronization remain open',
             'Water host state/restoration checked; complete fluid simulation, lighting and all direct collision callers remain open',

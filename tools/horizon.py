@@ -121,7 +121,7 @@ def main():
     parser.add_argument("--target-dir", type=Path, default=ROOT / "target/horizon-cargo")
     parser.add_argument("--no-audio", action="store_true", help="drop audio and controllers (a server build)")
     parser.add_argument("--library", action="store_true", help="test native library payloads instead of the game binary")
-    parser.add_argument("--package", choices=["horizon-client", "horizon-items"], default="horizon-client",
+    parser.add_argument("--package", choices=["horizon-client", "horizon-client-render", "horizon-items"], default="horizon-client",
                         help="native crate to test (non-default is valid only with test)")
     args = parser.parse_args()
     if args.package != "horizon-client" and args.action != "test":
@@ -154,7 +154,8 @@ def main():
                 result = subprocess.run(command, cwd=output, capture_output=True, text=True)
             report.update(cargo_seconds=time.monotonic()-run_start, cargo_command=command,
                           cargo_exit=result.returncode)
-            log = ROOT / "target" / f"horizon-{args.action}{'-lib' if args.library else ''}{'-items' if args.package == 'horizon-items' else ''}.log"
+            package_suffix = {"horizon-items": "-items", "horizon-client-render": "-render"}.get(args.package, "")
+            log = ROOT / "target" / f"horizon-{args.action}{'-lib' if args.library else ''}{package_suffix}.log"
             log.write_text(result.stdout + result.stderr)
             report["cargo_log"] = str(log)
             if result.returncode:

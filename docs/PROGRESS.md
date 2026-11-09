@@ -13,6 +13,11 @@ per-part channel demand and separate `gn` persistence are implemented. A source
 terminal profile requires a channel and idles at 0.5 AE/tick. The active world
 adapter remains center-only pending part geometry, input, light, rendering and
 real storage menus; this foundation does not make terminals playable.
+Source reporting-part geometry and primary selection are now in the shared
+helper used by native center outlines/collision/Pick Block. Dense outline and
+collision retain their different source widths. The geometry comparison runs
+20,410 cases with the real pinned Minecraft AABB class; facade geometry and
+native side-part activation remain separate work.
 
 The native center-only CableBus checkpoint integrates all 32 source physical
 states, five cable types and 17 colors, graph-derived visuals, original atlas
@@ -81,14 +86,16 @@ remain open.
 | Fluid transforms | Both original Fluix recipes, original timer and greedy claims, per-entity native phase, six level RNG draws and zero-delay fresh outputs; full effects/explosion/codec/cache/lifecycle remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Latest checkpoint: 155 standalone Rust tests, 224 native game tests, native
-compilation and 16 Python tests pass.
-Final native build and seven CableBus/four power world regression groups pass
-on the same binary; these remain center-only world proofs. The previous
-fluid-transform native checkpoint passed 213 game tests, native check/build,
-the 18-case Fluix/item world scenario and the 23-group Inscriber regression.
-The unchanged native library/item payloads previously passed 19 and 7 tests
-respectively. Earlier isolated CableBus
+Latest rule/native tests: 159 standalone Rust, 229 native game, 22 native
+render-crate and 16 Python tests pass. Geometry uses 20,410 original-Java/real
+Minecraft AABB comparisons. Final native check/build and eight CableBus/sixteen
+placement/drop world groups pass on one binary, including dense edge selection
+and actual placement obstruction boundaries. The previous primary-node checkpoint passed native
+check/build, seven CableBus and four power regression groups on one binary;
+these remain center-only world proofs. The previous fluid-transform checkpoint
+passed the 18-case Fluix/item world scenario and 23-group Inscriber regression.
+Unchanged native client-library/item payloads previously passed 19 and 7 tests.
+Earlier isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.

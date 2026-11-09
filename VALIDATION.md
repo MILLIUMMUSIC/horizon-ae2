@@ -3,7 +3,45 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current primary multipart node checkpoint
+## Current multipart geometry checkpoint
+
+- Formatting, Clippy with warnings denied, 159 standalone Rust tests and 16
+  Python tests pass. The source inventory contains 1,429 Java files and 125
+  partial classes. Stack-limit and carried native item-tick source audits pass.
+- `tools/part_geometry_oracle.py` runs the original BusCollisionHelper class,
+  Reporting boxes, CableBus selection and existing extracted cable box methods.
+  Its 20,410 comparisons include 7,378 side transforms, 3,456 explicit-axis
+  transforms and 9,576 host-shape/selection cases. The verified original
+  Minecraft 1.21.1 AABB constructor, inflation and containment execute through
+  reflection. Exact/adjacent boundaries, reversed coordinates, signed zero,
+  infinities and canonical NaNs are included. Binding and result hashes are in
+  `docs/part-geometry-oracle.json`.
+- Direction vectors, host storage, connection/neighbor state and absent facades
+  remain controlled bindings. These comparisons do not execute VoxelShape union,
+  GPU rendering, native movement callers or complete part lifecycle. Native
+  centers consume the helper; supported saved primary reporting shapes remain
+  behind the inactive side-part boundary.
+- Native game tests pass (229), including saved-host primary geometry and facade
+  refusal. Native render-crate tests pass (22), including actual World/registry/
+  block-entity instances for all five cable types at ordinary and large
+  coordinates. They check outline bounds, physical VoxelShape bounds and local
+  center selection. Run that suite with `tools/horizon.py test --package
+  horizon-client-render --no-audio`; `--library` alone targets a different crate.
+- Native compilation/build and source-package validation pass. On the same
+  final binary, `docs/part-geometry-world-smoke.json` records eight CableBus
+  groups, including dense edge rays and real bare Pick Block for both dense
+  types. `docs/part-geometry-placement-world-smoke.json` records sixteen groups:
+  all 85 real held-item placements, five survival mining/name cases, actual
+  player obstruction, both dense types on either side of the physical boundary,
+  consumption/rollback, ME power, water/buckets, ownership and restart. Fixtures
+  await loaded chunks and assert their floor. Content is not rewritten.
+
+These are isolated integrated-client worlds with supplied inputs. They do not
+prove source-game GPU equivalence, every collision caller, side-part placement,
+full lifecycle or independent multiplayer. Original repositories, installed
+resources and player saves/settings remain unchanged.
+
+## Primary multipart node checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 155 standalone Rust tests, 16 Python
   tests, source inventory (1,429 Java files / 124 partial classes), stack-limit

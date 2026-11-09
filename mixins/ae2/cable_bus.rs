@@ -148,6 +148,37 @@ impl Saved {
         }
         Ok(self.primary_snapshots(pos, 0)?.into_iter().next())
     }
+    /// Source local boxes for supported primary slots. Facades need their own
+    /// codec and context-sensitive shape pass; never discard them here.
+    pub fn primary_boxes(
+        &self,
+        connections: u8,
+        dense_neighbours: u8,
+        visual: bool,
+    ) -> Result<Vec<(Option<Direction>, super::ae2_part_geometry::Bounds)>, &'static str> {
+        self.primary_snapshots([0; 3], 0)?;
+        if Direction::ALL
+            .into_iter()
+            .any(|d| self.parts.facade(d).is_some())
+        {
+            return Err("facade shape implementation unavailable");
+        }
+        let parts = Direction::ALL.into_iter().fold(0, |mask, side| {
+            mask | if self.parts.part(side).is_some() {
+                1 << side as u8
+            } else {
+                0
+            }
+        });
+        Ok(super::ae2_part_geometry::reporting_host_boxes(
+            self.center()?
+                .map_or(super::ae2_cable::CableType::None, |c| c.kind),
+            parts,
+            connections,
+            dense_neighbours,
+            visual,
+        ))
+    }
 }
 #[derive(Clone, Debug)]
 struct Observed {
@@ -349,6 +380,41 @@ mod tests {
             ),
             ("otherService", Tag::Long(91)),
         ])
+    }
+
+    #[test]
+    fn supported_primary_shapes_keep_sides_and_refuse_unimplemented_facades() {
+        let mut data = host(Color::Transparent, 0.0);
+        for side in SIDES {
+            data.insert(key(side), terminal(1, 0.0));
+        }
+        let saved = Saved::read(&data).unwrap();
+        let boxes = saved.primary_boxes(0, 0, true).unwrap();
+        // Six reporting parts (two boxes each), cable core and six internal
+        // cable connectors ending at AEBasePart's source length of 3 pixels.
+        assert_eq!(boxes.len(), 19);
+        assert_eq!(boxes[0].0, Some(Direction::Down));
+        assert_eq!(boxes[12].0, None);
+        assert_eq!(
+            boxes[12].1.0,
+            [
+                5. / 16.,
+                5. / 16.,
+                5. / 16.,
+                11. / 16.,
+                11. / 16.,
+                11. / 16.
+            ]
+        );
+        assert_eq!(boxes[13].1.0[1], 3. / 16.);
+        data.insert(key(FACADES[0]), Tag::Int(7));
+        assert!(
+            Saved::read(&data)
+                .unwrap()
+                .primary_boxes(0, 0, true)
+                .is_err()
+        );
+        assert!(Saved::read(&data).unwrap().center_snapshot([0; 3]).is_err());
     }
     #[test]
     fn primary_node_decoding_keeps_each_side_and_removes_occupied_or_blocked_exposure() {

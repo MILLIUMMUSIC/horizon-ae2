@@ -81,8 +81,8 @@
       "pending": 16
     },
     "parts": {
-      "partial": 10,
-      "pending": 72
+      "partial": 11,
+      "pending": 71
     },
     "recipes": {
       "partial": 4,
@@ -7257,8 +7257,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/BusCollisionHelper.java",
+      "port": "mixins/ae2/part_geometry.rs",
+      "scope": "side/explicit-axis transforms, Java floating min/max and visual/collision context, reporting boxes and ordered primary selection; original class/source methods compared with real Minecraft AABB; native center view/pick consumes helper; facades, complete side-part world activation, shape cache/callers and lifecycle remain pending",
       "sha256": "68c9695925d736e6b2c002781bf75222c944e717ec1f8ad50a6c6db997ec2534",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",
@@ -7687,8 +7689,8 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/reporting/AbstractReportingPart.java",
-      "port": "mixins/ae2/network.rs",
-      "scope": "primary terminal node profile: source REQUIRE_CHANNEL and 0.5 AE/tick idle; constructor compared in a controlled Java host; native geometry, spin/input, opacity/light, complete packets, menu and lifecycle remain pending",
+      "port": "mixins/ae2/part_geometry.rs",
+      "scope": "source reporting boxes and primary terminal node REQUIRE_CHANNEL/0.5 AE idle profile in network.rs; constructor/geometry compared with original Java and real Minecraft AABB; native side-part activation, spin/input, opacity/light, complete packets, menu and lifecycle remain pending",
       "sha256": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f",
       "status": "partial"
     },

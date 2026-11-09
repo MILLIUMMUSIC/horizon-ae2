@@ -31,6 +31,24 @@ The full mod is not yet complete.
 
 ## Primary multipart node foundation
 
+`part_geometry.rs` carries BusCollisionHelper's side/explicit-axis transforms,
+Java floating-point bounds, reporting-part boxes and source primary selection
+order (Down through East, then center). Selection inflates by 0.002 and keeps
+Minecraft's half-open upper bound. The original helper class and extracted
+Reporting/CableBus/cable methods match 20,410 cases while running the verified
+Minecraft 1.21.1 AABB constructor, inflation and containment. Direction vectors,
+part storage and neighbor state are controlled bindings, and facades are absent.
+NaNs are compared canonically, without asserting payload-bit identity.
+
+Native center outlines, contextual collision and Pick Block consume this
+helper. Dense visual bounds are 3..13 pixels; physical bounds are 4.9..11.1.
+Selection uses local coordinates before inflation rather than inflating already
+translated world coordinates. Saved primary reporting shapes retain separate
+slot identities and use the source inherited three-pixel cable connection
+length. Unknown parts and facade geometry are refused by that primary-shape
+binding; complete facade codecs, shape caching, all direct collision callers
+and native side-part activation remain open.
+
 The network binding addresses primary managed nodes by physical position and
 optional part side. Co-located nodes retain separate graph identity, services,
 saved buffer shares and channel requirements. A supported terminal profile uses

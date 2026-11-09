@@ -258,7 +258,8 @@ PARTIAL.update({
 
 
 PARTIAL.update({
-    "parts/reporting/AbstractReportingPart.java": ("mixins/ae2/network.rs", "primary terminal node profile: source REQUIRE_CHANNEL and 0.5 AE/tick idle; constructor compared in a controlled Java host; native geometry, spin/input, opacity/light, complete packets, menu and lifecycle remain pending"),
+    "parts/reporting/AbstractReportingPart.java": ("mixins/ae2/part_geometry.rs", "source reporting boxes and primary terminal node REQUIRE_CHANNEL/0.5 AE idle profile in network.rs; constructor/geometry compared with original Java and real Minecraft AABB; native side-part activation, spin/input, opacity/light, complete packets, menu and lifecycle remain pending"),
+    "parts/BusCollisionHelper.java": ("mixins/ae2/part_geometry.rs", "side/explicit-axis transforms, Java floating min/max and visual/collision context, reporting boxes and ordered primary selection; original class/source methods compared with real Minecraft AABB; native center view/pick consumes helper; facades, complete side-part world activation, shape cache/callers and lifecycle remain pending"),
     "parts/CableBusContainer.java": ("mixins/ae2/cable_bus.rs", "center plus six primary part-node addresses, source internal edges and occupied/blocked exposure, per-slot observed gn identity and persistence; source host topology oracle; active native decoder remains center-only until shapes/input/render/menu support is bound; full registry/facade/recovery/readiness and external secondary nodes remain pending"),
     "parts/networking/CablePart.java": ("mixins/ae2/network.rs", "85 cable profiles and native centers, source external versus primary-part channel counts, raw stream versus powered render gating; full native part shapes/input/render/menu/stream and lifecycle remain pending"),
 })

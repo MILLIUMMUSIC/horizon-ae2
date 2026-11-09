@@ -41,6 +41,12 @@ occupied sides remove center exposure. forget_node replaces one slot;
 forget_host removes every node of an actual BE replacement. cable_stream keeps
 raw source channels; cable_visual applies the powered getChannelsOnSide gate
 and CableBusContainer's smart-cable gate.
+part_geometry.rs ports BusCollisionHelper and reporting-part boxes, including
+Java signed-zero/NaN bounds and half-open inflated selection. Dense outline is
+3..13 pixels; physical collision is 4.9..11.1. Never swap isVisual with
+isBBCollision. Native center shapes and Pick Block consume this helper; saved
+primary shapes still do not activate side parts. Render payload tests require
+tools/horizon.py test --package horizon-client-render, not only --library.
 Hosts.primary_snapshots/observe_primary/persist_node are groundwork for the
 multipart adapter. Keep the active center-only decoder boundary until source
 shape/input/render and real menu support land. Secondary tunnel/fiber nodes,

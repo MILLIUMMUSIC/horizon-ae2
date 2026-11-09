@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "cases": 20410,
+  "side_transform_cases": 7378,
+  "explicit_axis_cases": 3456,
+  "host_shape_selection_cases": 9576,
+  "source_sha256": {
+    "api/util/AECableType.java": "a761136e26aca36e249ee3a8b6ba7635333f210e263165d11053eb8fdad9f15f",
+    "api/util/AECableVariant.java": "bd26216b15a67844e75da9bd72fb29ad9fd5066cd06174caea0f081e0eb4367f",
+    "api/util/AECableSize.java": "a14252f638cab0db91b7eabdbe4bd5f000b0b4970bc09d5faa27c090dd5db39a",
+    "api/util/AEColor.java": "b21a185ef86587abbf4c91c40d4c55ac6536d2cc8e48a7b968e741eee4ee03aa",
+    "parts/CableBusStorage.java": "8d50b79ad9f906bbc381a9fa9c41cc9e32ab7b7697337ebc91fc71716d81b64c",
+    "parts/networking/CablePart.java": "0bc810b4b8c344b5550796c970785be782a0543197a66a87d6e317d0ebaff68f",
+    "parts/networking/GlassCablePart.java": "d805a53c8ee9f0d3be30c1cae677b9ba2220fc74776d9ef1d0be0e71e6c95320",
+    "parts/networking/CoveredCablePart.java": "80f8151d1febc07ed483d1a29994d004a424aefe28df5cc0a90a25456c229cc9",
+    "parts/networking/SmartCablePart.java": "d02069227e395a75f6e1f56e70bbe78a0844a1141263dbc74e851f8ebc605449",
+    "parts/networking/DenseCablePart.java": "86949c343ab795f22d0cc1724776fd5f64242a2279ee3edfbe29fcd8176314db",
+    "me/InWorldGridNode.java": "8aa961cd4d7d84e1643100e80fd2b1815fee464b56914515918bac0818f639ef",
+    "parts/BusCollisionHelper.java": "68c9695925d736e6b2c002781bf75222c944e717ec1f8ad50a6c6db997ec2534",
+    "api/parts/IPartCollisionHelper.java": "abb25d20d783fdfcfbd24615545bb0c264422ad7a841fe5f1348e468d09f83e3",
+    "parts/reporting/AbstractReportingPart.java": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f",
+    "parts/CableBusContainer.java": "60179b40ebe2d5af4dc3d3d298a0cdab6b4033ad00fa94688944e6660155dd07"
+  },
+  "method_sha256": {
+    "reporting_boxes": "c52f140fefd6e56b091860afd0e921338a75f3be28fdbda38e764e8813f5af71",
+    "selection": "1f223ffe19dd3f61e4e280ef8f70516a812c4a1c13b8d5634e450489808e5662",
+    "non_dense_boxes": "6803927686fe1fc486d5fec14eaa46587453f1ff9fdef84656ec3f68f3b36edb"
+  },
+  "binding_sha256": {
+    "net/minecraft/core/Direction.java": "18b386c5dbce85b49df293d521520a58d480e2c0c96e36b69be4dd004c9cda35",
+    "net/minecraft/world/phys/Vec3.java": "b7a32955304850972f2abdbfafd2a463b1b07ad53d3adcb01b3c8a8c87d25045",
+    "net/minecraft/world/phys/AABB.java": "ed7a50ab1ebb9797762c2334abeaab03a24529b6de2aacc5c31a7035f827bee3",
+    "oracle/PartGeometryOracle.java": "d70223e761626437d9fef46708eedacb3fef6d843bf7c4b281d260458b3e5864"
+  },
+  "rust_sha256": {
+    "mixins/ae2/part_geometry.rs": "9cc1d4f129545e62ee14d9bd1a8636f070621118f18ef00d9f4827e01f0b77eb",
+    "mixins/ae2/cable.rs": "3290cf4eb759e68914000b8cca0d742980a9b51135badbacf63c83607ee2b5c7",
+    "examples/part_geometry_oracle.rs": "57237b4303c7b6a218c089ec51341137c0cd1882374886e5d7a1581ec20ab948"
+  },
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "minecraft_mappings_sha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+  "input_sha256": "1e630af5619366d5bc5927837640cf8a9ea5b974064bee7f8dc951f9a97f2bbd",
+  "output_sha256": "805ce81a80493fa8e97a0d4c3d8847a0d01d19fd3c1003328d1fcb69f2d547ab",
+  "scope": "Verbatim BusCollisionHelper class, Reporting getBoxes, CableBus selectPartLocal and carried cable box methods; real pinned Minecraft AABB construction, inflation and containment",
+  "limits": [
+    "Direction vectors, part storage, cable neighbor/connection state and absent facades are controlled bindings",
+    "Canonical NaN output comparison; NaN payload bits are not asserted",
+    "No full VoxelShape union/cache, native world collision callers, part admission/input/render or complete lifecycle proof"
+  ]
+}

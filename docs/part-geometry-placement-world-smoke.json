@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "case": "all 85 cable items place original centers in creative without shrinking",
+      "owner": 0
+    },
+    "real held-item cable chain carries ME power to a Charger recipe",
+    {
+      "case": "survival placement/mining glass_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:white_glass_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:white_glass_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining covered_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:black_covered_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:black_covered_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining smart_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:orange_smart_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:orange_smart_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining covered_dense_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:pink_covered_dense_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:pink_covered_dense_cable",
+          "slot": 1
+        }
+      ]
+    },
+    {
+      "case": "survival placement/mining smart_dense_cable",
+      "returned": [
+        {
+          "components": "{\"minecraft:custom_data\":{keep_on_unplaced:99},\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 2,
+          "item": "ae2:blue_smart_dense_cable",
+          "slot": 0
+        },
+        {
+          "components": "{\"minecraft:custom_name\":{color:\"gold\",text:\"Cable name\"}}",
+          "count": 1,
+          "item": "ae2:blue_smart_dense_cable",
+          "slot": 1
+        }
+      ]
+    },
+    "player obstruction rolls back the new host and preserves held count",
+    "both dense types admit a player just outside the 4.9-pixel physical boundary and refuse one just inside; only successful survival placement consumes",
+    "unsupported facade host is preserved unchanged when central-item admission fails",
+    "Level command destruction returns the cable part, never a glass or CableBus item",
+    "real bucket drains and refills the CableBus without removing its part",
+    "water placement records source waterlogged state and removal restores water",
+    "creative mining produces no cable drop",
+    "disabled block_drops suppresses the part drop",
+    "source part/custom name and world-wide owner mapping survive restart and another placement"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/cable-items-qnnb38qm",
+  "binary_sha256": "2e56c48e7f342a6247ed99604079a8fc550187baad121bb027a46b908689a0d3",
+  "geometry_sha256": {
+    "part_geometry.rs": "9cc1d4f129545e62ee14d9bd1a8636f070621118f18ef00d9f4827e01f0b77eb",
+    "cable_view.rs": "8143f8dcb63b145e5a29ff30c40d22c7f07c002a5400cbe649dee0ba34ad24b1",
+    "cable_items.rs": "3683f1253048afc8648b0085b04c6a7f97428d6c0ecb9343c967ee649ff1c621"
+  },
+  "limits": [
+    "Center-only placement/drop; unsupported side parts/facades and compatibility are not implemented",
+    "Offhand Color Applicator, complete settings/security, source readiness events and external CTRL synchronization remain open",
+    "Water host state/restoration checked; complete fluid simulation, lighting and all direct collision callers remain open",
+    "Native game verification; no complete Java/NeoForge world oracle"
+  ]
+}
