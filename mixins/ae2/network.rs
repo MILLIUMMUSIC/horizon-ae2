@@ -114,7 +114,7 @@ impl Kind {
         match self {
             Self::Controller => super::ae2_controller::IDLE,
             Self::Drive => 2.0,
-            Self::Terminal => 0.5,
+            Self::Terminal => super::ae2_reporting::idle_power(true),
             _ => 0.0,
         }
     }

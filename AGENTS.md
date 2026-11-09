@@ -47,6 +47,16 @@ Java signed-zero/NaN bounds and half-open inflated selection. Dense outline is
 isBBCollision. Native center shapes and Pick Block consume this helper; saved
 primary shapes still do not activate side parts. Render payload tests require
 tools/horizon.py test --package horizon-client-render, not only --library.
+reporting.rs owns signed spin, source placement/wrench arithmetic, numeric NBT
+getByte conversion, transient opacity cache and power/missing-channel flags.
+Float/DoubleTag floor before narrowing; never replace this with a direct byte
+cast. Wrench uses signed Java remainder. Source light queries opacity even
+when unpowered; only the facing neighbor invalidates the cache. Saves write
+only spin, never flags/opacity. These callback rules and the saved-part codec
+do not activate native side parts or replace full inherited/host lifecycle.
+When those parts are activated, retain Reporting state by actual part identity;
+Part.reporting constructs fresh state, not an opacity cache to recreate on each
+query. Apply read_spin to retained instances for in-place NBT reads.
 Hosts.primary_snapshots/observe_primary/persist_node are groundwork for the
 multipart adapter. Keep the active center-only decoder boundary until source
 shape/input/render and real menu support land. Secondary tunnel/fiber nodes,

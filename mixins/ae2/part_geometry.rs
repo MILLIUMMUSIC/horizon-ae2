@@ -99,10 +99,7 @@ impl CollisionHelper {
         }))
     }
     pub fn reporting_boxes(self) -> [Bounds; 2] {
-        [
-            self.add_box([2., 2., 14., 14., 14., 16.]),
-            self.add_box([4., 4., 13., 12., 12., 14.]),
-        ]
+        super::ae2_reporting::BOXES.map(|b| self.add_box(b))
     }
 }
 

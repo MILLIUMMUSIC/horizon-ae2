@@ -3,7 +3,41 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current multipart geometry checkpoint
+## Current reporting-part state checkpoint
+
+- Formatting, Clippy with warnings denied, 163 standalone Rust tests, 16 Python
+  tests and source/stack-limit/native-tick audits pass. Source coverage remains
+  125 partial classes out of 1,429; no complete-terminal claim is made.
+- `tools/reporting_oracle.py` executes eleven verbatim AbstractReportingPart
+  callbacks and AEBasePart's two flag-stream methods. All 249,125 cases match:
+  171,660 placement, 1,024 wrench, 65,536 flag/stream/model, 8,313 numeric-NBT and
+  2,592 light/cache cases. The verified original Minecraft Mth.floor,
+  CompoundTag and numeric tags execute through reflection. This includes
+  arbitrary float bits, integer boundaries, signed spin/remainder, suppressed
+  flag notifications, lazy off-state opacity queries, sentinel invalidation and
+  coordinate/brightness overflow. See `docs/reporting-oracle.json` for hashes.
+- The native saved-part bridge reads the source numeric spin and saves only a
+  Byte spin, preserving node/unknown data. Opacity and client flags stay transient.
+  Node idle and reporting geometry consume the same source profile/constants.
+- The 20,410 geometry and 66,048 primary-topology comparisons pass again with
+  updated dependency hashes. Their world-level scope is unchanged.
+- Native compilation/build, 234 game tests and 26 native render-crate tests
+  pass on the frozen source set. The new native codec case checks that signed
+  spin changes preserve `gn` and unknown fields without saving opacity.
+- `docs/reporting-cable-regression.json` records eight existing center CableBus
+  world groups passing on the final binary, including dense edge Pick Block,
+  real power/color topology and restart. This is a center regression, not a
+  world-level validation of reporting-part callbacks. Native source-package
+  validation passes; prior native client-library/item suites concern unchanged
+  payloads and are not counted as newly repeated runs.
+
+Player, host, world/node, inherited callbacks and model interfaces in the state
+oracle are controlled bindings. These rule/codec proofs do not activate native
+side-part placement, wrench handling, lighting, rendering, menus or complete
+managed-node/packet lifecycle. The full-port objective and active center-only
+world boundary remain unchanged.
+
+## Multipart geometry checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 159 standalone Rust tests and 16
   Python tests pass. The source inventory contains 1,429 Java files and 125

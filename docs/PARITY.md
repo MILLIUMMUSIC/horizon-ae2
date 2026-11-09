@@ -31,6 +31,18 @@ The full mod is not yet complete.
 
 ## Primary multipart node foundation
 
+Reporting state preserves signed spin and source numeric NBT conversion,
+including Float/DoubleTag floor-before-byte narrowing. Vertical placement uses
+the source float32 yaw arithmetic; horizontal sides retain spin. Wrench turns
+use signed Java remainder and mutate only on the server. Client power/missing-
+channel flags use the original low two bits, separate notification predicates,
+two-byte reporting stream and off/on/has-channel model choice. Opacity is queried
+lazily even when off; only the mounted-side neighbor invalidates the cache.
+The native saved-part codec writes spin alone and preserves other part data.
+249,125 original callback comparisons execute the actual Minecraft numeric tags,
+CompoundTag and Mth.floor. Their player/world/host/node/model interfaces are
+controlled, not native side-part input/light/transport or full lifecycle proofs.
+
 `part_geometry.rs` carries BusCollisionHelper's side/explicit-axis transforms,
 Java floating-point bounds, reporting-part boxes and source primary selection
 order (Down through East, then center). Selection inflates by 0.002 and keeps

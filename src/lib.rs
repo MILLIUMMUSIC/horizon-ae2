@@ -49,6 +49,8 @@ pub mod ae2_cable;
 pub mod ae2_part_geometry;
 #[path = "../mixins/ae2/part_storage.rs"]
 pub mod ae2_part_storage;
+#[path = "../mixins/ae2/reporting.rs"]
+pub mod ae2_reporting;
 
 #[path = "../mixins/ae2/node_data.rs"]
 pub mod ae2_node_data;

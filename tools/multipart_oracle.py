@@ -142,6 +142,7 @@ def main():
       'source_sha256':{name:sha((BASE/name).read_bytes()) for name in source_files},
       'wire_method_sha256':{name:sha(wire_methods[name].encode()) for name in ['write','read','visual','channels']},
       'binding_sha256':sha(java.encode()),'rust_sha256':sha((ROOT/'mixins/ae2/network.rs').read_bytes()),
+      'reporting_sha256':sha((ROOT/'mixins/ae2/reporting.rs').read_bytes()),
       'driver_sha256':sha((ROOT/'examples/multipart_oracle.rs').read_bytes()),'input_sha256':sha(data),'output_sha256':sha(actual),
       'scope':'Verbatim CableBus updateConnections/addToWorld/removeFromWorld/getGridNode, Reporting constructor and CablePart write/read/visual/channel methods; primary slot topology and wire/render distinction',
       'limits':['Controlled part storage/registry, node lifecycle callbacks, grid helper, finalized ad-hoc counts, level and packet bindings',

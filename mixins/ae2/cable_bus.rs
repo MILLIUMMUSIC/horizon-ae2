@@ -24,6 +24,37 @@ pub struct Part {
     pub id: String,
     pub data: Compound,
 }
+impl Part {
+    pub fn reporting(&self) -> Option<super::ae2_reporting::Reporting> {
+        use super::ae2_reporting::{Number, Reporting};
+        if self.id != "ae2:terminal" {
+            return None;
+        }
+        let number = match self.data.get(&key("spin")) {
+            Some(Tag::Byte(v)) => Some(Number::Byte(*v)),
+            Some(Tag::Short(v)) => Some(Number::Short(*v)),
+            Some(Tag::Int(v)) => Some(Number::Int(*v)),
+            Some(Tag::Long(v)) => Some(Number::Long(*v)),
+            Some(Tag::Float(v)) => Some(Number::Float(f32::from_bits(*v))),
+            Some(Tag::Double(v)) => Some(Number::Double(f64::from_bits(*v))),
+            _ => None,
+        };
+        let mut reporting = Reporting::default();
+        reporting.read_spin(number);
+        Some(reporting)
+    }
+    /// Only the source spin byte is saved here. Opacity and synchronized
+    /// power/channel flags are transient; preserve all other raw part fields.
+    pub fn save_reporting(&mut self, reporting: &super::ae2_reporting::Reporting) -> bool {
+        if self.id != "ae2:terminal" {
+            return false;
+        }
+        let value = Tag::Byte(reporting.spin());
+        let changed = self.data.get(&key("spin")) != Some(&value);
+        self.data.insert(key("spin"), value);
+        changed
+    }
+}
 #[derive(Clone, Debug)]
 pub struct Saved {
     pub parts: PartStorage<Part, Part, Tag>,
@@ -415,6 +446,30 @@ mod tests {
                 .is_err()
         );
         assert!(Saved::read(&data).unwrap().center_snapshot([0; 3]).is_err());
+    }
+
+    #[test]
+    fn reporting_spin_codec_keeps_signed_source_values_and_only_saves_spin() {
+        let mut data = host(Color::Transparent, 0.0);
+        let Tag::Compound(mut part) = terminal(9, 3.0) else {
+            unreachable!()
+        };
+        part.insert(key("spin"), Tag::Float((-0.1f32).to_bits()));
+        part.insert(key("unknown"), Tag::Int(123));
+        data.insert(key("north"), Tag::Compound(part));
+        let mut saved = Saved::read(&data).unwrap();
+        let mut part = saved.parts.part(Direction::North).unwrap().clone();
+        let mut state = part.reporting().unwrap();
+        assert_eq!(state.spin(), -1);
+        let original_gn = part.data.get(&key("gn")).cloned();
+        state.wrench_turn(false);
+        assert!(part.save_reporting(&state));
+        assert_eq!(part.data.get(&key("spin")), Some(&Tag::Byte(0)));
+        assert_eq!(part.data.get(&key("gn")), original_gn.as_ref());
+        assert_eq!(part.data.get(&key("unknown")), Some(&Tag::Int(123)));
+        assert!(!part.data.contains_key(&key("opacity")));
+        saved.parts.set_part(Direction::North, Some(part));
+        assert_eq!(saved.parts.center().unwrap().id, "ae2:fluix_smart_cable");
     }
     #[test]
     fn primary_node_decoding_keeps_each_side_and_removes_occupied_or_blocked_exposure() {

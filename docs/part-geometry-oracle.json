@@ -33,7 +33,8 @@
     "oracle/PartGeometryOracle.java": "d70223e761626437d9fef46708eedacb3fef6d843bf7c4b281d260458b3e5864"
   },
   "rust_sha256": {
-    "mixins/ae2/part_geometry.rs": "9cc1d4f129545e62ee14d9bd1a8636f070621118f18ef00d9f4827e01f0b77eb",
+    "mixins/ae2/part_geometry.rs": "eb1b30d368c3a10622a64e063c92cf03c2f89b933588efcd2943e8977b466860",
+    "mixins/ae2/reporting.rs": "ad179cf966bdd76a1b54777b2d6f417811bf7db3ec715bb228b56beb2527d7d7",
     "mixins/ae2/cable.rs": "3290cf4eb759e68914000b8cca0d742980a9b51135badbacf63c83607ee2b5c7",
     "examples/part_geometry_oracle.rs": "57237b4303c7b6a218c089ec51341137c0cd1882374886e5d7a1581ec20ab948"
   },

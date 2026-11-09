@@ -207,7 +207,7 @@ private final int x,y,z;Direction(int x,int y,int z){this.x=x;this.y=y;this.z=z;
         'source_sha256': {name: sha((BASE / name).read_bytes()) for name in source_files},
         'method_sha256': {'reporting_boxes': sha(reporting.encode()), 'selection': sha(selection.encode()), **{name: sha(body.encode()) for name, body in cable_methods.items() if 'boxes' in name}},
         'binding_sha256': {name: sha(body.encode()) for name, body in bindings.items()},
-        'rust_sha256': {name: sha((ROOT / name).read_bytes()) for name in ['mixins/ae2/part_geometry.rs', 'mixins/ae2/cable.rs', 'examples/part_geometry_oracle.rs']},
+        'rust_sha256': {name: sha((ROOT / name).read_bytes()) for name in ['mixins/ae2/part_geometry.rs', 'mixins/ae2/reporting.rs', 'mixins/ae2/cable.rs', 'examples/part_geometry_oracle.rs']},
         'minecraft_client_sha256': sha((minecraft_reference.WORK / 'client.jar').read_bytes()),
         'minecraft_mappings_sha256': sha((minecraft_reference.WORK / 'client_mappings.txt').read_bytes()),
         'input_sha256': sha(data), 'output_sha256': sha(actual.stdout),

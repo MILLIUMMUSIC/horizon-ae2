@@ -54,6 +54,7 @@ Blocks, items and recipes carried over as data do not count as working features 
 | Powered items and finite energy-cell items | `item_energy*.rs`, `energy_cell_item.rs`, `energy_cell_model.rs`: charging, energy bars, item models and implemented placement/drop energy paths |
 | ME Drive | `drive_glue.rs`, `gui.rs`, `automation*.rs`: ten actual cell slots, supported backends, power/channel gating, filtered screen and hopper/dropper access |
 | Cable parts and CableBus | `cable.rs`, `part_storage.rs`, `cable_bus.rs`, `node_data.rs`: types/colors, center NBT, saved node data and reload identity |
+| Reporting-part state rules | `reporting.rs`: signed spin, source numeric NBT, placement/wrench arithmetic, power/channel flags, model choice and transient opacity/light cache; native side-part activation remains pending |
 | Cable item placement and drops | `part_placement.rs`, `cable_items.rs`, `player_registry.rs`: target/admission rules, entity obstruction, survival/creative consumption, named part drops, buckets and original owner-array persistence |
 | Cable input and Pick Block | `ctrl.rs`, `cable_input.rs`, `cable_pick.rs`: configurable physical key, authenticated per-player opposite-side state and hit-selected bare center item |
 | Cable placement results | `part_use.rs`, `cable_actions.rs`, `cable_prediction.rs`: ordered source results, client preview, server consumption and sequence-based correction |

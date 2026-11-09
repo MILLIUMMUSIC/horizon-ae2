@@ -18,6 +18,11 @@ helper used by native center outlines/collision/Pick Block. Dense outline and
 collision retain their different source widths. The geometry comparison runs
 20,410 cases with the real pinned Minecraft AABB class; facade geometry and
 native side-part activation remain separate work.
+Reporting state also preserves source signed spin, placement/wrench arithmetic,
+numeric NBT conversion, transient light/opacity cache and power/channel flags.
+249,125 source callback comparisons pass with actual Minecraft numeric tags and
+floor. A native saved-part codec preserves all other raw data; full inherited
+callbacks and native part input/light/transport/model/menu activation remain open.
 
 The native center-only CableBus checkpoint integrates all 32 source physical
 states, five cable types and 17 colors, graph-derived visuals, original atlas
@@ -86,9 +91,10 @@ remain open.
 | Fluid transforms | Both original Fluix recipes, original timer and greedy claims, per-entity native phase, six level RNG draws and zero-delay fresh outputs; full effects/explosion/codec/cache/lifecycle remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Latest rule/native tests: 159 standalone Rust, 229 native game, 22 native
-render-crate and 16 Python tests pass. Geometry uses 20,410 original-Java/real
-Minecraft AABB comparisons. Final native check/build and eight CableBus/sixteen
+Latest rule/native tests: 163 standalone Rust, 234 native game, 26 native
+render-crate and 16 Python tests pass. Reporting state uses 249,125 source
+callback comparisons; geometry uses 20,410 original-Java/real Minecraft AABB
+comparisons. Native check/build pass. The previous geometry checkpoint's eight CableBus/sixteen
 placement/drop world groups pass on one binary, including dense edge selection
 and actual placement obstruction boundaries. The previous primary-node checkpoint passed native
 check/build, seven CableBus and four power regression groups on one binary;

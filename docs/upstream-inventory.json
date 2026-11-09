@@ -7249,8 +7249,8 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/AEBasePart.java",
-      "port": "mixins/ae2/cable_items.rs",
-      "scope": "source gn center persistence, placement owner and customName import/dismantle export; full generic settings, services, packet and readiness lifecycle pending",
+      "port": "mixins/ae2/reporting.rs",
+      "scope": "source client power/missing-channel flag byte, visibility-change predicates and activity/model rules; existing gn/owner/customName settings binding remains partial; complete managed-node/host callbacks, generic settings and native multipart transport/lifecycle remain pending",
       "sha256": "a4fcf64b1586a7b7820eaf83e0dda70b92e1a7fe68c6e8871ead34506df9db19",
       "status": "partial"
     },
@@ -7689,8 +7689,8 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/reporting/AbstractReportingPart.java",
-      "port": "mixins/ae2/part_geometry.rs",
-      "scope": "source reporting boxes and primary terminal node REQUIRE_CHANNEL/0.5 AE idle profile in network.rs; constructor/geometry compared with original Java and real Minecraft AABB; native side-part activation, spin/input, opacity/light, complete packets, menu and lifecycle remain pending",
+      "port": "mixins/ae2/reporting.rs",
+      "scope": "source reporting boxes/node profile, signed spin/NBT/placement/wrench state, light/opacity cache, model selection and two-byte stream callbacks; original Java callbacks compared with actual Minecraft numeric tags/floor; native saved-spin bridge; world side-part input/light/render activation, inherited callbacks, complete packet/menu/lifecycle remain pending",
       "sha256": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f",
       "status": "partial"
     },

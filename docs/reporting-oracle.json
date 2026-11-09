@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "cases": 249125,
+  "placement_cases": 171660,
+  "wrench_cases": 1024,
+  "stream_flag_model_cases": 65536,
+  "nbt_cases": 8313,
+  "light_cache_cases": 2592,
+  "source_sha256": {
+    "parts/reporting/AbstractReportingPart.java": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f",
+    "parts/AEBasePart.java": "a4fcf64b1586a7b7820eaf83e0dda70b92e1a7fe68c6e8871ead34506df9db19"
+  },
+  "method_sha256": {
+    "public void onNeighborChanged(": "ae6124f8bafb7e51f7e1469d430bc17aad2de43cd0eb8d2941ca73f7bdf8b858",
+    "public void readFromNBT(": "beaabc4a305c1cb99cf0a2cb6ad832e118e9b5a173297a99e97e126f5888898e",
+    "public void writeToNBT(": "a7e5efadb443708e3c88ce70ea63ea11e3a88ce93aeb26a8f9c19356dbd82287",
+    "public void writeToStream(": "742e9d642c3e2cc5270c47b774b6c763dc34ec2f6bb783989e2b7682dd690f26",
+    "public boolean readFromStream(": "cce836e0aae52d570405108b8bb35145aededed8d9d95c592740fdeca7919126",
+    "public final int getLightLevel(": "73eda29188ea9ff6078ede23385c09cefb81d91f63f054acf886578acabd81df",
+    "public boolean onUseWithoutItem(": "4480331db4c1afb0fa62140f8261806e24867f790fa93ee1ad4f16c6213578a6",
+    "public final void onPlacement(": "e21b54676e36e98ae4a9c87da223fb0eacd8d1b4e1ea98c3b6de2725f868ca7d",
+    "private int blockLight(": "30998730568d496fd7cf86121da598fa43d9d2b51bde20406f22dd370dcac911",
+    "protected IPartModel selectModel(": "313de12ddca8d5af339c70933c21383bd415b72b8c3b6baf9920e9a434e19fda",
+    "public final byte getSpin(": "8cb3267f403e06ee4569424fb67e97fbafd7c54189737cc1dca0a31eceae9125"
+  },
+  "base_method_sha256": [
+    "06b5ecd2989f2d55e48ab02270f104eb7b9e185084780cef54f6306b8ef7a584",
+    "a454a16f7816a843861eaac157dbab165454417c75ea2cfedc9bde249806f434"
+  ],
+  "binding_sha256": "eee15213658e3436b7bd531ced59832796a6d619901b39f5c4ab943e3f993a79",
+  "rust_sha256": {
+    "mixins/ae2/reporting.rs": "ad179cf966bdd76a1b54777b2d6f417811bf7db3ec715bb228b56beb2527d7d7",
+    "examples/reporting_oracle.rs": "9da799c32b6852f94cb25982305a761228d71ce2d9db465c9afde363071d63c4"
+  },
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "minecraft_mappings_sha256": "140c47931cccc8fc9e4c22d7603e2d714d1a953a146f51ea7397d95c955536ec",
+  "input_sha256": "925a04d139b1d4584611dc1ccef99c88b3812c12484b6ef44823a334f0c272d4",
+  "output_sha256": "0e3d6451e38e69ed8e79a5e257bf6b84d6be5086ddd93825016d8f437b951e85",
+  "scope": "Verbatim Reporting placement/wrench/NBT/stream/light/cache/model callbacks and AEBasePart flags; real pinned Minecraft Mth.floor, CompoundTag and numeric tags",
+  "limits": [
+    "Player/world/node/host/model/base-callback bindings are controlled; no native placement, complete managed-node/input/packet ordering or world-light proof",
+    "Native saved-part bridge and node profile consume these rules, but side-part world activation/rendering/menu remains separate"
+  ]
+}

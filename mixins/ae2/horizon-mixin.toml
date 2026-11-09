@@ -681,6 +681,12 @@ name = "ae2_part_geometry"
 source = "part_geometry.rs"
 
 [[module]]
+id = "reporting"
+file = "crates/horizon-client/src/game.rs"
+name = "ae2_reporting"
+source = "reporting.rs"
+
+[[module]]
 id = "node_data"
 file = "crates/horizon-client/src/game.rs"
 name = "ae2_node_data"
@@ -776,6 +782,12 @@ id = "cable-native-part_geometry"
 file = "crates/horizon-client-render/src/lib.rs"
 name = "ae2_part_geometry"
 source = "part_geometry.rs"
+
+[[module]]
+id = "cable-native-reporting"
+file = "crates/horizon-client-render/src/lib.rs"
+name = "ae2_reporting"
+source = "reporting.rs"
 
 [[module]]
 id = "cable-native-cube_builder"
