@@ -68,6 +68,7 @@ def package():
                  'tools/block_orientation.py', 'tools/orientation_oracle.py', 'examples/orientation_oracle.rs', 'docs/orientation-oracle.json',
                  'tools/smoke_quartz.py', 'docs/quartz-world-smoke.json',
                  'tools/inscriber_oracle.py', 'examples/inscriber_oracle.rs', 'docs/inscriber-oracle.json', 'tools/smoke_controller_craft.py', 'docs/controller-craft-world-smoke.json', 'tools/smoke_inscriber.py', 'docs/inscriber-world-smoke.json',
+                 'tools/multipart_oracle.py', 'examples/multipart_oracle.rs', 'docs/multipart-oracle.json', 'docs/multipart-cable-regression.json', 'docs/multipart-power-regression.json',
                  'LICENSES/Horizon-MIT', 'tools/item_tick_source.py', 'tools/transform_oracle.py', 'examples/transform_oracle.rs', 'docs/transform-oracle.json', 'tools/smoke_fluix_throw.py', 'docs/fluix-world-smoke.json', 'docs/fluid-inscriber-regression.json', 'docs/item-tick-source-audit.json',
                  'tools/smoke_cell_1k.py', 'docs/cell-1k-world-smoke.json', 'tools/smoke_charge_certus.py', 'docs/charge-certus-world-smoke.json',
                  'tools/smoke_charger_orientation.py', 'tools/smoke_wrench_rotation.py', 'tools/smoke_crank_states.py',

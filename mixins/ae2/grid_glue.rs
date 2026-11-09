@@ -72,6 +72,7 @@ fn snapshots(game: &Game<'_>, state: &mut Dimension) -> Vec<Snapshot> {
         };
         snapshots.push(Snapshot {
             pos: [x, y, z],
+            side: None,
             kind,
             front: direction(game, [x, y, z]),
             exposed: 63,
@@ -142,6 +143,24 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         state.drives.reconcile(&mut state.network);
         let states = state.network.end_tick();
         for persisted in &states {
+            if persisted.side.is_some() {
+                let [x, y, z] = persisted.pos;
+                if let Some(BlockEntity::Mod(be)) = game.world.block_entities.get_mut(&(x, y, z))
+                    && be.id == super::ae2_cable_bus::BLOCK
+                    && state.cables.persist_node(
+                        super::ae2_network::NodeKey {
+                            pos: persisted.pos,
+                            side: persisted.side,
+                        },
+                        &mut be.nbt,
+                        persisted.kind,
+                        persisted.buffer_share,
+                    )
+                {
+                    game.world.modified.insert((x >> 4, z >> 4));
+                }
+                continue;
+            }
             let Kind::Cable(cable) = persisted.kind else {
                 continue;
             };
@@ -181,7 +200,7 @@ pub(super) fn post_tick(game: &mut Game<'_>, dimension: &str) {
         .filter_map(|state| state.controller_model.map(|model| (state.pos, model)))
         .collect();
     for state in states {
-        if matches!(state.kind, Kind::Cable(_)) {
+        if state.side.is_some() || matches!(state.kind, Kind::Cable(_)) {
             continue;
         }
         let [x, y, z] = state.pos;
@@ -274,7 +293,7 @@ pub(super) fn node_placed(dimension: &str, pos: [i32; 3]) {
         .unwrap_or_else(|e| e.into_inner())
         .get_mut(dimension)
     {
-        state.network.forget_node(pos);
+        state.network.forget_host(pos);
         state.inscribers.forget(pos);
     }
 }

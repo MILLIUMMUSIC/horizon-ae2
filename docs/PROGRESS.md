@@ -7,6 +7,13 @@ per-file status and `PARITY.md` for unresolved behavior.
 
 ## Current work
 
+The graph and saved-host binding now address each primary part separately from
+its cable center. Internal null-direction edges, occupied-face blocking,
+per-part channel demand and separate `gn` persistence are implemented. A source
+terminal profile requires a channel and idles at 0.5 AE/tick. The active world
+adapter remains center-only pending part geometry, input, light, rendering and
+real storage menus; this foundation does not make terminals playable.
+
 The native center-only CableBus checkpoint integrates all 32 source physical
 states, five cable types and 17 colors, graph-derived visuals, original atlas
 sources, dynamic outline/raycast, contextual movement/piston shapes, and a
@@ -54,6 +61,7 @@ remain open.
 
 | Layer | Evidence and current boundary |
 | --- | --- |
+| Primary multipart nodes | 66,048 original-Java comparisons of host topology, primary node profile and cable wire/channel methods; per-slot native codec/identity tests; actual world activation and full lifecycle remain open |
 | Cable geometry | 24,405 Java cases, 467,940 quads, 9,358,800 float fields; GPU/world collector, attachments/facades and full lighting remain separate |
 | Cable node data | 20,064 Java equality cases; real typed NBT roundtrip and native graph-buffer identity tests; explicit source load/readiness events remain open |
 | Cable profiles | 85 type/color profiles, source flags and channel visuals; 278,956 Java cases; dense trunk and normal bottleneck tested in the binding |
@@ -73,10 +81,14 @@ remain open.
 | Fluid transforms | Both original Fluix recipes, original timer and greedy claims, per-entity native phase, six level RNG draws and zero-delay fresh outputs; full effects/explosion/codec/cache/lifecycle remain open |
 | Content/tooling | Pinned original assets, 461 NeoForge tags, 58 unstackable registrations, deterministic source packaging and isolated builds; carried content does not imply implemented mechanics |
 
-Latest standalone/native checkpoint: 149 standalone Rust tests, 213 native game
-tests and 16 Python tests. Native check/build, the 18-case Fluix/item world
-scenario and the 23-group Inscriber regression pass. The unchanged native
-library/item payloads previously passed 19 and 7 tests respectively. Earlier isolated CableBus
+Latest checkpoint: 155 standalone Rust tests, 224 native game tests, native
+compilation and 16 Python tests pass.
+Final native build and seven CableBus/four power world regression groups pass
+on the same binary; these remain center-only world proofs. The previous
+fluid-transform native checkpoint passed 213 game tests, native check/build,
+the 18-case Fluix/item world scenario and the 23-group Inscriber regression.
+The unchanged native library/item payloads previously passed 19 and 7 tests
+respectively. Earlier isolated CableBus
 world checks pass, including all 85 center Pick Block items, Ctrl data, packet
 ordering, configured keys and restart. The earlier finite/creative power and
 restart regression also passes.

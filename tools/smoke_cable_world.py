@@ -5,6 +5,7 @@ Creates parts through source-format commands. Survival placement, complete
 multipart behavior, external multiplayer and all collision paths remain open.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -65,9 +66,15 @@ def main():
         merge(pos, '{hasRedstone:2,cable:{id:"ae2:'+item+'"}}')
     try:
         first = launch(1)
-        ctl('tp', 15.5, 82, 1.5); ctl('wait', 60)
+        ctl('tp', 15.5, 82, 1.5)
+        for corner in [(4,71,-8),(29,72,18)]:
+            for _ in range(80):
+                if ctl('block',*corner).get('loaded'):break
+                ctl('wait',5)
+            else:raise AssertionError(f'fixture chunk did not load: {corner}')
         ctl('command', 'fill 4 71 -8 29 72 18 stone')
         ctl('command', 'fill 4 73 -8 29 90 18 air')
+        assert ctl('getblock',8,72,8)['block']=='minecraft:stone'
         test = (6, 74, 8)
         ctl('server-hold', 'on')
         try:
@@ -135,7 +142,7 @@ def main():
         assert ctl('container', *charger)['slots'] == [{'count': 1, 'item': 'ae2:charged_certus_quartz_crystal'}]
         checks.append('source center identity, node NBT and downstream inventory survive restart')
         ctl('quit')
-        report = {'passed': True, 'checks': checks, 'logs': str(work), 'limits': ['parts created by source-format commands, survival placement/drop not implemented', 'smooth AO/full lighting and all direct collision callers require further coverage', 'facades/side parts/full source lifecycle and external multiplayer remain open', 'GPU screenshot requires visual review; no Java/NeoForge world oracle']}
+        report = {'passed': True, 'checks': checks, 'logs': str(work), 'binary_sha256':hashlib.sha256(args.game.read_bytes()).hexdigest(), 'network_sha256':hashlib.sha256((ROOT/'mixins/ae2/network.rs').read_bytes()).hexdigest(), 'limits': ['parts created by source-format commands, survival placement/drop not exercised here', 'smooth AO/full lighting and all direct collision callers require further coverage', 'facades/side parts/full source lifecycle and external multiplayer remain open', 'GPU screenshot requires visual review; no Java/NeoForge world oracle']}
         (work/'result.json').write_text(json.dumps(report, indent=2)+'\n')
         print(json.dumps(report, indent=2))
     finally:

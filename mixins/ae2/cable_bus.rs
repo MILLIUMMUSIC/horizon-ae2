@@ -3,7 +3,7 @@
 // Registry/facade codecs and unsupported side-part implementations remain open.
 use super::ae2_cable::Cable;
 use super::ae2_grid::Direction;
-use super::ae2_network::{Kind, Network, Pos, Snapshot};
+use super::ae2_network::{Kind, Network, NodeKey, Pos, Snapshot};
 use super::ae2_part_storage::PartStorage;
 use horizon_world::nbt::{Compound, JavaString, Tag};
 use std::collections::BTreeMap;
@@ -55,6 +55,17 @@ fn node(part: &Part) -> Option<&Compound> {
         _ => None,
     }
 }
+fn buffer(part: &Part) -> Result<f64, &'static str> {
+    let value = match node(part).and_then(|n| n.get(&key("e"))) {
+        Some(Tag::Double(value)) => f64::from_bits(*value),
+        _ => 0.0,
+    };
+    if value.is_finite() && value >= 0.0 {
+        Ok(value)
+    } else {
+        Err("unsupported node energy")
+    }
+}
 /// GridNode.areTagsEqualIgnoringPlayerId treats absent, empty and p-only alike.
 fn same_node_data(a: Option<&Compound>, b: Option<&Compound>) -> bool {
     super::ae2_node_data::same_ignoring_owner(a, b, &key("p"))
@@ -89,37 +100,53 @@ impl Saved {
             .map(|p| Cable::from_item(&p.id).ok_or("unsupported center part"))
             .transpose()
     }
+    pub fn part(&self, side: Option<Direction>) -> Option<&Part> {
+        side.map_or_else(|| self.parts.center(), |side| self.parts.part(side))
+    }
+    /// Primary-node decoding for the next multipart host stage. The active
+    /// native adapter remains center-only until part shape/input/render support
+    /// is bound; do not equate these snapshots with a functioning terminal UI.
+    pub fn primary_snapshots(&self, pos: Pos, blocked: u8) -> Result<Vec<Snapshot>, &'static str> {
+        let cable = self.center()?;
+        let mut output = Vec::new();
+        let mut exposed = 63 & !blocked;
+        let mut sides = Vec::new();
+        for side in Direction::ALL {
+            if let Some(part) = self.parts.part(side) {
+                if part.id != "ae2:terminal" {
+                    return Err("side-part implementation unavailable");
+                }
+                // IPart.canBePlacedOn allows CABLE; dense supports DENSE_CABLE.
+                if cable.is_some_and(|c| c.kind.is_dense()) {
+                    return Err("terminal is incompatible with dense cable");
+                }
+                exposed &= !(1 << side as u8);
+                sides.push(Snapshot::terminal(pos, side, buffer(part)?));
+            }
+        }
+        if let Some(cable) = cable {
+            output.push(Snapshot {
+                pos,
+                side: None,
+                kind: Kind::Cable(cable),
+                front: Direction::North,
+                exposed,
+                stored: 0.0,
+                saved_buffer: buffer(self.parts.center().unwrap())?,
+            });
+        }
+        // Source addToWorld installs the center, then East through Down.
+        output.extend(sides.into_iter().rev());
+        Ok(output)
+    }
     pub fn center_snapshot(&self, pos: Pos) -> Result<Option<Snapshot>, &'static str> {
-        let Some(cable) = self.center()? else {
-            return Ok(None);
-        };
-        // Attached parts have their own grid nodes/services. Activating only
-        // the center would silently omit them; keep this host inactive until
-        // those parts are implemented. The complete raw NBT remains untouched.
         if Direction::ALL
             .into_iter()
             .any(|side| self.parts.part(side).is_some())
         {
             return Err("side-part implementation unavailable");
         }
-        let center = self.parts.center().unwrap();
-        // EnergyService.addNode checks contains(e, TAG_DOUBLE), not the
-        // generic numeric getter. Integer/float fields do not restore energy.
-        let saved_buffer = match node(center).and_then(|n| n.get(&key("e"))) {
-            Some(Tag::Double(value)) => f64::from_bits(*value),
-            _ => 0.0,
-        };
-        if !saved_buffer.is_finite() || saved_buffer < 0.0 {
-            return Err("unsupported node energy");
-        }
-        Ok(Some(Snapshot {
-            pos,
-            kind: Kind::Cable(cable),
-            front: Direction::North,
-            exposed: 63,
-            stored: 0.0,
-            saved_buffer,
-        }))
+        Ok(self.primary_snapshots(pos, 0)?.into_iter().next())
     }
 }
 #[derive(Clone, Debug)]
@@ -128,7 +155,7 @@ struct Observed {
 }
 #[derive(Default)]
 pub struct Hosts {
-    observed: BTreeMap<Pos, Observed>,
+    observed: BTreeMap<NodeKey, Observed>,
 }
 impl Hosts {
     /// Source loadPart replaces the part when item identity differs, including
@@ -139,16 +166,83 @@ impl Hosts {
         pos: Pos,
         host: &Compound,
     ) -> Result<(Option<Snapshot>, bool), &'static str> {
+        // Keep the active native boundary until multipart geometry/input/menu
+        // work is installed. An unknown side must never silently disappear.
         let saved = Saved::read(host)?;
-        let snapshot = saved.center_snapshot(pos)?;
-        let Some(part) = saved.parts.center() else {
-            return Ok((None, self.observed.remove(&pos).is_some()));
-        };
-        let replaced = self.observed.get(&pos).is_some_and(|old| {
-            old.part.id != part.id || !same_node_data(node(&old.part), node(part))
-        });
-        self.observed.insert(pos, Observed { part: part.clone() });
-        Ok((snapshot, replaced))
+        if Direction::ALL
+            .into_iter()
+            .any(|side| saved.parts.part(side).is_some())
+        {
+            return Err("side-part implementation unavailable");
+        }
+        let (snapshots, replaced) = self.observe_saved(pos, &saved, 0)?;
+        Ok((
+            snapshots.into_iter().next(),
+            replaced.contains(&NodeKey::center(pos)),
+        ))
+    }
+    pub fn observe_primary(
+        &mut self,
+        pos: Pos,
+        host: &Compound,
+        blocked: u8,
+    ) -> Result<(Vec<Snapshot>, Vec<NodeKey>), &'static str> {
+        let saved = Saved::read(host)?;
+        self.observe_saved(pos, &saved, blocked)
+    }
+    fn observe_saved(
+        &mut self,
+        pos: Pos,
+        saved: &Saved,
+        blocked: u8,
+    ) -> Result<(Vec<Snapshot>, Vec<NodeKey>), &'static str> {
+        let snapshots = saved.primary_snapshots(pos, blocked)?;
+        let incoming = snapshots
+            .iter()
+            .map(|snapshot| {
+                let k = snapshot.key();
+                (k, saved.part(k.side).unwrap().clone())
+            })
+            .collect::<BTreeMap<_, _>>();
+        // Keys are ordered center, East ... Down at each position. Observe
+        // only this host's at most seven primary nodes, not every loaded host.
+        let old_keys = self
+            .observed
+            .range(NodeKey::center(pos)..=NodeKey::part(pos, Direction::Down))
+            .map(|(key, _)| *key)
+            .collect::<Vec<_>>();
+        let replaced = old_keys
+            .iter()
+            .copied()
+            .filter(|key| {
+                let old = &self.observed[key];
+                incoming.get(key).is_none_or(|new| {
+                    new.id != old.part.id || !same_node_data(node(&old.part), node(new))
+                })
+            })
+            .collect();
+        for key in old_keys {
+            self.observed.remove(&key);
+        }
+        self.observed.extend(
+            incoming
+                .into_iter()
+                .map(|(key, part)| (key, Observed { part })),
+        );
+        Ok((snapshots, replaced))
+    }
+    pub fn primary_snapshots(
+        &mut self,
+        pos: Pos,
+        host: &Compound,
+        blocked: u8,
+        network: &mut Network,
+    ) -> Result<Vec<Snapshot>, &'static str> {
+        let (snapshots, replaced) = self.observe_primary(pos, host, blocked)?;
+        for key in replaced {
+            network.forget_node(key);
+        }
+        Ok(snapshots)
     }
     pub fn snapshot(
         &mut self,
@@ -163,24 +257,37 @@ impl Hosts {
         Ok(snapshot)
     }
     pub fn retain(&mut self, positions: &std::collections::BTreeSet<Pos>) {
-        self.observed.retain(|pos, _| positions.contains(pos));
+        self.observed.retain(|key, _| positions.contains(&key.pos));
     }
     /// Return a new gn only if the live center still equals the observed one.
     /// Preserve host/part/facade fields and unknown service data; this is not a
     /// complete Grid.saveNodeData implementation. p is always an Int on save.
     pub fn persist(&mut self, pos: Pos, host: &mut Compound, cable: Cable, share: f64) -> bool {
+        self.persist_node(NodeKey::center(pos), host, Kind::Cable(cable), share)
+    }
+    pub fn persist_node(
+        &mut self,
+        address: NodeKey,
+        host: &mut Compound,
+        expected_kind: Kind,
+        share: f64,
+    ) -> bool {
+        let field = address.side.map_or("cable", |side| SIDES[side as usize]);
         if !share.is_finite() || share < 0.0 {
             return false;
         }
-        let Some(old) = self.observed.get_mut(&pos) else {
+        let Some(old) = self.observed.get_mut(&address) else {
             return false;
         };
-        let Ok(Some(current)) = part(host.get(&key("cable"))) else {
+        let Ok(Some(current)) = part(host.get(&key(field))) else {
             return false;
         };
-        if Cable::from_item(&current.id) != Some(cable)
-            || current.id != old.part.id
-            || current.data != old.part.data
+        let kind = match address.side {
+            None => Cable::from_item(&current.id).map(Kind::Cable),
+            Some(_) if current.id == "ae2:terminal" => Some(Kind::Terminal),
+            _ => None,
+        };
+        if kind != Some(expected_kind) || current.id != old.part.id || current.data != old.part.data
         {
             return false;
         }
@@ -200,7 +307,7 @@ impl Hosts {
         let changed = data != old.part.data;
         old.part.data = data.clone();
         if changed {
-            host.insert(key("cable"), Tag::Compound(data));
+            host.insert(key(field), Tag::Compound(data));
         }
         changed
     }
@@ -231,6 +338,205 @@ mod tests {
             unreachable!()
         };
         v
+    }
+    fn terminal(owner: i32, energy: f64) -> Tag {
+        Tag::compound([
+            ("id", Tag::String("ae2:terminal".into())),
+            ("spin", Tag::Byte(2)),
+            (
+                "gn",
+                Tag::compound([("p", Tag::Int(owner)), ("e", Tag::Double(energy.to_bits()))]),
+            ),
+            ("otherService", Tag::Long(91)),
+        ])
+    }
+    #[test]
+    fn primary_node_decoding_keeps_each_side_and_removes_occupied_or_blocked_exposure() {
+        let pos = [1, 2, 3];
+        for mask in 0u8..64 {
+            let mut h = host(Color::Red, 20.0);
+            for side in Direction::ALL {
+                if mask & (1 << side as u8) != 0 {
+                    h.insert(
+                        key(SIDES[side as usize]),
+                        terminal(side as i32, side as u8 as f64 + 1.0),
+                    );
+                }
+            }
+            let saved = Saved::read(&h).unwrap();
+            for blocked in 0u8..64 {
+                let snapshots = saved.primary_snapshots(pos, blocked).unwrap();
+                assert_eq!(snapshots.len(), 1 + mask.count_ones() as usize);
+                assert_eq!(snapshots[0].key(), NodeKey::center(pos));
+                assert_eq!(snapshots[0].exposed, 63 & !mask & !blocked);
+                let mut seen = std::collections::BTreeSet::new();
+                for snapshot in &snapshots[1..] {
+                    let side = snapshot.side.unwrap();
+                    assert_eq!(snapshot.kind, Kind::Terminal);
+                    assert_eq!(snapshot.exposed, 0);
+                    assert_eq!(snapshot.saved_buffer, side as u8 as f64 + 1.0);
+                    assert!(seen.insert(snapshot.key()));
+                }
+            }
+            assert_eq!(saved.center_snapshot(pos).is_err(), mask != 0);
+        }
+    }
+    #[test]
+    fn side_only_hosts_stay_separate_and_unknown_or_dense_parts_refuse_without_mutation() {
+        let pos = [1, 2, 3];
+        let mut h = Compound::new();
+        h.insert(key("north"), terminal(1, 4.0));
+        h.insert(key("south"), terminal(2, 6.0));
+        let mut hosts = Hosts::default();
+        let mut network = Network::default();
+        let snapshots = hosts.primary_snapshots(pos, &h, 0, &mut network).unwrap();
+        assert_eq!(snapshots.len(), 2);
+        network.sync(snapshots);
+        assert_ne!(
+            network.node_service((pos, Direction::North)).unwrap().0,
+            network.node_service((pos, Direction::South)).unwrap().0
+        );
+        let before = h.clone();
+        assert!(Saved::read(&h).unwrap().center_snapshot(pos).is_err());
+        assert_eq!(h, before);
+        h.insert(
+            key("west"),
+            Tag::compound([("id", Tag::String("addon:unknown_part".into()))]),
+        );
+        assert!(Saved::read(&h).unwrap().primary_snapshots(pos, 0).is_err());
+        let mut h = host(Color::Red, 0.0);
+        h.insert(key("north"), terminal(1, 0.0));
+        center(&mut h).insert(
+            key("id"),
+            Tag::String(
+                Cable {
+                    kind: CableType::DenseSmart,
+                    color: Color::Red,
+                }
+                .item()
+                .unwrap()
+                .as_str()
+                .into(),
+            ),
+        );
+        assert!(Saved::read(&h).unwrap().primary_snapshots(pos, 0).is_err());
+    }
+    #[test]
+    fn node_data_replacement_for_one_side_does_not_reset_center_or_siblings() {
+        let pos = [1, 2, 3];
+        let mut h = host(Color::Red, 20.0);
+        h.insert(key("north"), terminal(1, 4.0));
+        h.insert(key("south"), terminal(2, 6.0));
+        let mut hosts = Hosts::default();
+        let mut network = Network::default();
+        let snapshots = hosts.primary_snapshots(pos, &h, 0, &mut network).unwrap();
+        network.sync(snapshots);
+        let keys = [
+            NodeKey::center(pos),
+            NodeKey::part(pos, Direction::North),
+            NodeKey::part(pos, Direction::South),
+        ];
+        let ids = keys.map(|key| network.node_service(key).unwrap().1);
+        let Tag::Compound(north) = h.get_mut(&key("north")).unwrap() else {
+            unreachable!()
+        };
+        let Tag::Compound(gn) = north.get_mut(&key("gn")).unwrap() else {
+            unreachable!()
+        };
+        gn.insert(key("p"), Tag::Int(99));
+        let snapshots = hosts.primary_snapshots(pos, &h, 0, &mut network).unwrap();
+        network.sync(snapshots);
+        assert_eq!(keys.map(|key| network.node_service(key).unwrap().1), ids);
+        let Tag::Compound(north) = h.get_mut(&key("north")).unwrap() else {
+            unreachable!()
+        };
+        let Tag::Compound(gn) = north.get_mut(&key("gn")).unwrap() else {
+            unreachable!()
+        };
+        gn.insert(key("e"), Tag::Double(3.0f64.to_bits()));
+        let snapshots = hosts.primary_snapshots(pos, &h, 0, &mut network).unwrap();
+        network.sync(snapshots);
+        let after = keys.map(|key| network.node_service(key).unwrap().1);
+        assert_eq!(ids[0], after[0]);
+        assert_ne!(ids[1], after[1]);
+        assert_eq!(ids[2], after[2]);
+        h.remove(&key("cable"));
+        let snapshots = hosts.primary_snapshots(pos, &h, 0, &mut network).unwrap();
+        network.sync(snapshots);
+        assert_eq!(network.node_service(keys[0]), None);
+        assert_eq!(network.node_service(keys[2]).unwrap().1, ids[2]);
+    }
+    #[test]
+    fn side_energy_save_targets_only_its_still_observed_gn_and_preserves_raw_data() {
+        let pos = [1, 2, 3];
+        let mut h = host(Color::Red, 20.0);
+        h.insert(key("north"), terminal(1, 4.0));
+        h.insert(key("south"), terminal(2, 6.0));
+        h.insert(
+            key("proxy"),
+            Tag::compound([("e", Tag::Double(999.0f64.to_bits()))]),
+        );
+        h.insert(key("facadeEast"), Tag::String("opaque-codec-marker".into()));
+        let before = h.clone();
+        let mut hosts = Hosts::default();
+        hosts.observe_primary(pos, &h, 0).unwrap();
+        let k = NodeKey::part(pos, Direction::North);
+        assert!(hosts.persist_node(k, &mut h, Kind::Terminal, 1.5));
+        for field in ["cable", "south", "proxy", "facadeEast"] {
+            assert_eq!(h.get(&key(field)), before.get(&key(field)));
+        }
+        let saved = Saved::read(&h).unwrap();
+        let north = saved.part(Some(Direction::North)).unwrap();
+        assert_eq!(buffer(north).unwrap(), 1.5);
+        assert_eq!(north.data.get(&key("spin")), Some(&Tag::Byte(2)));
+        assert_eq!(north.data.get(&key("otherService")), Some(&Tag::Long(91)));
+        assert!(!hosts.persist_node(k, &mut h, Kind::Terminal, 1.5));
+        let Tag::Compound(north) = h.get_mut(&key("north")).unwrap() else {
+            unreachable!()
+        };
+        north.insert(key("spin"), Tag::Byte(1));
+        let newer = h.clone();
+        assert!(!hosts.persist_node(k, &mut h, Kind::Terminal, 0.0));
+        assert_eq!(h, newer);
+        hosts.observe_primary(pos, &h, 0).unwrap();
+        assert!(hosts.persist_node(k, &mut h, Kind::Terminal, 0.0));
+        assert!(
+            node(
+                Saved::read(&h)
+                    .unwrap()
+                    .part(Some(Direction::North))
+                    .unwrap()
+            )
+            .unwrap()
+            .get(&key("e"))
+            .is_none()
+        );
+    }
+    #[test]
+    fn observing_one_host_retains_all_neighboring_host_slots_and_their_snapshots() {
+        let mut hosts = Hosts::default();
+        let mut h = host(Color::Red, 20.0);
+        h.insert(key("north"), terminal(1, 4.0));
+        for x in -128..128 {
+            hosts.observe_primary([x, 2, 3], &h, 0).unwrap();
+        }
+        let before = hosts
+            .observed
+            .iter()
+            .filter(|(key, _)| key.pos != [0, 2, 3])
+            .map(|(key, value)| (*key, value.part.data.clone()))
+            .collect::<BTreeMap<_, _>>();
+        h.remove(&key("north"));
+        let (_, replaced) = hosts.observe_primary([0, 2, 3], &h, 0).unwrap();
+        assert_eq!(replaced, vec![NodeKey::part([0, 2, 3], Direction::North)]);
+        let after = hosts
+            .observed
+            .iter()
+            .filter(|(key, _)| key.pos != [0, 2, 3])
+            .map(|(key, value)| (*key, value.part.data.clone()))
+            .collect::<BTreeMap<_, _>>();
+        assert_eq!(before, after);
+        assert_eq!(hosts.observed.len(), 511);
     }
     #[test]
     fn all_source_centers_read_only_gn_not_full_block_proxy_and_keep_facades_and_side_data() {

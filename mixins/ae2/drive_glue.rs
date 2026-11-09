@@ -293,6 +293,7 @@ mod tests {
     fn node(pos: Pos, kind: Kind) -> Snapshot {
         Snapshot {
             pos,
+            side: None,
             kind,
             front: Direction::North,
             exposed: 63,

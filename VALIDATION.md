@@ -1,9 +1,47 @@
 # Verification evidence
 
-Last updated: 8 November 2026. Development host: macOS arm64, Rust 1.99.1,
+Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current fluid-transform checkpoint
+## Current primary multipart node checkpoint
+
+- Formatting, Clippy with warnings denied, 155 standalone Rust tests, 16 Python
+  tests, source inventory (1,429 Java files / 124 partial classes), stack-limit
+  and carried native item-tick source audits pass. Native compilation and 224
+  game tests pass. The previous 19 native library and 7 native item-crate tests
+  concern unchanged payloads and are not newly repeated here.
+- `tools/multipart_oracle.py` compares 66,048 valid primary-host configurations
+  with verbatim CableBus connection/add/remove/node-query methods, the Reporting
+  constructor and CablePart channel/stream methods. Cases cover occupied and
+  blocked sides, four neighbor patterns, all cable types and side-only hosts.
+  Registry, node lifecycle callbacks, grid helper and finalized ad-hoc counts
+  are controlled bindings. Existing separate pathing/energy oracles cover those
+  algorithms; this run does not establish full managed-node lifecycle parity.
+  Source, binding, driver and result hashes are in `docs/multipart-oracle.json`.
+- Core regressions cover independent co-located nodes, internal null-direction
+  edges, external-face blocking, channel limits, per-slot replacement and host
+  replacement. Native codec regressions cover per-part node persistence, owner
+  identity, stale-write refusal and bounded lookup among 256 observed hosts.
+- Raw stream channels remain independent of power. Rendering applies both the
+  original powered getter and CableBusContainer's smart-cable gate, including a
+  powered five-cable-type regression.
+- The final native build passes seven CableBus world check groups: 32 physical
+  states, 85 center IDs and node saves, center outline picking, power through
+  five cables, color isolation/reconnection and restart. Four power scenarios
+  pass on the same binary: finite supply, front-face refusal, creative supply
+  and restart conservation. `docs/multipart-cable-regression.json` and
+  `docs/multipart-power-regression.json` record binary/binding hashes. These
+  exercise existing center behavior, not side-part activation or Java-world
+  rendering equivalence. Native source-package validation also passes.
+
+The active native adapter remains center-only. Primary terminal snapshots and
+per-slot persistence are groundwork, not a playable terminal. Source geometry,
+selection, placement/removal, light, rendering, real storage menus, external/
+secondary tunnel nodes and complete lifecycle/packets remain required. PR #3
+is not resolved by this checkpoint. Original engine checkouts, installed
+resources and player saves remain untouched.
+
+## Fluid-transform checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 149 standalone Rust tests, 16 Python
   tests, source inventory (1,429 Java files / 123 partial classes) and stack-limit

@@ -33,6 +33,18 @@ implemented. cable_items.rs/part_placement.rs add all 85 central-item placement
 and drop paths, full-shape entity obstruction, names and water/buckets. Per-part
 nodes/readiness, facades, direct collision callers, partial breaking, complete
 settings/security, multipart input results and source packets remain open.
+network.rs addresses each primary node by NodeKey(position, optional part side).
+Snapshot/Persisted carry that side; never alias a side node to its center or
+write part energy to root proxy. Internal edges have no direction. Primary
+terminal nodes require a channel, idle at 0.5 AE/tick and expose no world face;
+occupied sides remove center exposure. forget_node replaces one slot;
+forget_host removes every node of an actual BE replacement. cable_stream keeps
+raw source channels; cable_visual applies the powered getChannelsOnSide gate
+and CableBusContainer's smart-cable gate.
+Hosts.primary_snapshots/observe_primary/persist_node are groundwork for the
+multipart adapter. Keep the active center-only decoder boundary until source
+shape/input/render and real menu support land. Secondary tunnel/fiber nodes,
+complete source lifecycle, codecs/recovery and packets remain open.
 ctrl.rs/cable_input.rs carry default-false per-player CTRL state through the native
 authenticated mod channel. Process it in guest_native_net before subsequent use
 packets, charging the shared PER_TICK allowance exactly once. Never defer this

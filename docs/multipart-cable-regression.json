@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "checks": [
+    "all 32 source light/waterlogged states registered",
+    "all 85 source cable center IDs participate and save gn instead of proxy",
+    {
+      "center_outline_pick": {
+        "block": {
+          "block": "ae2:cable_bus",
+          "distance": 2.8772990808002645,
+          "face": "north",
+          "loaded": true,
+          "point": [
+            8.5,
+            74.50500000314209,
+            8.375
+          ],
+          "pos": [
+            8,
+            74,
+            8
+          ],
+          "state": "ae2:cable_bus[light_level=0,waterlogged=false]"
+        },
+        "entity": null,
+        "kind": "block"
+      }
+    },
+    "actual ME power crosses five CableBus nodes to a real Charger recipe",
+    "unlike nontransparent cable colors split the live power network",
+    "transparent cable reconnects the colored network",
+    "source center identity, node NBT and downstream inventory survive restart"
+  ],
+  "logs": "/Users/millium/Documents/repos/horizon-ae2/target/smoke/cable-world-e0lk9dbz",
+  "binary_sha256": "28f19e825f6d4f2a3293d80d4a7ddd26a95ed2f0a6c956082720c885820cd365",
+  "network_sha256": "9d28918a096d9ee16f8b337a004d75faf98a2e84a84a24c4cd6815bb6d14c28e",
+  "limits": [
+    "parts created by source-format commands, survival placement/drop not exercised here",
+    "smooth AO/full lighting and all direct collision callers require further coverage",
+    "facades/side parts/full source lifecycle and external multiplayer remain open",
+    "GPU screenshot requires visual review; no Java/NeoForge world oracle"
+  ]
+}

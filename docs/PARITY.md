@@ -29,6 +29,39 @@ The full mod is not yet complete.
 | Fluid transforms | Both built-in Fluix recipes from carried data, source signed timer/threshold/reset, greedy claims, surviving per-entity post-movement/merge/lifetime/environment phase, six level RNG draws and immediate zero-delay fresh entities | Source lightning, explosion recipes/frequency assembly, arbitrary fluid tags and result components, original query/recipe/cache/reload order, command object replacement and complete identity lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
+## Primary multipart node foundation
+
+The network binding addresses primary managed nodes by physical position and
+optional part side. Co-located nodes retain separate graph identity, services,
+saved buffer shares and channel requirements. A supported terminal profile uses
+the original Reporting constructor's REQUIRE_CHANNEL and 0.5 AE/tick idle.
+Parts connect internally to a cable center with a null-direction connection.
+Occupied and blocked sides remove the center's exposed world face; a primary
+terminal node never becomes an external-facing node. Side-only hosts have
+separate isolated nodes. Removing one part preserves siblings, while physical
+BE replacement forgets all hosted nodes.
+
+The CableBus codec can decode primary terminal snapshots and observe/persist
+each slot's own `gn`, retaining raw settings/facades/unknown data. Owner-only
+changes preserve identity; changed item/node data replaces only the affected
+slot. Writes refuse a stale live part rather than overwriting newer data.
+Dense cable admission and unknown/malformed saved hosts remain guarded; complete
+source registry/admission/recovery is not established by these bindings.
+
+`cable_stream` exposes original raw channel counts, including internal parts;
+`cable_visual` preserves the source powered getter and smart-cable rendering
+gate. Ad-hoc finalization
+stamps the total demand on each connection; controller routing accounts for
+individual leaf channels. The host Java oracle controls finalized counts and
+does not replace the existing separate pathing/energy proofs.
+
+The active native decoder deliberately still rejects side-bearing hosts until
+part shape/selection, placement/removal, light, input, rendering and a real
+storage-menu path are bound. This checkpoint is not a playable terminal or a
+resolution of PR #3. External/secondary tunnel/fiber nodes, complete source
+managed-node identity/readiness/events, packet transport and multiplayer remain
+required work. The full-port objective is unchanged.
+
 ## Fluid item transforms
 
 The server adapter reads ordinary water/lava recipes from native custom recipe

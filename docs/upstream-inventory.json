@@ -81,8 +81,8 @@
       "pending": 16
     },
     "parts": {
-      "partial": 9,
-      "pending": 73
+      "partial": 10,
+      "pending": 72
     },
     "recipes": {
       "partial": 4,
@@ -7264,7 +7264,7 @@
       "family": "parts",
       "path": "src/main/java/appeng/parts/CableBusContainer.java",
       "port": "mixins/ae2/cable_bus.rs",
-      "scope": "source center/side keys, gn buffered energy and host snapshot persistence; side-part/facade registry codecs, placement/render/packets/lifecycle pending",
+      "scope": "center plus six primary part-node addresses, source internal edges and occupied/blocked exposure, per-slot observed gn identity and persistence; source host topology oracle; active native decoder remains center-only until shapes/input/render/menu support is bound; full registry/facade/recovery/readiness and external secondary nodes remain pending",
       "sha256": "60179b40ebe2d5af4dc3d3d298a0cdab6b4033ad00fa94688944e6660155dd07",
       "status": "partial"
     },
@@ -7545,8 +7545,8 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/networking/CablePart.java",
-      "port": "mixins/ae2/cable.rs",
-      "scope": "85 item profiles, node flags, connection lengths/boxes, visual channels and suffix payload; world placement, persistence, base packet and renderer pending",
+      "port": "mixins/ae2/network.rs",
+      "scope": "85 cable profiles and native centers, source external versus primary-part channel counts, raw stream versus powered render gating; full native part shapes/input/render/menu/stream and lifecycle remain pending",
       "sha256": "0bc810b4b8c344b5550796c970785be782a0543197a66a87d6e317d0ebaff68f",
       "status": "partial"
     },
@@ -7687,8 +7687,10 @@
     {
       "family": "parts",
       "path": "src/main/java/appeng/parts/reporting/AbstractReportingPart.java",
+      "port": "mixins/ae2/network.rs",
+      "scope": "primary terminal node profile: source REQUIRE_CHANNEL and 0.5 AE/tick idle; constructor compared in a controlled Java host; native geometry, spin/input, opacity/light, complete packets, menu and lifecycle remain pending",
       "sha256": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "parts",

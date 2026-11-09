@@ -35,7 +35,7 @@ remaining behavior, and [VALIDATION.md](VALIDATION.md) for what was checked and 
 | 9. Full validation | Rule tests, Java differential comparisons, native tests and selected game scenarios | Complete survival progression, source-game comparisons, multiplayer and large-network validation |
 
 These are feature checkpoints, not completed milestones. The source inventory tracks all 1,429 Java
-files, including 123 partially ported classes. That count is not a gameplay completion percentage.
+files, including 124 partially ported classes. That count is not a gameplay completion percentage.
 Blocks, items and recipes carried over as data do not count as working features on their own.
 
 ## What is ported
@@ -66,6 +66,11 @@ Blocks, items and recipes carried over as data do not count as working features 
 The Inscriber currently operates through automation and its original four inventory slots. Its source
 menu and name-press workflow are still pending. Controller and Inscriber crafting recipes and the
 original sky-stone materials are registered.
+
+The network core now addresses a cable center and each side part separately,
+including internal edges, channel demand and per-slot node saves. This is a
+dependency for terminals. The active world adapter remains center-only until
+part geometry, input, rendering and real storage menus are connected.
 
 The Drive supports all 23 built-in cell profiles, but portable and tool cells do not yet have their
 complete handheld behavior. Its screen exposes ten real slots; priority controls and the complete

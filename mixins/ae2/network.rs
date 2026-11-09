@@ -11,6 +11,50 @@ use super::ae2_power::{EnergyNode, EnergyService, EnergySystem, ServiceId, Store
 use std::collections::{BTreeMap, BTreeSet};
 pub type Pos = [i32; 3];
 
+/// One primary managed node at a full block/cable center or a particular part.
+/// External tunnel/fiber nodes need distinct addresses when those parts land.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NodeKey {
+    pub pos: Pos,
+    pub side: Option<Direction>,
+}
+impl NodeKey {
+    pub fn center(pos: Pos) -> Self {
+        Self { pos, side: None }
+    }
+    pub fn part(pos: Pos, side: Direction) -> Self {
+        Self {
+            pos,
+            side: Some(side),
+        }
+    }
+    fn order(self) -> u8 {
+        self.side.map_or(0, |d| 6 - d as u8)
+    }
+}
+impl From<Pos> for NodeKey {
+    fn from(pos: Pos) -> Self {
+        Self::center(pos)
+    }
+}
+impl From<(Pos, Direction)> for NodeKey {
+    fn from((pos, side): (Pos, Direction)) -> Self {
+        Self::part(pos, side)
+    }
+}
+impl Ord for NodeKey {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.pos
+            .cmp(&other.pos)
+            .then_with(|| self.order().cmp(&other.order()))
+    }
+}
+impl PartialOrd for NodeKey {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     Controller,
@@ -20,6 +64,7 @@ pub enum Kind {
     DenseEnergyCell,
     CreativeEnergyCell,
     Drive,
+    Terminal,
     Cable(Cable),
 }
 impl Kind {
@@ -44,7 +89,7 @@ impl Kind {
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Drive => "ae2:drive",
-            Self::Cable(_) => "ae2:cable_bus",
+            Self::Cable(_) | Self::Terminal => "ae2:cable_bus",
         }
     }
     pub fn capacity(self) -> f64 {
@@ -54,7 +99,23 @@ impl Kind {
             Self::EnergyCell => 200000.0,
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
-            Self::Drive | Self::Cable(_) => 0.0,
+            Self::Drive | Self::Cable(_) | Self::Terminal => 0.0,
+        }
+    }
+    pub fn node_flags(self) -> Flags {
+        match self {
+            Self::Drive | Self::Terminal => Flags::REQUIRE_CHANNEL,
+            Self::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
+            Self::Cable(cable) => cable.kind.node_flags(),
+            _ => Flags::default(),
+        }
+    }
+    pub fn base_idle_power(self) -> f64 {
+        match self {
+            Self::Controller => super::ae2_controller::IDLE,
+            Self::Drive => 2.0,
+            Self::Terminal => 0.5,
+            _ => 0.0,
         }
     }
     fn grid_color(self) -> Color {
@@ -87,7 +148,7 @@ impl Kind {
                 self.capacity(),
                 super::ae2_controller::STORAGE_PRIORITY,
             )),
-            Self::Charger | Self::Inscriber | Self::Drive | Self::Cable(_) => None,
+            Self::Charger | Self::Inscriber | Self::Drive | Self::Cable(_) | Self::Terminal => None,
             Self::EnergyCell => Some(Store::finite(
                 amount.clamp(0.0, self.capacity()),
                 self.capacity(),
@@ -101,11 +162,7 @@ impl Kind {
             Self::CreativeEnergyCell => Some(Store::creative()),
         };
         EnergyNode {
-            idle: match self {
-                Self::Controller => super::ae2_controller::IDLE,
-                Self::Drive => 2.0,
-                _ => 0.0,
-            },
+            idle: self.base_idle_power(),
             store,
             passive_rate: None,
         }
@@ -114,6 +171,7 @@ impl Kind {
 #[derive(Clone, Copy, Debug)]
 pub struct Snapshot {
     pub pos: Pos,
+    pub side: Option<Direction>,
     pub kind: Kind,
     pub front: Direction,
     /// Exposed in-world faces; the multipart host removes blocked/occupied sides.
@@ -122,8 +180,27 @@ pub struct Snapshot {
     pub saved_buffer: f64,
 }
 impl Snapshot {
+    pub fn key(self) -> NodeKey {
+        NodeKey {
+            pos: self.pos,
+            side: self.side,
+        }
+    }
+    pub fn terminal(pos: Pos, side: Direction, saved_buffer: f64) -> Self {
+        Self {
+            pos,
+            side: Some(side),
+            kind: Kind::Terminal,
+            front: side,
+            exposed: 0,
+            stored: 0.0,
+            saved_buffer,
+        }
+    }
     fn exposes(self, direction: Direction) -> bool {
-        self.exposed & (1 << direction as u8) != 0
+        self.side.is_none()
+            && self.kind != Kind::Terminal
+            && self.exposed & (1 << direction as u8) != 0
             && (!matches!(self.kind, Kind::Charger | Kind::Inscriber | Kind::Drive)
                 || self.front != direction)
     }
@@ -131,6 +208,7 @@ impl Snapshot {
 #[derive(Clone, Copy, Debug)]
 pub struct Persisted {
     pub pos: Pos,
+    pub side: Option<Direction>,
     pub kind: Kind,
     pub stored: Option<f64>,
     pub buffer_share: f64,
@@ -148,7 +226,7 @@ struct Node {
 pub struct Network {
     graph: Graph,
     energy: EnergySystem,
-    nodes: BTreeMap<Pos, Node>,
+    nodes: BTreeMap<NodeKey, Node>,
     connections: BTreeMap<(NodeId, NodeId), ConnectionId>,
     pivots: BTreeMap<ServiceId, NodeId>,
     channel_power: BTreeMap<ServiceId, f64>,
@@ -168,7 +246,7 @@ impl Network {
     /// Reconcile loaded nodes. A removed unloaded node's last persisted proxy.e
     /// already carries its share; active services deduct it proportionally.
     pub fn sync(&mut self, snapshots: Vec<Snapshot>) {
-        let incoming: BTreeMap<_, _> = snapshots.into_iter().map(|s| (s.pos, s)).collect();
+        let incoming: BTreeMap<_, _> = snapshots.into_iter().map(|s| (s.key(), s)).collect();
         let mut changed = false;
         let gone: Vec<_> = self
             .nodes
@@ -213,13 +291,8 @@ impl Network {
                 }
                 None => {
                     let id = self.graph.add_node(NodeSpec {
-                        flags: match snapshot.kind {
-                            Kind::Drive => Flags::REQUIRE_CHANNEL,
-                            Kind::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
-                            Kind::Cable(cable) => cable.kind.node_flags(),
-                            _ => Flags::default(),
-                        },
-                        controller: (snapshot.kind == Kind::Controller).then_some(pos),
+                        flags: snapshot.kind.node_flags(),
+                        controller: (snapshot.kind == Kind::Controller).then_some(snapshot.pos),
                         ..Default::default()
                     });
                     self.nodes.insert(
@@ -235,24 +308,40 @@ impl Network {
             }
         }
         let mut desired = BTreeMap::new();
-        for (pos, node) in &self.nodes {
+        for (key, node) in &self.nodes {
             for direction in Direction::ALL {
-                if !node.snapshot.exposes(direction) {
+                if !self.exposes(*key, direction) {
                     continue;
                 }
                 let delta = direction.offset();
-                let neighbor = std::array::from_fn(|i| pos[i] + delta[i]);
-                if let Some(other) = self.nodes.get(&neighbor)
+                let neighbor = std::array::from_fn(|i| key.pos[i] + delta[i]);
+                let other_key = NodeKey::center(neighbor);
+                if let Some(other) = self.nodes.get(&other_key)
                     && node.id < other.id
-                    && other.snapshot.exposes(direction.opposite())
+                    && self.exposes(other_key, direction.opposite())
                     && node
                         .snapshot
                         .kind
                         .grid_color()
                         .compatible(other.snapshot.kind.grid_color())
                 {
-                    desired.insert((node.id, other.id), direction);
+                    desired.insert((node.id, other.id), Some(direction));
                 }
+            }
+        }
+        // CableBusContainer.addPart/addToWorld connects each primary part to
+        // the center with GridHelper.createConnection, whose direction is null.
+        for (key, node) in &self.nodes {
+            if key.side.is_some()
+                && let Some(center) = self.nodes.get(&NodeKey::center(key.pos))
+                && matches!(center.snapshot.kind, Kind::Cable(_))
+            {
+                let pair = if center.id < node.id {
+                    (center.id, node.id)
+                } else {
+                    (node.id, center.id)
+                };
+                desired.insert(pair, None);
             }
         }
         let removed: Vec<_> = self
@@ -270,7 +359,7 @@ impl Network {
             if let std::collections::btree_map::Entry::Vacant(entry) = self.connections.entry(key) {
                 entry.insert(
                     self.graph
-                        .connect(key.0, key.1, Some(direction))
+                        .connect(key.0, key.1, direction)
                         .expect("unique adjacent connection"),
                 );
                 changed = true;
@@ -378,26 +467,46 @@ impl Network {
             self.pivots.remove(&service);
         }
     }
+    fn exposes(&self, key: NodeKey, direction: Direction) -> bool {
+        let Some(node) = self.nodes.get(&key) else {
+            return false;
+        };
+        node.snapshot.exposes(direction)
+            && (!matches!(node.snapshot.kind, Kind::Cable(_))
+                || !self.nodes.contains_key(&NodeKey::part(key.pos, direction)))
+    }
     pub fn begin_tick(&mut self) {
         self.energy.begin_tick();
     }
     /// A real placement created a new block entity, even if its position,
     /// kind and saved amounts happen to equal the old one's last snapshot.
-    pub fn forget_node(&mut self, pos: Pos) {
-        if self.nodes.contains_key(&pos) {
+    pub fn forget_node(&mut self, key: impl Into<NodeKey>) {
+        let key = key.into();
+        if self.nodes.contains_key(&key) {
             let remaining = self
                 .nodes
-                .values()
-                .filter(|node| node.snapshot.pos != pos)
-                .map(|node| node.snapshot)
+                .iter()
+                .filter(|(k, _)| **k != key)
+                .map(|(_, node)| node.snapshot)
                 .collect();
             self.sync(remaining);
         }
     }
+    /// Destruction/replacement of the physical BE removes all hosted nodes.
+    /// Removing/replacing just one part must use forget_node with its slot.
+    pub fn forget_host(&mut self, pos: Pos) {
+        let remaining = self
+            .nodes
+            .values()
+            .filter(|node| node.snapshot.pos != pos)
+            .map(|node| node.snapshot)
+            .collect();
+        self.sync(remaining);
+    }
     /// Read live storage only if the BE still echoes this node's last saved
     /// amount. A newer external /data replacement must not be overwritten.
     pub fn storage_for_snapshot(&self, pos: Pos, kind: Kind, saved: f64) -> Option<f64> {
-        let node = self.nodes.get(&pos)?;
+        let node = self.nodes.get(&NodeKey::center(pos))?;
         if node.snapshot.kind != kind || node.snapshot.stored.to_bits() != saved.to_bits() {
             return None;
         }
@@ -406,8 +515,14 @@ impl Network {
             .store(node.id)
             .map(Store::amount)
     }
-    pub fn extract(&mut self, pos: Pos, amount: f64, multiplier: f64, commit: bool) -> f64 {
-        let Some(service) = self.nodes.get(&pos).and_then(|n| n.service) else {
+    pub fn extract(
+        &mut self,
+        key: impl Into<NodeKey>,
+        amount: f64,
+        multiplier: f64,
+        commit: bool,
+    ) -> f64 {
+        let Some(service) = self.nodes.get(&key.into()).and_then(|n| n.service) else {
             return 0.0;
         };
         self.energy.extract(service, amount, multiplier, commit)
@@ -427,6 +542,7 @@ impl Network {
                 node.snapshot.saved_buffer = service.node_energy_share();
                 Persisted {
                     pos: node.snapshot.pos,
+                    side: node.snapshot.side,
                     kind: node.snapshot.kind,
                     stored,
                     buffer_share: node.snapshot.saved_buffer,
@@ -442,15 +558,29 @@ impl Network {
             })
             .collect()
     }
-    pub fn is_powered(&self, pos: Pos) -> bool {
+    pub fn is_powered(&self, key: impl Into<NodeKey>) -> bool {
         self.nodes
-            .get(&pos)
+            .get(&key.into())
             .and_then(|n| n.service)
             .and_then(|s| self.energy.service(s))
             .is_some_and(EnergyService::is_powered)
     }
     pub fn cable_visual(&self, pos: Pos) -> Option<super::ae2_cable::VisualState> {
-        let node = self.nodes.get(&pos)?;
+        let mut state = self.cable_stream(pos)?;
+        let Kind::Cable(cable) = self.nodes.get(&NodeKey::center(pos))?.snapshot.kind else {
+            return None;
+        };
+        // CableBusContainer.getRenderState applies the smart-type gate in
+        // addition to CablePart.getChannelsOnSide's power gate.
+        if !cable.kind.is_smart() || !self.is_powered(pos) {
+            state.channels = [0; 6];
+        }
+        Some(state)
+    }
+    /// Raw source stream channels are independent from the rendering gate in
+    /// CablePart.getChannelsOnSide and CableBusContainer.getRenderState.
+    pub fn cable_stream(&self, pos: Pos) -> Option<super::ae2_cable::VisualState> {
+        let node = self.nodes.get(&NodeKey::center(pos))?;
         let Kind::Cable(cable) = node.snapshot.kind else {
             return None;
         };
@@ -460,36 +590,75 @@ impl Network {
             let connection = self.graph.connection(*id)?;
             if let Some(side) = connection.direction(node.id) {
                 state.connections |= 1 << side as u8;
-                state.channels[side as usize] = if self.is_powered(pos) {
-                    i32::from(cable.kind.visual_channels(
-                        connection.used_channels() as i32,
-                        grid_node.max_channels(ChannelMode::Default) as i32,
-                        ChannelMode::Default,
-                        true,
-                    ))
-                } else {
-                    0
-                };
+                state.channels[side as usize] = i32::from(cable.kind.visual_channels(
+                    connection.used_channels() as i32,
+                    grid_node.max_channels(ChannelMode::Default) as i32,
+                    ChannelMode::Default,
+                    true,
+                ));
+            }
+        }
+        // Stream channels for internal side parts without setting a connected
+        // in-world face. A real external connection (if present) wins later.
+        for side in Direction::ALL {
+            if state.connections & (1 << side as u8) != 0 {
+                continue;
+            }
+            if let Some(part) = self.nodes.get(&NodeKey::part(pos, side)) {
+                let max = self
+                    .graph
+                    .node(part.id)?
+                    .connections()
+                    .iter()
+                    .filter_map(|id| self.graph.connection(*id))
+                    .map(|c| c.used_channels())
+                    .max()
+                    .unwrap_or(0);
+                state.channels[side as usize] = i32::from(cable.kind.visual_channels(
+                    max as i32,
+                    grid_node.max_channels(ChannelMode::Default) as i32,
+                    ChannelMode::Default,
+                    true,
+                ));
             }
         }
         Some(state)
     }
-    pub fn node_service(&self, pos: Pos) -> Option<(ServiceId, NodeId)> {
-        let node = self.nodes.get(&pos)?;
+    pub fn node_service(&self, key: impl Into<NodeKey>) -> Option<(ServiceId, NodeId)> {
+        let node = self.nodes.get(&key.into())?;
         Some((node.service?, node.id))
     }
-    pub fn set_idle(&mut self, pos: Pos, idle: f64) -> Result<(), &'static str> {
-        let (service, node) = self.node_service(pos).ok_or("unknown network node")?;
+    /// The original connection direction is absent for an internal host edge.
+    /// Return finalized channel use independently from the grid's power state.
+    pub fn connection(
+        &self,
+        from: impl Into<NodeKey>,
+        to: impl Into<NodeKey>,
+    ) -> Option<(Option<Direction>, u32)> {
+        let from = self.nodes.get(&from.into())?.id;
+        let to = self.nodes.get(&to.into())?.id;
+        let connection = self
+            .graph
+            .node(from)?
+            .connections()
+            .iter()
+            .filter_map(|id| self.graph.connection(*id))
+            .find(|connection| connection.other(from) == Some(to))?;
+        Some((connection.direction(from), connection.used_channels()))
+    }
+    pub fn set_idle(&mut self, key: impl Into<NodeKey>, idle: f64) -> Result<(), &'static str> {
+        let (service, node) = self.node_service(key).ok_or("unknown network node")?;
         self.energy
             .service_mut(service)
             .unwrap()
             .set_idle(node, idle)
     }
-    pub fn is_online(&self, pos: Pos) -> bool {
-        self.is_powered(pos)
+    pub fn is_online(&self, key: impl Into<NodeKey>) -> bool {
+        let key = key.into();
+        self.is_powered(key)
             && self
                 .nodes
-                .get(&pos)
+                .get(&key)
                 .and_then(|n| self.graph.node(n.id))
                 .is_some_and(|n| n.meets_channel_requirements())
     }
@@ -498,6 +667,216 @@ impl Network {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn ticks(n: &mut Network) {
+        for _ in 0..20 {
+            n.begin_tick();
+            n.end_tick();
+        }
+    }
+    #[test]
+    fn all_six_primary_part_nodes_are_distinct_and_use_source_internal_edges() {
+        use super::super::ae2_cable::CableType;
+        let p = [0, 0, 0];
+        let center = cable(p, CableType::Smart, Color::Red);
+        let mut nodes = vec![center, snapshot([0, 0, 1], Kind::CreativeEnergyCell, 0.0)];
+        // Leave South free to admit the power supply.
+        nodes.extend(
+            Direction::ALL
+                .into_iter()
+                .filter(|d| *d != Direction::South)
+                .map(|d| Snapshot::terminal(p, d, 0.0)),
+        );
+        let mut n = Network::default();
+        n.sync(nodes);
+        ticks(&mut n);
+        let center_id = n.node_service(p).unwrap().1;
+        let mut ids = BTreeSet::from([center_id]);
+        for side in Direction::ALL
+            .into_iter()
+            .filter(|d| *d != Direction::South)
+        {
+            let key = NodeKey::part(p, side);
+            assert!(ids.insert(n.node_service(key).unwrap().1));
+            assert!(n.is_online(key));
+            assert_eq!(n.connection(p, key), Some((None, 5)));
+            assert_eq!(n.connection(key, p), Some((None, 5)));
+            assert_eq!(n.cable_visual(p).unwrap().channels[side as usize], 5);
+        }
+        assert_eq!(
+            n.cable_visual(p).unwrap().connections,
+            1 << Direction::South as u8
+        );
+        // PathingService's ad-hoc finalizer stamps the total demand (five)
+        // onto every connection. Controller routing uses one on each leaf.
+        let mut controlled = vec![
+            center,
+            snapshot([0, 0, 1], Kind::Controller, 0.0),
+            snapshot([0, 0, 2], Kind::CreativeEnergyCell, 0.0),
+        ];
+        controlled.extend(
+            Direction::ALL
+                .into_iter()
+                .filter(|d| *d != Direction::South)
+                .map(|d| Snapshot::terminal(p, d, 0.0)),
+        );
+        n.sync(controlled);
+        ticks(&mut n);
+        for side in Direction::ALL
+            .into_iter()
+            .filter(|d| *d != Direction::South)
+        {
+            assert_eq!(n.connection(p, NodeKey::part(p, side)), Some((None, 1)));
+        }
+        let persisted = n.end_tick();
+        assert_eq!(persisted.iter().filter(|s| s.pos == p).count(), 6);
+        assert_eq!(
+            persisted
+                .iter()
+                .filter(|s| s.pos == p && s.side.is_some())
+                .count(),
+            5
+        );
+        // All six parts can coexist when power is provided on an adjacent host.
+        let mut nodes = vec![center];
+        nodes.extend(Direction::ALL.map(|d| Snapshot::terminal(p, d, 0.0)));
+        n.sync(nodes);
+        assert_eq!(n.nodes.len(), 7);
+    }
+    #[test]
+    fn occupied_face_blocks_the_center_and_primary_parts_never_connect_outside() {
+        use super::super::ae2_cable::CableType;
+        let p = [0, 0, 0];
+        let side = NodeKey::part(p, Direction::East);
+        let mut terminal = Snapshot::terminal(p, Direction::East, 0.0);
+        terminal.exposed = 63;
+        let mut n = Network::default();
+        n.sync(vec![
+            cable(p, CableType::Smart, Color::Transparent),
+            terminal,
+            snapshot([1, 0, 0], Kind::CreativeEnergyCell, 0.0),
+        ]);
+        ticks(&mut n);
+        assert_eq!(n.connection(p, [1, 0, 0]), None);
+        assert_eq!(n.connection(side, [1, 0, 0]), None);
+        assert_eq!(n.connection(p, side), Some((None, 1)));
+        assert!(!n.is_powered(p));
+        assert!(!n.is_online(side));
+        assert_ne!(
+            n.node_service(side).unwrap().0,
+            n.node_service([1, 0, 0]).unwrap().0
+        );
+    }
+    #[test]
+    fn part_channel_demand_counts_each_node_and_empty_hosts_do_not_join_parts() {
+        use super::super::ae2_cable::CableType;
+        let mut nodes = vec![
+            cable([0, 0, 0], CableType::Smart, Color::Transparent),
+            cable([1, 0, 0], CableType::Smart, Color::Transparent),
+            snapshot([-1, 0, 0], Kind::CreativeEnergyCell, 0.0),
+        ];
+        let mut parts = vec![];
+        for (p, excluded) in [([0, 0, 0], Direction::West), ([1, 0, 0], Direction::West)] {
+            for side in Direction::ALL
+                .into_iter()
+                .filter(|d| *d != excluded && *d != Direction::East)
+            {
+                let part = Snapshot::terminal(p, side, 0.0);
+                parts.push(part.key());
+                nodes.push(part);
+            }
+        }
+        // Eight source REQUIRE_CHANNEL parts operate in an ad-hoc grid.
+        let mut n = Network::default();
+        n.sync(nodes.clone());
+        ticks(&mut n);
+        assert_eq!(parts.len(), 8);
+        assert!(parts.iter().all(|k| n.is_online(*k)));
+        nodes.push(Snapshot::terminal([1, 0, 0], Direction::East, 0.0));
+        n.sync(nodes);
+        ticks(&mut n);
+        assert!(parts.iter().all(|k| !n.is_online(*k)));
+        n.sync(vec![
+            Snapshot::terminal([3, 0, 0], Direction::Up, 0.0),
+            Snapshot::terminal([3, 0, 0], Direction::Down, 0.0),
+        ]);
+        assert_ne!(
+            n.node_service(([3, 0, 0], Direction::Up)).unwrap().0,
+            n.node_service(([3, 0, 0], Direction::Down)).unwrap().0
+        );
+    }
+    #[test]
+    fn replacing_one_slot_preserves_siblings_while_replacing_the_be_forgets_all() {
+        use super::super::ae2_cable::CableType;
+        let p = [0, 0, 0];
+        let a = NodeKey::part(p, Direction::Up);
+        let b = NodeKey::part(p, Direction::Down);
+        let nodes = vec![
+            cable(p, CableType::Smart, Color::Transparent),
+            Snapshot::terminal(p, Direction::Up, 0.0),
+            Snapshot::terminal(p, Direction::Down, 0.0),
+        ];
+        let mut n = Network::default();
+        n.sync(nodes.clone());
+        let id = |n: &Network, key| n.node_service(key).unwrap().1;
+        let before = (id(&n, NodeKey::center(p)), id(&n, a), id(&n, b));
+        n.forget_node(a);
+        n.sync(nodes.clone());
+        assert_eq!(id(&n, NodeKey::center(p)), before.0);
+        assert_ne!(id(&n, a), before.1);
+        assert_eq!(id(&n, b), before.2);
+        n.forget_node(p);
+        n.sync(nodes.clone());
+        assert_ne!(id(&n, NodeKey::center(p)), before.0);
+        assert_eq!(id(&n, b), before.2);
+        let old = n
+            .nodes
+            .values()
+            .map(|node| node.id)
+            .collect::<BTreeSet<_>>();
+        n.forget_host(p);
+        assert!(n.nodes.is_empty());
+        n.sync(nodes);
+        assert!(n.nodes.values().all(|node| !old.contains(&node.id)));
+    }
+    #[test]
+    fn source_channel_bytes_do_not_disappear_when_the_energy_service_is_unpowered() {
+        use super::super::ae2_cable::CableType;
+        let mut n = Network::default();
+        n.sync(vec![
+            cable([0, 0, 0], CableType::Smart, Color::Transparent),
+            snapshot([0, 0, -1], Kind::Drive, 0.0),
+        ]);
+        assert!(!n.is_powered([0, 0, 0]));
+        let view = n.cable_stream([0, 0, 0]).unwrap();
+        assert_eq!(n.cable_visual([0, 0, 0]).unwrap().channels, [0; 6]);
+        assert_eq!(view.connections, 1 << Direction::North as u8);
+        assert_eq!(view.channels[Direction::North as usize], 1);
+    }
+
+    #[test]
+    fn powered_render_channels_require_a_smart_cable_but_stream_channels_do_not() {
+        use super::super::ae2_cable::CableType;
+        for kind in CableType::VALID {
+            let mut n = Network::default();
+            n.sync(vec![
+                cable([0, 0, 0], kind, Color::Transparent),
+                snapshot([0, 0, -1], Kind::Drive, 0.0),
+                snapshot([0, 0, 1], Kind::CreativeEnergyCell, 0.0),
+            ]);
+            ticks(&mut n);
+            assert!(n.is_powered([0, 0, 0]));
+            assert_eq!(
+                n.cable_stream([0, 0, 0]).unwrap().channels[Direction::North as usize],
+                1
+            );
+            assert_eq!(
+                n.cable_visual([0, 0, 0]).unwrap().channels[Direction::North as usize],
+                i32::from(kind.is_smart()),
+                "{kind:?}"
+            );
+        }
+    }
 
     fn cable(pos: Pos, kind: super::super::ae2_cable::CableType, color: Color) -> Snapshot {
         snapshot(pos, Kind::Cable(Cable { kind, color }), 0.0)
@@ -679,6 +1058,7 @@ mod tests {
     fn snapshot(pos: Pos, kind: Kind, stored: f64) -> Snapshot {
         Snapshot {
             pos,
+            side: None,
             kind,
             front: Direction::North,
             exposed: 63,

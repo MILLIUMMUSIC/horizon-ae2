@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "cases": 66048,
+  "method_sha256": [
+    "efabdd6916b1cf4724ead45a7ae1666084cf92660a415755ed76cbd243c6bc30",
+    "ff5fe9a8a6aab2da55d68c82ced8160155e5035b593298ff63d745804a181499",
+    "58ef97b4095f0e8969032063c13ea00ac4201d7ea9c661836f2b6080c482598a",
+    "72f0a8155699b23f5f79e466f53830494df7a8d0d417fcba5c1d0b4178c85408",
+    "052b2f52b4a6179f97f8834bf3514257bb6b38a3f847aaac4198bd86ab170736"
+  ],
+  "source_sha256": {
+    "api/util/AECableType.java": "a761136e26aca36e249ee3a8b6ba7635333f210e263165d11053eb8fdad9f15f",
+    "api/util/AECableVariant.java": "bd26216b15a67844e75da9bd72fb29ad9fd5066cd06174caea0f081e0eb4367f",
+    "api/util/AECableSize.java": "a14252f638cab0db91b7eabdbe4bd5f000b0b4970bc09d5faa27c090dd5db39a",
+    "api/util/AEColor.java": "b21a185ef86587abbf4c91c40d4c55ac6536d2cc8e48a7b968e741eee4ee03aa",
+    "parts/CableBusStorage.java": "8d50b79ad9f906bbc381a9fa9c41cc9e32ab7b7697337ebc91fc71716d81b64c",
+    "parts/networking/CablePart.java": "0bc810b4b8c344b5550796c970785be782a0543197a66a87d6e317d0ebaff68f",
+    "parts/networking/GlassCablePart.java": "d805a53c8ee9f0d3be30c1cae677b9ba2220fc74776d9ef1d0be0e71e6c95320",
+    "parts/networking/CoveredCablePart.java": "80f8151d1febc07ed483d1a29994d004a424aefe28df5cc0a90a25456c229cc9",
+    "parts/networking/SmartCablePart.java": "d02069227e395a75f6e1f56e70bbe78a0844a1141263dbc74e851f8ebc605449",
+    "parts/networking/DenseCablePart.java": "86949c343ab795f22d0cc1724776fd5f64242a2279ee3edfbe29fcd8176314db",
+    "me/InWorldGridNode.java": "8aa961cd4d7d84e1643100e80fd2b1815fee464b56914515918bac0818f639ef",
+    "parts/CableBusContainer.java": "60179b40ebe2d5af4dc3d3d298a0cdab6b4033ad00fa94688944e6660155dd07",
+    "parts/reporting/AbstractReportingPart.java": "cce15699e0dc069d3a1a5df3dfbf78638b8c0bdcfecf12f604953df710f1b98f"
+  },
+  "wire_method_sha256": {
+    "write": "d3e059cc096a4581464afd6f8240123b05d8b608158bb165dc9be2161b626d9b",
+    "read": "4fba628106e1d4fb17707b9301a2704969b9465ac2c0766d36db57dc07e40ae2",
+    "visual": "f88af1c15fec227ee48f74e2eb2497f9dfe33afd26d68c2e7f2cf3e2c553ad59",
+    "channels": "2f54e2a879f002ae1e803390d38a23f347063f4510f647ffcb3fabdbd4103461"
+  },
+  "binding_sha256": "ba37779527d6af1e08bf6ff60b4675f42153546d4b56c228804fc3a3140f0e25",
+  "rust_sha256": "9d28918a096d9ee16f8b337a004d75faf98a2e84a84a24c4cd6815bb6d14c28e",
+  "driver_sha256": "1b39a0a7b6e01406447a8cff21163da9dbe0a5a5678b19a145dc4e41d8e8c2c3",
+  "input_sha256": "39ebd17b2761d3315183f6b6e13bebf245def56c1fa5c28a8d6a5683d51fbae3",
+  "output_sha256": "a613b9d449437898b3df8642adafdf90229b509511877d14797e9c635c9c2117",
+  "scope": "Verbatim CableBus updateConnections/addToWorld/removeFromWorld/getGridNode, Reporting constructor and CablePart write/read/visual/channel methods; primary slot topology and wire/render distinction",
+  "limits": [
+    "Controlled part storage/registry, node lifecycle callbacks, grid helper, finalized ad-hoc counts, level and packet bindings",
+    "Grid merge/pathing algorithms are covered by separate existing oracles; no full lifecycle/order equivalence is claimed here",
+    "Only valid primary-node host configurations; source admission/recovery, external tunnel/fiber nodes, menus, shapes, rendering and native world activation remain separate"
+  ]
+}

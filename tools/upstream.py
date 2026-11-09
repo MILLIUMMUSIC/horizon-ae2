@@ -257,6 +257,13 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "parts/reporting/AbstractReportingPart.java": ("mixins/ae2/network.rs", "primary terminal node profile: source REQUIRE_CHANNEL and 0.5 AE/tick idle; constructor compared in a controlled Java host; native geometry, spin/input, opacity/light, complete packets, menu and lifecycle remain pending"),
+    "parts/CableBusContainer.java": ("mixins/ae2/cable_bus.rs", "center plus six primary part-node addresses, source internal edges and occupied/blocked exposure, per-slot observed gn identity and persistence; source host topology oracle; active native decoder remains center-only until shapes/input/render/menu support is bound; full registry/facade/recovery/readiness and external secondary nodes remain pending"),
+    "parts/networking/CablePart.java": ("mixins/ae2/network.rs", "85 cable profiles and native centers, source external versus primary-part channel counts, raw stream versus powered render gating; full native part shapes/input/render/menu/stream and lifecycle remain pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 
