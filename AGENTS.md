@@ -324,3 +324,20 @@ press. Keep the existing quartz missing-actor guard at block_drops_raw. Explosio
 entity/full loot context, world-pack tag reload and cube inherited/client/compass
 lifecycle remain separate work. `tools/tag_entry_reference.py` runs actual MC
 TagEntry reference cases; it is not a whole-pool Java/native comparison.
+
+Shared storage-menu modules are standalone only until consumed by a real native
+menu adapter. storage_helper.rs preserves source extraction/insert energy
+asymmetry, CONFIG callback, 0.9 tolerance, Java saturating casts and item stats.
+incremental_update.rs retains full server keys and newest equal pending objects;
+clear preserves serials, reset clears them, removal leaves pending changes.
+Its sorted pending order does not claim Java HashSet iteration. me_interaction.rs
+preserves 21 InventoryAction ordinals, malformed wire consumption and dispatch to
+only the current matching compatible menu. storage_menu.rs preserves retained
+stack identity under callbacks; clone a handle, explicitly copy a stack. ROLL_DOWN
+shrinks the fresh cursor; ROLL_UP mutates its retained handle. Fluid actions
+continue into the source null/item switch. Null-key filling with a real context
+returns typed NullFluidKey at the original fault boundary. Keep the inherited
+256 transfer cap and partial-failure behavior. Run all four corresponding Java
+oracles. Native session/host/window authority, actual inventory/capabilities,
+update transport and UI remain open; never activate a generic empty terminal
+or add a persistent third ME Chest withdrawal slot.

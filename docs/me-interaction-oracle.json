@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "cases": 44253,
+  "source_sha256": {
+    "core/network/serverbound/MEInteractionPacket.java": "4a90e9bf8009e99a1ae1bf04f11ff3aa715851bd34fe782b84b4e73d24f880ff",
+    "helpers/InventoryAction.java": "e4f0155377cc0d8886873643f08266f6de1f04e7d52ec49a835ded1c54bef0d5"
+  },
+  "binding_sha256": "b9f33d5de548595990daae1fd7f8d74a5a089aa24e830ed3420844bb800118a9",
+  "rust_sha256": {
+    "mixins/ae2/me_interaction.rs": "0d8efb5fc92e64deb9c96160d50664616355e273ac4ba06e135f08bf4779d9c8",
+    "examples/me_interaction_oracle.rs": "4b56bf65078dc90a7e23940914a3c4bbf726125cfd66ccc382e76f90bd65dafb"
+  },
+  "minecraft_client_sha256": "499f6897d1837516680f3114072d8106e11c9adcd933fe5cf051b551089b0c99",
+  "input_sha256": "aa1c0cb26175e7c56eb95d8a55497b0843be3b3ac832d09ae9416b6c3d4112a5",
+  "output_sha256": "0eafb61ecac174195e71e27d0e56aa91119cff1690795b10766688d6b08a3615",
+  "scope": "Original packet body encode/decode and server current-menu/id dispatch, original InventoryAction enum, actual Minecraft FriendlyByteBuf/VarLong/VarInt and Netty indices; malformed/noncanonical input and signed bounds",
+  "limits": [
+    "Controlled codec/type registration and player/menu interfaces; no native network authentication or real menu lifetime/storage transaction",
+    "This is packet payload behavior, not complete native framing or the MEStorageMenu link/serial/action gate"
+  ]
+}

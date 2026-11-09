@@ -1,8 +1,8 @@
 {
   "families": {
     "api": {
-      "partial": 29,
-      "pending": 243
+      "partial": 30,
+      "pending": 242
     },
     "block": {
       "partial": 11,
@@ -17,8 +17,8 @@
       "pending": 210
     },
     "core": {
-      "partial": 6,
-      "pending": 63
+      "partial": 7,
+      "pending": 62
     },
     "crafting": {
       "partial": 0,
@@ -45,8 +45,8 @@
       "pending": 2
     },
     "helpers": {
-      "partial": 0,
-      "pending": 26
+      "partial": 1,
+      "pending": 25
     },
     "hooks": {
       "partial": 1,
@@ -73,8 +73,8 @@
       "pending": 42
     },
     "menu": {
-      "partial": 3,
-      "pending": 89
+      "partial": 5,
+      "pending": 87
     },
     "mixins": {
       "partial": 1,
@@ -1599,8 +1599,10 @@
     {
       "family": "api",
       "path": "src/main/java/appeng/api/storage/StorageHelper.java",
+      "port": "mixins/ae2/storage_helper.rs",
+      "scope": "powered extraction/insertion control flow, factor/tolerance, Java casts and item-stat callbacks; 12960 original-class traces; real native energy/action-source/stat binding and crafting-link loader pending",
       "sha256": "a518a090f42b1f6f14731bb058b68afd4c3bc47814ccbd7ffaf5506be51815be",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "api",
@@ -4147,8 +4149,10 @@
     {
       "family": "core",
       "path": "src/main/java/appeng/core/network/serverbound/MEInteractionPacket.java",
+      "port": "mixins/ae2/me_interaction.rs",
+      "scope": "wire encode/decode and current-handler container-id dispatch, 44253 original-record cases with actual MC buffer/VarLong/VarInt; authenticated native transport/session integration pending",
       "sha256": "4a90e9bf8009e99a1ae1bf04f11ff3aa715851bd34fe782b84b4e73d24f880ff",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "core",
@@ -4835,8 +4839,10 @@
     {
       "family": "helpers",
       "path": "src/main/java/appeng/helpers/InventoryAction.java",
+      "port": "mixins/ae2/me_interaction.rs",
+      "scope": "all 21 source ordinals and interaction-packet enum codec; native action bindings and remaining consumers pending",
       "sha256": "e4f0155377cc0d8886873643f08266f6de1f04e7d52ec49a835ded1c54bef0d5",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "helpers",
@@ -6595,8 +6601,8 @@
     {
       "family": "menu",
       "path": "src/main/java/appeng/menu/AEBaseMenu.java",
-      "port": "mixins/ae2/guest_quick.rs",
-      "scope": "Drive-only forward quick-move order and remote client prediction suppression; bulk actions/security/other menus pending",
+      "port": "mixins/ae2/storage_menu.rs",
+      "scope": "inherited fill/empty 1-or-256 transfer loops and errors/sounds, used by the original-method menu oracle; existing Drive quick-move binding retained; full native slot/semantic/capability/security and remaining base menu lifecycle pending",
       "sha256": "e3e02ef8aaa46461e6176965e4752976021c5be2411b4c964f30400f7b78209f",
       "status": "partial"
     },
@@ -6911,14 +6917,18 @@
     {
       "family": "menu",
       "path": "src/main/java/appeng/menu/me/common/IncrementalUpdateHelper.java",
+      "port": "mixins/ae2/incremental_update.rs",
+      "scope": "full-key serial allocation, clear/reset/commit, newest pending key object and signed wrap/collision; 30015 original-class operations; sorted pending order differs from Java HashSet and native sessions pending",
       "sha256": "897aad8af481efe4c3ac8f4f2722170e39f1718775e5c5ccf1976993ac34b25f",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "menu",
       "path": "src/main/java/appeng/menu/me/common/MEStorageMenu.java",
+      "port": "mixins/ae2/storage_menu.rs",
+      "scope": "server interaction/serial/link gates, item actions, bucket fallback and quick-move callback program, 18096 original-method traces; actual native screen/session/inventory/capabilities, update synchronization, view cells/settings and full lifecycle pending",
       "sha256": "4970dfdf709ec465c9101e7ef578bfced6dedd771265fcf8306ce0e8655a1818",
-      "status": "pending"
+      "status": "partial"
     },
     {
       "family": "menu",
@@ -8733,8 +8743,8 @@
     {
       "family": "util",
       "path": "src/main/java/appeng/util/Platform.java",
-      "port": "mixins/ae2/item_energy_glue.rs",
-      "scope": "isChargeable for the 16 built-in WRITE powered items, maximum > 0 and nonempty stack; all other Platform utilities and addon item registry pending",
+      "port": "mixins/ae2/storage_menu.rs",
+      "scope": "source carried insertion remainder and copy-with-size boundaries through original-method oracle; existing 16-item native charging predicate retained; remaining utilities and addon registry pending",
       "sha256": "46ea0437a96b14479ab9c1ea16bb201f5fe62ec5868bf733da769e65773dec28",
       "status": "partial"
     },

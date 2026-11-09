@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "cases": 12960,
+  "source_sha256": "a518a090f42b1f6f14731bb058b68afd4c3bc47814ccbd7ffaf5506be51815be",
+  "binding_sha256": "d372971b87702c204291fb2f499fc0c3d0d71fdd6da8c323c242533c6a910b85",
+  "rust_sha256": {
+    "mixins/ae2/storage_helper.rs": "5a0df0b0c8d86a78423ddf217b428a0e14d966c45895365c439cf689bec68666",
+    "examples/storage_helper_oracle.rs": "117c0c453f216a81f54667c0ee36d6eaa680d569b2dc2b32ce3ed705aebda519"
+  },
+  "input_sha256": "aa2e1201432a4fd670b7a5091e8c22a5d6b688d869ea3b541718c2e62202603a",
+  "output_sha256": "238551f1e5d517806d5489526645fc902ea20da7df41d16fac81b51dde7fda89",
+  "scope": "Both original powered transfer overloads with explicit mode; complete ordered storage/power/statistics callback traces, source CONFIG argument, signed long counts, saturation and nonfinite energy",
+  "limits": [
+    "Controlled key classes and inventory/power/action-source/statistics callbacks; crafting-link loader is compiled but excluded",
+    "No native menu, actual permission check, real player statistic lifecycle or CONFIG implementation is proved"
+  ]
+}

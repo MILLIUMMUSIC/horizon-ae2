@@ -29,6 +29,42 @@ The full mod is not yet complete.
 | Fluid transforms | Both built-in Fluix recipes from carried data, source signed timer/threshold/reset, greedy claims, surviving per-entity post-movement/merge/lifetime/environment phase, six level RNG draws and immediate zero-delay fresh entities | Source lightning, explosion recipes/frequency assembly, arbitrary fluid tags and result components, original query/recipe/cache/reload order, command object replacement and complete identity lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
+## Shared storage-menu interaction core
+
+The standalone menu core retains full server keys behind per-menu serials.
+MEInteractionPacket preserves all 21 InventoryAction ordinals, Minecraft wire
+encoding (including malformed/noncanonical varint consumption), and dispatches
+only to the current compatible handler with the matching container ID. Native
+sender/window/host identity and lifecycle must still bind this core.
+
+StorageHelper preserves source simulation/commit ordering, the 0.9 tolerance,
+Java floating-to-long saturation, item statistics, and the extraction/insert
+energy asymmetry: extraction charges for the original simulated amount while
+insertion charges for the reduced amount. The binding must apply CONFIG and
+use the actual action source, key and player. IncrementalUpdateHelper retains
+serials across full refreshes, discards them on reset/removal, and keeps the
+newest equal pending object. Native pending iteration is sorted; it does not
+claim Java HashSet order fidelity.
+
+MEStorageMenu's server callback program covers source link/serial/null-key
+gates, item actions, retained versus fresh carried-stack references, copied
+insertion remainder, quick-move loops and bucket fallback. Inherited fill/empty
+loops retain the 256-transfer cap, simulation, error and sound boundaries.
+A source null-key filling fault becomes a typed rejection before transfer.
+The Java comparison executes the original methods against controlled identity-
+preserving stacks, two player slots, storage/power and bucket/tank strategies.
+It compares every ordered callback and reachable final state in 18,096 cases,
+including reentrant cursor/slot/storage changes. Separate original-class checks
+cover 12,960 StorageHelper scenarios, 30,015 incremental-update operations and
+44,253 packet cases; reports record hashes and excluded scope.
+
+These modules are standalone dependencies for the remaining terminal/ME Chest
+PRs. They are not registered as native payloads yet. Actual native menus, client
+updates/view cells/settings, host/window authority, real slot semantics and
+container capabilities, crafting UI, player statistics/sounds, multiplayer and
+full menu lifecycle remain required. No extra ME Chest inventory slot or empty
+generic terminal screen is introduced.
+
 ## Primary multipart node foundation
 
 The standalone packed-quad rotation core follows QuadRotator, source Fabric

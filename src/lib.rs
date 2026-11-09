@@ -96,3 +96,15 @@ pub mod ae2_meteorite_placer;
 
 #[path = "../mixins/ae2/meteorite_command.rs"]
 pub mod ae2_meteorite_command;
+
+#[path = "../mixins/ae2/storage_helper.rs"]
+pub mod ae2_storage_helper;
+
+#[path = "../mixins/ae2/incremental_update.rs"]
+pub mod ae2_incremental_update;
+
+#[path = "../mixins/ae2/me_interaction.rs"]
+pub mod ae2_me_interaction;
+
+#[path = "../mixins/ae2/storage_menu.rs"]
+pub mod ae2_storage_menu;

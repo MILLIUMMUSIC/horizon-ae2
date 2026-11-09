@@ -7,6 +7,13 @@ per-file status and `PARITY.md` for unresolved behavior.
 
 ## Current work
 
+The shared standalone storage-menu core now covers source packet/window dispatch,
+serial/key retention, powered transfers, item/cursor actions and inherited fluid
+container loops. Original Java comparisons pass 12,960 power-helper scenarios,
+30,015 update operations, 44,253 packet cases and 18,096 menu traces. These are
+controlled callback comparisons. Real native menu/session/UI/capability binding
+remains open for PR #3/#6; neither terminal nor ME Chest is playable yet.
+
 The graph and saved-host binding now address each primary part separately from
 its cable center. Internal null-direction edges, occupied-face blocking,
 per-part channel demand and separate `gn` persistence are implemented. A source

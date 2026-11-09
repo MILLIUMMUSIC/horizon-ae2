@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "cases": 18096,
+  "source_sha256": {
+    "menu/me/common/MEStorageMenu.java": "4970dfdf709ec465c9101e7ef578bfced6dedd771265fcf8306ce0e8655a1818",
+    "menu/AEBaseMenu.java": "e3e02ef8aaa46461e6176965e4752976021c5be2411b4c964f30400f7b78209f",
+    "helpers/InventoryAction.java": "e4f0155377cc0d8886873643f08266f6de1f04e7d52ec49a835ded1c54bef0d5",
+    "api/storage/StorageHelper.java": "a518a090f42b1f6f14731bb058b68afd4c3bc47814ccbd7ffaf5506be51815be",
+    "menu/me/common/IncrementalUpdateHelper.java": "897aad8af481efe4c3ac8f4f2722170e39f1718775e5c5ccf1976993ac34b25f",
+    "util/Platform.java": "46ea0437a96b14479ab9c1ea16bb201f5fe62ec5868bf733da769e65773dec28"
+  },
+  "method_sha256": {
+    "0": "cbe9d6bc182da39fc64a3079e95e67a8beacacebb3aac61b6d384ea9271b25ca",
+    "1": "9a92cd867e07aa93c781f949cab4c227a9d699932f62140307e9705d6f11e9bb",
+    "2": "4ce6e7171a0a972eb89ea80522b919dc36778022376bfc84fb566a442e8e9087",
+    "3": "e77ce0ffb79c5a2a309b416d2a416d7f625e4cd026092ab671e26b7f7bf654a6",
+    "4": "4b90dce5006d983aec51e4d0b998f29c362ae98bbf4549317da37d63e7bb5761",
+    "5": "81303435d3c96119c68ab4c1b6946d09e425ef289df3b03efc6f9a109d1e936b",
+    "6": "b589b2a5f75d231c33275a9910f33f633a63eae77c745b9e2638ba250f7e67d7"
+  },
+  "binding_sha256": "10e2ef60d92b26e4ecb988beb525e9bf99e718dd52d3a559f1c15dd3cda7c11b",
+  "rust_sha256": {
+    "mixins/ae2/storage_menu.rs": "d4e36a593336956f023dc21325500a37b43c8c329a2d1e752af6afb488ceb615",
+    "mixins/ae2/storage_helper.rs": "5a0df0b0c8d86a78423ddf217b428a0e14d966c45895365c439cf689bec68666",
+    "examples/storage_menu_oracle.rs": "f428052c570f8d267062ad80e069b1aafaee417c189fafdaaa315bfac5639e4c",
+    "examples/support/storage_menu_fixture.rs": "a49d78f25c39837a69812b9fdb1e6268030b209125e478de31ef2f52435a87a9"
+  },
+  "input_sha256": "c301d893b894b953840502c54deba13ff583c08a87dfcd273853e82637283c09",
+  "output_sha256": "2d57e6e348f35be7db7b84b92c6b6e38e60dc8bd512d1416bc309dcec19d5b97",
+  "scope": "Original server interaction/null/serial gates, item actions, carried remainder, quick-move program, bucket fallback, inherited fill/empty loops, actual StorageHelper and update helper; ordered callback traces and resulting cursor/slots/storage/power/container state",
+  "limits": [
+    "Controlled key/stack/player/slot/container strategies, storage and energy callbacks; no actual native menus, platform capabilities, permission or whole-world behavior",
+    "Opaque stack handles preserve object identity under controlled reentrant callbacks; a source null-key filling fault maps to typed NullFluidKey rejection",
+    "Two controlled destination slots/player slots and controlled generic bucket/tank callbacks; full platform slot/semantic/capability implementations remain separate",
+    "Client dispatch branch, actual player stats/sounds/crafting UI and registry codecs are not executed"
+  ]
+}

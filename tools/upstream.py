@@ -292,6 +292,17 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "api/storage/StorageHelper.java": ("mixins/ae2/storage_helper.rs", "powered extraction/insertion control flow, factor/tolerance, Java casts and item-stat callbacks; 12960 original-class traces; real native energy/action-source/stat binding and crafting-link loader pending"),
+    "menu/me/common/IncrementalUpdateHelper.java": ("mixins/ae2/incremental_update.rs", "full-key serial allocation, clear/reset/commit, newest pending key object and signed wrap/collision; 30015 original-class operations; sorted pending order differs from Java HashSet and native sessions pending"),
+    "helpers/InventoryAction.java": ("mixins/ae2/me_interaction.rs", "all 21 source ordinals and interaction-packet enum codec; native action bindings and remaining consumers pending"),
+    "core/network/serverbound/MEInteractionPacket.java": ("mixins/ae2/me_interaction.rs", "wire encode/decode and current-handler container-id dispatch, 44253 original-record cases with actual MC buffer/VarLong/VarInt; authenticated native transport/session integration pending"),
+    "menu/me/common/MEStorageMenu.java": ("mixins/ae2/storage_menu.rs", "server interaction/serial/link gates, item actions, bucket fallback and quick-move callback program, 18096 original-method traces; actual native screen/session/inventory/capabilities, update synchronization, view cells/settings and full lifecycle pending"),
+    "menu/AEBaseMenu.java": ("mixins/ae2/storage_menu.rs", "inherited fill/empty 1-or-256 transfer loops and errors/sounds, used by the original-method menu oracle; existing Drive quick-move binding retained; full native slot/semantic/capability/security and remaining base menu lifecycle pending"),
+    "util/Platform.java": ("mixins/ae2/storage_menu.rs", "source carried insertion remainder and copy-with-size boundaries through original-method oracle; existing 16-item native charging predicate retained; remaining utilities and addon registry pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

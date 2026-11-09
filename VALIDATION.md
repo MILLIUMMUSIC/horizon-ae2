@@ -3,7 +3,38 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
-## Current meteorite placement checkpoint
+## Shared storage-menu core
+
+- Formatting, Clippy with warnings denied, 191 standalone tests and 17 Python
+  tests pass. The inventory records 148 partial classes of 1,429, none complete.
+- `tools/storage_helper_oracle.py`: 12,960 whole-original-class callback traces
+  compare power-limited simulate/commit, item/fluid factors, signed boundaries,
+  nonfinite power and statistics against the Rust core.
+- `tools/incremental_update_oracle.py`: 30,015 operations run the actual original
+  helper with Guava BiMap/HashSet and controlled equality/object identities.
+  Pending sets are sorted for comparison; Java HashSet iteration is excluded.
+- `tools/me_interaction_oracle.py`: 44,253 original-record encode/decode/dispatch
+  cases execute actual Minecraft FriendlyByteBuf, VarLong and VarInt with real
+  Netty. This includes malformed consumption, trailing bytes, all action ordinals
+  and current-menu/window refusal. Menu and player bindings are controlled.
+- `tools/storage_menu_oracle.py`: 18,096 source-method scenarios compare complete
+  ordered traces and reachable cursor/slot/network/power/container state. Seven
+  original interaction/fill/empty methods, original StorageHelper/update helper
+  and source remainder/placeable helpers run with controlled stack identity,
+  two destination slots and bucket/tank strategies. Reentrant callbacks replace
+  cursors/slots or change storage; partial fluid commits and null-key faults
+  retain source boundaries. Reports record exact input/source/binding/output hashes.
+- Packaging retains all four drivers, Rust examples, the shared fixture and
+  reports. The actual native-mod reader accepts the 165-entry archive; all 191
+  tests also pass from its extracted corresponding source.
+  These cores are not native-registered; no Horizon runtime payload
+  changed and native game suites were not repeated for this standalone change.
+
+Actual native session/host/window authority, real slot/capability bindings,
+client updates/search/view cells/settings, crafting UI, statistics/sounds and
+complete lifecycle/multiplayer remain required for the terminal and ME Chest PRs.
+
+## Meteorite placement checkpoint (previous)
 
 - Formatting, Clippy with warnings denied, 184 standalone Rust tests, 17 Python
   tests and source/stack-limit/native-tick audits pass. Source inventory covers

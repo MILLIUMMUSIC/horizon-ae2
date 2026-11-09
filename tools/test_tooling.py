@@ -298,7 +298,11 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(source.read("mixins/ae2/charger.rs"), z.read(prefix + "charger.rs"))
                 for name in ["tools/meteorite_oracle.py", "examples/meteorite_oracle.rs",
                              "tools/tag_entry_reference.py", "docs/meteorite-oracle.json",
-                             "docs/meteorite-native.json", "docs/tag-entry-reference.json"]:
+                             "docs/meteorite-native.json", "docs/tag-entry-reference.json",
+                             "tools/storage_menu_oracle.py", "examples/storage_menu_oracle.rs",
+                             "examples/support/storage_menu_fixture.rs", "docs/storage-menu-oracle.json",
+                             "tools/storage_helper_oracle.py", "tools/incremental_update_oracle.py",
+                             "tools/me_interaction_oracle.py"]:
                     self.assertIn(name, source.namelist())
 
     def test_corresponding_source_includes_content_preparation_imports(self):
