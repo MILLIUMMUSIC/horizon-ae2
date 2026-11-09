@@ -7,7 +7,9 @@ use super::ae2_cable::{Cable, Color};
 use super::ae2_grid::{
     ChannelMode, ConnectionId, ControllerState, Direction, Flags, Graph, NodeId, NodeSpec,
 };
-use super::ae2_power::{EnergyNode, EnergyService, EnergySystem, ServiceId, Store};
+use super::ae2_power::{
+    EnergyNode, EnergyService, EnergySystem, Flow, ServiceId, SharedPower, Store,
+};
 use std::collections::{BTreeMap, BTreeSet};
 pub type Pos = [i32; 3];
 
@@ -56,6 +58,37 @@ impl PartialOrd for NodeKey {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ChestPower {
+    capacity: u64,
+    priority: i32,
+}
+impl ChestPower {
+    /// Source construction calls setInternalMaxPower(500 * CONFIG), whose
+    /// StoredEnergyAmount clamps the maximum. Do not reconstruct an existing
+    /// host's capacity when its live CONFIG multiplier changes later.
+    pub fn new(config_multiplier: f64, priority: i32) -> Option<Self> {
+        if !config_multiplier.is_finite() || config_multiplier <= 0.0 {
+            return None;
+        }
+        Some(Self {
+            capacity: (500.0 * config_multiplier)
+                .min(super::ae2_energy::MAX_MAXIMUM)
+                .to_bits(),
+            priority,
+        })
+    }
+    pub fn capacity(self) -> f64 {
+        f64::from_bits(self.capacity)
+    }
+    pub fn priority(self) -> i32 {
+        self.priority
+    }
+    pub fn with_priority(self, priority: i32) -> Self {
+        Self { priority, ..self }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     Controller,
     Charger,
@@ -64,6 +97,7 @@ pub enum Kind {
     DenseEnergyCell,
     CreativeEnergyCell,
     Drive,
+    Chest(ChestPower),
     Terminal,
     Cable(Cable),
 }
@@ -89,6 +123,7 @@ impl Kind {
             Self::DenseEnergyCell => "ae2:dense_energy_cell",
             Self::CreativeEnergyCell => "ae2:creative_energy_cell",
             Self::Drive => "ae2:drive",
+            Self::Chest(_) => "ae2:chest",
             Self::Cable(_) | Self::Terminal => "ae2:cable_bus",
         }
     }
@@ -100,11 +135,12 @@ impl Kind {
             Self::DenseEnergyCell => 1600000.0,
             Self::CreativeEnergyCell => super::ae2_energy::MAX_MAXIMUM,
             Self::Drive | Self::Cable(_) | Self::Terminal => 0.0,
+            Self::Chest(profile) => profile.capacity(),
         }
     }
     pub fn node_flags(self) -> Flags {
         match self {
-            Self::Drive | Self::Terminal => Flags::REQUIRE_CHANNEL,
+            Self::Drive | Self::Chest(_) | Self::Terminal => Flags::REQUIRE_CHANNEL,
             Self::Controller => Flags::CANNOT_CARRY | Flags::DENSE_CAPACITY,
             Self::Cable(cable) => cable.kind.node_flags(),
             _ => Flags::default(),
@@ -114,6 +150,9 @@ impl Kind {
         match self {
             Self::Controller => super::ae2_controller::IDLE,
             Self::Drive => 2.0,
+            // ManagedGridNode/GridNode start at 1.0. Chest's separate local
+            // idlePowerUsage field remains 0 until a readable cell is loaded.
+            Self::Chest(_) => 1.0,
             Self::Terminal => super::ae2_reporting::idle_power(true),
             _ => 0.0,
         }
@@ -128,6 +167,7 @@ impl Kind {
         // CablePart.changeColor updates the existing managed node in place.
         match (self, other) {
             (Self::Cable(a), Self::Cable(b)) => a.kind == b.kind,
+            (Self::Chest(a), Self::Chest(b)) => a.capacity == b.capacity,
             _ => self == other,
         }
     }
@@ -135,8 +175,10 @@ impl Kind {
         // EnergyCellBlockEntity.loadTag calls StoredEnergyAmount.setStored,
         // rather than the constructor's direct assignment. Preserve its
         // MIN_AMOUNT threshold even when this is the first loaded snapshot.
-        let amount = if matches!(self, Self::EnergyCell | Self::DenseEnergyCell)
-            && amount < super::ae2_energy::MIN_AMOUNT
+        let amount = if matches!(
+            self,
+            Self::EnergyCell | Self::DenseEnergyCell | Self::Chest(_)
+        ) && amount < super::ae2_energy::MIN_AMOUNT
         {
             0.0
         } else {
@@ -160,6 +202,15 @@ impl Kind {
                 1600,
             )),
             Self::CreativeEnergyCell => Some(Store::creative()),
+            Self::Chest(profile) => {
+                let mut store = Store::finite(
+                    amount.clamp(0.0, profile.capacity()),
+                    profile.capacity(),
+                    profile.priority(),
+                );
+                store.flow = super::ae2_power::Flow::Write;
+                Some(store)
+            }
         };
         EnergyNode {
             idle: self.base_idle_power(),
@@ -232,8 +283,27 @@ pub struct Network {
     channel_power: BTreeMap<ServiceId, f64>,
     controller_states: BTreeMap<ServiceId, ControllerState>,
     next_service: ServiceId,
+    chest_power: BTreeMap<NodeKey, SharedPower>,
 }
 impl Network {
+    /// The world binding owns this handle even while its node is unready or
+    /// detached. A replacement physical host must provide a fresh handle.
+    pub fn bind_chest_power(&mut self, pos: Pos, power: SharedPower) {
+        let key = NodeKey::center(pos);
+        if self
+            .chest_power
+            .get(&key)
+            .is_some_and(|old| !old.same_storage(&power))
+        {
+            self.forget_node(key);
+        }
+        self.chest_power.insert(key, power);
+    }
+    pub fn forget_chest_power(&mut self, pos: Pos) {
+        let key = NodeKey::center(pos);
+        self.forget_node(key);
+        self.chest_power.remove(&key);
+    }
     fn new_service(&mut self, pivot: NodeId) -> ServiceId {
         let id = self.next_service;
         self.next_service += 1;
@@ -273,7 +343,9 @@ impl Network {
                 Some(node) => {
                     if node.snapshot.front != snapshot.front
                         || node.snapshot.exposed != snapshot.exposed
-                        || node.snapshot.kind != snapshot.kind
+                        || (node.snapshot.kind != snapshot.kind
+                            && !matches!((node.snapshot.kind, snapshot.kind),
+                                (Kind::Chest(a), Kind::Chest(b)) if a.capacity == b.capacity))
                     {
                         changed = true;
                     }
@@ -443,10 +515,19 @@ impl Network {
             let service = assignments[&node.id];
             let (spec, buffer) = match transfers.remove(&pos) {
                 Some(t) => (t.node, t.saved_buffer),
-                None => (
-                    node.snapshot.kind.energy_node(node.snapshot.stored),
-                    node.snapshot.saved_buffer,
-                ),
+                None => {
+                    let mut spec = node.snapshot.kind.energy_node(node.snapshot.stored);
+                    if let Kind::Chest(profile) = node.snapshot.kind
+                        && let Some(power) = self.chest_power.get(&pos)
+                    {
+                        spec.store = Some(Store::shared(
+                            power.clone(),
+                            profile.priority(),
+                            Flow::Write,
+                        ));
+                    }
+                    (spec, node.snapshot.saved_buffer)
+                }
             };
             self.energy
                 .service_mut(service)
@@ -502,6 +583,7 @@ impl Network {
             .map(|node| node.snapshot)
             .collect();
         self.sync(remaining);
+        self.chest_power.remove(&NodeKey::center(pos));
     }
     /// Read live storage only if the BE still echoes this node's last saved
     /// amount. A newer external /data replacement must not be overwritten.
@@ -514,6 +596,46 @@ impl Network {
             .service(node.service?)?
             .store(node.id)
             .map(Store::amount)
+    }
+    /// Actual shared power store, including a Chest's WRITE-only local buffer.
+    pub fn local_storage(&self, key: impl Into<NodeKey>) -> Option<f64> {
+        let node = self.nodes.get(&key.into())?;
+        self.energy
+            .service(node.service?)?
+            .store(node.id)
+            .map(Store::amount)
+    }
+    /// After writing a live local amount to the still-matching BE, retain that
+    /// echo. A later unrelated sync must not restore the previously saved value.
+    pub fn local_storage_saved(&mut self, key: impl Into<NodeKey>, amount: f64) -> bool {
+        let key = key.into();
+        if self
+            .local_storage(key)
+            .is_none_or(|live| live.to_bits() != amount.to_bits())
+        {
+            return false;
+        }
+        self.nodes.get_mut(&key).unwrap().snapshot.stored = amount;
+        true
+    }
+    pub fn service_ids(&self) -> BTreeSet<ServiceId> {
+        self.nodes
+            .values()
+            .filter_map(|node| node.service)
+            .collect()
+    }
+    pub fn owner_storage_event(
+        &mut self,
+        key: impl Into<NodeKey>,
+        event: super::ae2_energy::PowerEvent,
+    ) -> bool {
+        let Some(node) = self.nodes.get(&key.into()) else {
+            return false;
+        };
+        let Some(service) = node.service.and_then(|id| self.energy.service_mut(id)) else {
+            return false;
+        };
+        service.owner_storage_event(node.id, event).is_ok()
     }
     pub fn extract(
         &mut self,
@@ -674,6 +796,82 @@ mod tests {
             n.end_tick();
         }
     }
+    #[test]
+    fn chest_uses_one_write_only_store_before_attachment_through_split_and_after_detachment() {
+        let p = [0, 0, 0];
+        let profile = ChestPower::new(2.0, 37).unwrap();
+        let power = SharedPower::new(500.0, profile.capacity());
+        let mut n = Network::default();
+        // Local work can precede ManagedGridNode readiness.
+        assert_eq!(power.extract(40.0, true), 40.0);
+        n.bind_chest_power(p, power.clone());
+        let chest = snapshot(p, Kind::Chest(profile), 500.0);
+        n.sync(vec![chest]);
+        assert_eq!(n.local_storage(p), Some(460.0));
+        assert_eq!(n.extract(p, 50.0, 1.0, true), 0.0);
+        assert_eq!(power.amount(), 460.0);
+        let (service, node) = n.node_service(p).unwrap();
+        let store = n.energy.service(service).unwrap().store(node).unwrap();
+        assert_eq!(store.flow, Flow::Write);
+        assert_eq!(store.priority, 37);
+        assert_eq!(store.maximum(), 1000.0);
+        assert_eq!(
+            n.graph.node(node).unwrap().spec.flags,
+            Flags::REQUIRE_CHANNEL
+        );
+        assert_eq!(n.energy.service(service).unwrap().base_idle(), 1.0);
+        // Add a different existing grid then merge/split; no amount is copied.
+        let supply = snapshot([0, 0, 1], Kind::CreativeEnergyCell, 0.0);
+        n.sync(vec![chest, supply]);
+        assert_eq!(n.local_storage(p), Some(power.amount()));
+        assert_eq!(power.extract(7.0, true), 7.0);
+        assert!(n.local_storage_saved(p, 453.0));
+        let chest = snapshot(p, Kind::Chest(profile), 453.0);
+        n.sync(vec![chest]);
+        assert_eq!(n.local_storage(p), Some(453.0));
+        n.forget_node(p);
+        assert!(n.local_storage(p).is_none());
+        assert_eq!(power.extract(3.0, true), 3.0);
+        n.sync(vec![chest]);
+        assert_eq!(n.local_storage(p), Some(450.0));
+        // A replaced physical BE gets a fresh store even with the same NBT echo.
+        let replacement = SharedPower::new(19.0, profile.capacity());
+        n.bind_chest_power(p, replacement.clone());
+        n.sync(vec![chest]);
+        assert_eq!(n.local_storage(p), Some(19.0));
+        assert_eq!(power.amount(), 450.0);
+        assert!(!n.local_storage_saved(p, 450.0));
+        n.forget_host(p);
+        assert!(!n.chest_power.contains_key(&NodeKey::center(p)));
+        assert_eq!(replacement.amount(), 19.0);
+    }
+
+    #[test]
+    fn chest_has_all_grid_faces_and_its_own_single_channel_demand() {
+        let mut n = Network::default();
+        let profile = ChestPower::new(1.0, 0).unwrap();
+        let p = [0, 0, 0];
+        let mut nodes = vec![snapshot(p, Kind::Chest(profile), 0.0)];
+        for d in Direction::ALL {
+            nodes.push(snapshot(d.offset(), Kind::CreativeEnergyCell, 0.0));
+        }
+        n.sync(nodes);
+        for d in Direction::ALL {
+            assert!(n.connection(p, d.offset()).is_some());
+        }
+        assert_eq!(
+            n.nodes[&NodeKey::center(p)].snapshot.front,
+            Direction::North
+        );
+        assert_eq!(Kind::Chest(profile).base_idle_power(), 1.0);
+        assert!(ChestPower::new(f64::NAN, 0).is_none());
+        assert!(ChestPower::new(0.0, 0).is_none());
+        assert_eq!(
+            ChestPower::new(f64::MAX, 0).unwrap().capacity(),
+            super::super::ae2_energy::MAX_MAXIMUM
+        );
+    }
+
     #[test]
     fn all_six_primary_part_nodes_are_distinct_and_use_source_internal_edges() {
         use super::super::ae2_cable::CableType;

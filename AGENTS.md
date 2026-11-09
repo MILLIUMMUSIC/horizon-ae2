@@ -367,3 +367,17 @@ only sink: indexed tank-0 capacity/validity differs from unindexed queries.
 Run tools/me_chest_oracle.py. Its original methods/classes use controlled
 world/grid/cell bindings, positive finite CONFIG and attached-level transfers;
 source nonfinite energy and pre-level faults remain outside this proof.
+
+SharedPower in power.rs owns one actual powered-host store independently of its
+managed node. Store::shared clones the handle, not its amount. Native Chest
+binding must retain it before readiness and across detach/reattach, and replace
+it for a new physical BE. Drain the owner event queue once outside service
+locks; route Chest RECEIVE to its current grid, PROVIDE to display recalculation.
+Do not initialize a duplicate local buffer from a saved value each tick. Raw
+StoredEnergyAmount construction starts provider/requester eligibility true;
+follow the source root constructor/load setters before interpreting events.
+Network ChestPower profiles describe construction capacity/priority only;
+Kind.from_block deliberately does not admit Chest until the host adapter lands.
+The initial managed node idle is 1.0, independently of Chest's local idle=0.0.
+All six grid faces are exposed. Runtime priority tree reordering, real world
+callbacks/menu/host identity and nonfinite recovery remain separate work.

@@ -316,6 +316,12 @@ PARTIAL.update({
 })
 
 
+PARTIAL.update({
+    "me/service/EnergyService.java": ("mixins/ae2/power.rs", "existing provider/requester/overlay/storage rules plus a shared powered-host store and explicit owner event path; 29907 original operations with retained WRITE-only host across grids; native owner callback interior ordering, dynamic power priority tree mutation and full world lifecycle pending"),
+    "blockentity/powersink/AEBasePoweredBlockEntity.java": ("mixins/ae2/power.rs", "shared owned power store can outlive managed grid attachment without copying energy; source wrapper/local extraction callback program also in me_chest.rs; native Chest root constructor/load/host binding, external capabilities and full base lifecycle pending"),
+})
+
+
 def git(source, *args):
     return subprocess.check_output(["git", "-C", str(source), *args], text=True).strip()
 

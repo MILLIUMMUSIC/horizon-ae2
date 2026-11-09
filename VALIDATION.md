@@ -3,6 +3,34 @@
 Last updated: 9 November 2026. Development host: macOS arm64, Rust 1.99.1,
 Python 3.12 and JDK 21. Pins: AE2 db17504, Horizon aa27eca, mixins 3f99a5c.
 
+## Shared powered-host network store
+
+- Formatting, Clippy with warnings denied, 196 standalone tests, 17 Python
+  tests and source audits pass. Source coverage remains 153 partial classes.
+- `tools/shared_power_oracle.py` compares 256 scenarios / 29,907 operations
+  against the original energy classes with a retained WRITE-only owner and
+  three grid services. It checks local work before attachment and while
+  detached, node migration, simulation/commit, resizing, buffer shares, events
+  and ticks. Source/binding/driver/input/output hashes are in its report.
+  Math/collection/grid/event infrastructure is controlled; finite values and
+  a fixed unique priority are covered with 1e-11 relative / 1e-8 absolute tolerance.
+- The graph tests retain one store through split/merge and reattachment, isolate
+  a replacement physical host from old handles, and check WRITE-only local power,
+  all six exposed faces, REQUIRE_CHANNEL and initial node idle 1 AE/tick.
+- Native check, 253 game tests and build pass. Existing dead-code warnings and
+  the nonfatal rust-objcopy/libLLVM warning remain. Native Chest registration,
+  world-host/callback/menu binding and full lifecycle are not active yet.
+- Eight existing center CableBus world groups pass on the completed build,
+  including power/color topology and restart. Runtime/source hashes and scope
+  are in `docs/shared-power-cable-regression.json`. This is a regression of
+  existing centers, not native Chest host or UI validation.
+- The actual native-mod reader accepts the 167-entry source package. Extracted
+  corresponding source independently passes all 196 standalone tests; archive
+  checks include the new oracle, driver and world-regression evidence.
+- Regression comparisons pass: 66,048 multipart cases, 200 single-grid energy
+  scenarios / 40,482 operations and 200 overlay scenarios / 52,083 operations.
+  Detailed regression reports remain under ignored target/review-2026-11-08/.
+
 ## ME Chest host callback core
 
 - Formatting, Clippy with warnings denied, 193 standalone tests and 17 Python

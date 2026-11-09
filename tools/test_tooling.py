@@ -305,7 +305,9 @@ class PackageTests(unittest.TestCase):
                              "tools/me_interaction_oracle.py", "tools/inventory_update_oracle.py",
                              "examples/inventory_update_oracle.rs", "docs/inventory-update-oracle.json",
                              "tools/me_chest_oracle.py", "examples/me_chest_oracle.rs",
-                             "examples/support/me_chest_fixture.rs", "docs/me-chest-oracle.json"]:
+                             "examples/support/me_chest_fixture.rs", "docs/me-chest-oracle.json",
+                             "tools/shared_power_oracle.py", "examples/shared_power_oracle.rs",
+                             "docs/shared-power-oracle.json", "docs/shared-power-cable-regression.json"]:
                     self.assertIn(name, source.namelist())
 
     def test_corresponding_source_includes_content_preparation_imports(self):

@@ -29,6 +29,35 @@ The full mod is not yet complete.
 | Fluid transforms | Both built-in Fluix recipes from carried data, source signed timer/threshold/reset, greedy claims, surviving per-entity post-movement/merge/lifetime/environment phase, six level RNG draws and immediate zero-delay fresh entities | Source lightning, explosion recipes/frequency assembly, arbitrary fluid tags and result components, original query/recipe/cache/reload order, command object replacement and complete identity lifecycle |
 | Platform/content | Pinned original resources, source stack limits, 461 generated NeoForge common tags and recipe preparation | Full platform services, recipe types/conditions/IDs, registries, progression, addons and coexistence checks |
 
+## Powered-host storage identity
+
+`SharedPower` retains one actual StoredEnergyAmount-compatible store across
+managed-node readiness, detachment, reattachment and grid transfers. Cloned
+handles alias that store. The EnergyService adapter retains WRITE/public rules;
+a Chest can consume its own local energy while that energy remains unavailable
+to the grid's provider list. Simulation leaves the store and owner queue alone.
+Committed threshold events enter an ordered owner queue for the level binding
+to drain outside service locks. The owning Chest still filters PROVIDE into
+its display path and forwards RECEIVE to its current grid only when attached.
+Native callback delivery at the original interior event sites remains pending.
+
+The graph has a parameterized Chest construction profile: bounded 500*CONFIG
+capacity, source priority, REQUIRE_CHANNEL, all six exposed grid faces and a
+shared WRITE-only power store. Its initial node idle is 1 AE/tick, inherited
+from ManagedGridNode/GridNode; the distinct local idlePowerUsage starts at zero.
+A readable cell changes the node/local idle through the existing host callback
+program. This graph support is not admitted by Kind.from_block yet: native
+Chest registration, loaded-host binding and menus are not active.
+
+256 original-energy-class scenarios / 29,907 operations compare a retained host
+across three grids, local work while detached, simulation/commit, resizing,
+owner events, buffer shares and ticks. Math/collections/grid/node/event bindings
+are controlled; finite inputs and a fixed unique priority are covered. Numerical
+tolerance is 1e-11 relative / 1e-8 absolute. Graph regressions check a fresh host's
+separate store, old-handle survival, split/merge and all six faces. Dynamic power-
+priority tree mutation, nonfinite power, native callback reentrancy, complete
+unload/drop/session identity and physical world binding remain required.
+
 ## ME Chest host rules
 
 `me_chest.rs` keeps the source's two inventories: input at combined slot 0 and

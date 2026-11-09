@@ -6,6 +6,7 @@
 use super::ae2_energy::{MAX_MAXIMUM, PowerEvent, StoredEnergy};
 use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::{Arc, Mutex};
 pub type NodeId = u64;
 pub type ServiceId = u64;
 const LOCAL: u64 = 0;
@@ -27,8 +28,76 @@ impl Flow {
 }
 
 #[derive(Clone, Debug)]
+struct SharedEnergy {
+    energy: StoredEnergy,
+    events: Vec<PowerEvent>,
+}
+/// One powered host's actual store, independent of its managed grid node.
+/// Joining/leaving a service clones this handle, never its energy amount.
+/// The level binding drains owner events outside energy-service locks.
+#[derive(Clone, Debug)]
+pub struct SharedPower(Arc<Mutex<SharedEnergy>>);
+impl SharedPower {
+    pub fn new(amount: f64, maximum: f64) -> Self {
+        Self(Arc::new(Mutex::new(SharedEnergy {
+            energy: StoredEnergy::new(amount, maximum),
+            events: Vec::new(),
+        })))
+    }
+    pub fn same_storage(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+    pub fn amount(&self) -> f64 {
+        self.0.lock().unwrap().energy.amount()
+    }
+    pub fn maximum(&self) -> f64 {
+        self.0.lock().unwrap().energy.maximum()
+    }
+    pub fn take_events(&self) -> Vec<PowerEvent> {
+        std::mem::take(&mut self.0.lock().unwrap().events)
+    }
+    pub fn insert(&self, amount: f64, commit: bool) -> f64 {
+        self.insert_with_events(amount, commit).0
+    }
+    fn insert_with_events(&self, amount: f64, commit: bool) -> (f64, Vec<PowerEvent>) {
+        let mut shared = self.0.lock().unwrap();
+        let result = shared.energy.insert(amount, commit);
+        shared.events.extend_from_slice(&result.1);
+        result
+    }
+    pub fn extract(&self, amount: f64, commit: bool) -> f64 {
+        self.extract_with_events(amount, commit).0
+    }
+    fn extract_with_events(&self, amount: f64, commit: bool) -> (f64, Vec<PowerEvent>) {
+        let mut shared = self.0.lock().unwrap();
+        let result = shared.energy.extract(amount, commit);
+        shared.events.extend_from_slice(&result.1);
+        result
+    }
+    pub fn set_stored(&self, amount: f64) {
+        self.set_with_events(amount);
+    }
+    fn set_with_events(&self, amount: f64) -> Vec<PowerEvent> {
+        let mut shared = self.0.lock().unwrap();
+        let events = shared.energy.set_stored(amount);
+        shared.events.extend_from_slice(&events);
+        events
+    }
+    pub fn set_maximum(&self, maximum: f64) {
+        self.resize_with_events(maximum);
+    }
+    fn resize_with_events(&self, maximum: f64) -> Vec<PowerEvent> {
+        let mut shared = self.0.lock().unwrap();
+        let events = shared.energy.set_maximum(maximum);
+        shared.events.extend_from_slice(&events);
+        events
+    }
+}
+
+#[derive(Clone, Debug)]
 enum StoreKind {
     Finite(StoredEnergy),
+    Shared(SharedPower),
     Creative,
 }
 #[derive(Clone, Debug)]
@@ -39,6 +108,14 @@ pub struct Store {
     pub public: bool,
 }
 impl Store {
+    pub fn shared(power: SharedPower, priority: i32, flow: Flow) -> Self {
+        Self {
+            kind: StoreKind::Shared(power),
+            priority,
+            flow,
+            public: true,
+        }
+    }
     pub fn finite(amount: f64, maximum: f64, priority: i32) -> Self {
         Self {
             kind: StoreKind::Finite(StoredEnergy::new(amount, maximum)),
@@ -58,12 +135,14 @@ impl Store {
     pub fn amount(&self) -> f64 {
         match &self.kind {
             StoreKind::Finite(s) => s.amount(),
+            StoreKind::Shared(s) => s.amount(),
             StoreKind::Creative => MAX_MAXIMUM,
         }
     }
     pub fn maximum(&self) -> f64 {
         match &self.kind {
             StoreKind::Finite(s) => s.maximum(),
+            StoreKind::Shared(s) => s.maximum(),
             StoreKind::Creative => MAX_MAXIMUM,
         }
     }
@@ -74,23 +153,30 @@ impl Store {
                 (amount - inserted, events)
             }
             StoreKind::Creative => (0.0, vec![]),
+            StoreKind::Shared(s) => {
+                let (inserted, events) = s.insert_with_events(amount, commit);
+                (amount - inserted, events)
+            }
         }
     }
     fn extract(&mut self, amount: f64, commit: bool) -> (f64, Vec<PowerEvent>) {
         match &mut self.kind {
             StoreKind::Finite(s) => s.extract(amount, commit),
+            StoreKind::Shared(s) => s.extract_with_events(amount, commit),
             StoreKind::Creative => (amount, vec![]),
         }
     }
     fn set(&mut self, amount: f64) -> Vec<PowerEvent> {
         match &mut self.kind {
             StoreKind::Finite(s) => s.set_stored(amount),
+            StoreKind::Shared(s) => s.set_with_events(amount),
             StoreKind::Creative => vec![],
         }
     }
     fn resize(&mut self, maximum: f64) -> Vec<PowerEvent> {
         match &mut self.kind {
             StoreKind::Finite(s) => s.set_maximum(maximum),
+            StoreKind::Shared(s) => s.resize_with_events(maximum),
             StoreKind::Creative => vec![],
         }
     }
@@ -291,6 +377,20 @@ impl EnergyService {
     }
     pub fn store(&self, id: NodeId) -> Option<&Store> {
         self.stores.get(&Self::store_id(id))
+    }
+    /// Source storagePowerChangeHandler path for an event the powered host
+    /// delivered. Local host work uses this after draining its owner queue.
+    pub fn owner_storage_event(
+        &mut self,
+        id: NodeId,
+        event: PowerEvent,
+    ) -> Result<(), &'static str> {
+        let sid = Self::store_id(id);
+        if !self.stores.contains_key(&sid) {
+            return Err("unknown power storage");
+        }
+        self.events(sid, vec![event]);
+        Ok(())
     }
     pub fn buffer_amount(&self) -> f64 {
         self.stores[&LOCAL].amount()
@@ -701,6 +801,49 @@ impl EnergySystem {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn shared_power_owner_queue_and_grid_write_flow_preserve_actual_store_identity() {
+        use super::*;
+        let power = SharedPower::new(0.0, 500.0);
+        // As in the owning block's initial load, initialize threshold state
+        // before charging; StoredEnergyAmount's constructor starts eligible.
+        power.set_stored(0.0);
+        let cloned = power.clone();
+        assert!(cloned.same_storage(&power));
+        let mut service = EnergyService::default();
+        service
+            .add_node(
+                1,
+                EnergyNode {
+                    idle: 0.0,
+                    store: Some(Store::shared(power.clone(), 19, Flow::Write)),
+                    passive_rate: None,
+                },
+                0.0,
+            )
+            .unwrap();
+        assert_eq!(service.inject_provider(1000.0, true), 475.0);
+        assert_eq!(power.amount(), 500.0);
+        assert_eq!(cloned.take_events(), [PowerEvent::Provide]);
+        assert!(power.take_events().is_empty());
+        // The service may use its private 25 AE buffer, but cannot drain the
+        // Chest's local 500 AE. The owner can, without copying an amount.
+        assert_eq!(service.extract_provider(1000.0, true), 25.0);
+        assert_eq!(power.extract(10.0, false), 10.0);
+        assert_eq!(power.amount(), 500.0);
+        assert!(power.take_events().is_empty());
+        assert_eq!(power.extract(10.0, true), 10.0);
+        assert_eq!(power.take_events(), [PowerEvent::Receive]);
+        service.owner_storage_event(1, PowerEvent::Receive).unwrap();
+        assert_eq!(service.inject_provider(40.0, true), 5.0);
+        assert_eq!(service.store(1).unwrap().amount(), 500.0);
+        let removed = service.remove_node(1).unwrap();
+        assert_eq!(power.extract(7.0, true), 7.0);
+        service
+            .add_node(1, removed.node, removed.saved_buffer)
+            .unwrap();
+        assert_eq!(service.store(1).unwrap().amount(), 493.0);
+    }
     use super::*;
     fn spec(idle: f64, store: Option<Store>) -> EnergyNode {
         EnergyNode {

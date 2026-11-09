@@ -19,6 +19,13 @@ The inventory update builder and serial-indexed client entry rules also match
 and partial-codec errors. Optional-key registry codecs and search/sort/pinned
 views remain binding work; native transport is not activated by these cores.
 
+The native-compiled network core now supports a retained powered-host store,
+with aliasing handles across node detachment/reattachment and grid transfer.
+A WRITE-only Chest store remains usable locally without becoming grid supply.
+256 original energy scenarios / 29,907 operations match, and graph tests cover
+replacement, split/merge and all six Chest faces. Initial node idle is 1 AE/tick;
+local idle starts at zero. Native Chest admission/host/menu binding remains open.
+
 ME Chest's standalone host program now matches 4,005 original-method scenarios:
 own-cell cache, grid/local power, input and fluid insertion, display/link,
 priority/node/mount callbacks and the two separate menu choices. Its two-slot
